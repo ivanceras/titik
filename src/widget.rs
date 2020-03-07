@@ -1,3 +1,4 @@
+use crate::buffer::Buffer;
 use stretch::{
     geometry::Size,
     node::{
@@ -33,6 +34,8 @@ impl Button {
             style: Style::default(),
         }
     }
+
+    fn draw(&self, buf: &mut Buffer) {}
 }
 
 impl Control {
@@ -82,38 +85,45 @@ pub fn compute_layout(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use stretch::style::*;
+    use stretch::{
+        geometry::*,
+        result::*,
+        style::*,
+    };
 
     #[test]
     fn layout() {
         let bx = Box {
-            children: vec![
-                Control::Button(Button::new("Hello")),
-                Control::Button(Button {
-                    label: "world".to_string(),
-                    style: Style {
-                        size: Size {
-                            width: Dimension::Points(160.0),
-                            height: Dimension::Points(140.0),
-                        },
-                        max_size: Size {
-                            width: Dimension::Points(150.0),
-                            height: Dimension::Points(140.0),
-                        },
-                        ..Default::default()
-                    },
-                }),
-            ],
             style: Style {
                 max_size: Size {
                     width: Dimension::Points(100.0),
                     height: Dimension::Points(100.0),
                 },
-                overflow: Overflow::Hidden,
-                flex_direction: FlexDirection::Column,
-                flex_grow: 1.0,
+                flex_direction: FlexDirection::Row,
                 ..Default::default()
             },
+            children: vec![
+                Control::Button(Button {
+                    style: Style {
+                        size: Size {
+                            width: Dimension::Points(30.0),
+                            height: Dimension::Points(34.0),
+                        },
+                        ..Default::default()
+                    },
+                    label: "Hello".to_string(),
+                }),
+                Control::Button(Button {
+                    style: Style {
+                        size: Size {
+                            width: Dimension::Points(20.0),
+                            height: Dimension::Points(10.0),
+                        },
+                        ..Default::default()
+                    },
+                    label: "world".to_string(),
+                }),
+            ],
         };
         let control = Control::Box(bx);
         let (parent, stretch) = compute_layout(
@@ -130,12 +140,21 @@ mod tests {
             stretch.layout(parent).expect("must have a layout")
         );
         let children = stretch.children(parent).expect("must have children");
-        for child in children {
+        for child in children.iter() {
             println!(
                 "child layout: {:?}",
-                stretch.layout(child).expect("must have a layout")
+                stretch.layout(*child).expect("must have a layout")
             );
         }
-        panic!();
+        let layout1 = stretch.layout(children[1]).expect("must have layout");
+        assert_eq!(
+            layout1.size,
+            Size {
+                width: 20.0,
+                height: 10.0
+            }
+        );
+
+        assert_eq!(layout1.location, Point { x: 30.0, y: 0.0 });
     }
 }
