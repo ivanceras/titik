@@ -1,0 +1,11 @@
+[package]
+name = "tuix"
+version = "0.1.0"
+authors = ["lee"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossterm = "0.16.0"
+stretch = "0.3.2"
