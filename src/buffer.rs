@@ -21,9 +21,19 @@ pub struct Buffer {
 }
 
 impl Cell {
-    pub fn new(symbol: String) -> Self {
+    pub fn new<S>(symbol: S) -> Self
+    where
+        S: ToString,
+    {
         Cell {
-            symbol,
+            symbol: symbol.to_string(),
+            style: ContentStyle::default(),
+        }
+    }
+
+    pub fn empty() -> Self {
+        Cell {
+            symbol: " ".to_string(),
             style: ContentStyle::default(),
         }
     }
@@ -43,6 +53,25 @@ impl Cell {
     }
 }
 
+impl Buffer {
+    /// create a buffer with size
+    pub fn new(width: usize, height: usize) -> Self {
+        let cells = (0..height)
+            .into_iter()
+            .map(|_| (0..width).into_iter().map(|_| Cell::empty()).collect())
+            .collect();
+        Buffer { cells }
+    }
+
+    pub fn set_symbol<S: ToString>(&mut self, x: usize, y: usize, symbol: S) {
+        if let Some(mut line) = self.cells.get_mut(y) {
+            if let Some(mut cell) = line.get_mut(x) {
+                *cell = Cell::new(symbol);
+            }
+        }
+    }
+}
+
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(bg) = self.style.background_color {
@@ -57,6 +86,17 @@ impl fmt::Display for Cell {
         }
 
         write!(f, "{}", self.symbol)
+    }
+}
+
+impl fmt::Display for Buffer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for line in self.cells.iter() {
+            for cell in line.iter() {
+                cell.fmt(f)?;
+            }
+        }
+        Ok(())
     }
 }
 
