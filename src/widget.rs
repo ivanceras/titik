@@ -75,6 +75,10 @@ impl Button {
         self.style = style;
     }
 
+    pub fn set_rounded(&mut self, rounded: bool) {
+        self.is_rounded = rounded;
+    }
+
     /// draw this button to the buffer, with the given computed layout
     pub fn draw(&self, buf: &mut Buffer, layout_tree: LayoutTree) {
         let layout = layout_tree.layout;
@@ -97,21 +101,31 @@ impl Button {
         for (t, ch) in self.label.chars().enumerate() {
             buf.set_symbol(loc_x + 1 + padding_start + t, loc_y + 2, ch);
         }
-        if self.is_rounded {
-            buf.set_symbol(loc_x, loc_y + 1, rounded::TOP_LEFT);
-            buf.set_symbol(loc_x, loc_y + height, rounded::BOTTOM_LEFT);
-            buf.set_symbol(loc_x + width, loc_y + 1, rounded::TOP_RIGHT);
-            buf.set_symbol(
-                loc_x + width,
-                loc_y + height,
-                rounded::BOTTOM_RIGHT,
-            );
+
+        let top_left = if self.is_rounded {
+            rounded::TOP_LEFT
         } else {
-            buf.set_symbol(loc_x, loc_y + 1, line::TOP_LEFT);
-            buf.set_symbol(loc_x, loc_y + height, line::BOTTOM_LEFT);
-            buf.set_symbol(loc_x + width, loc_y + 1, line::TOP_RIGHT);
-            buf.set_symbol(loc_x + width, loc_y + height, line::BOTTOM_RIGHT);
-        }
+            line::TOP_LEFT
+        };
+        let top_right = if self.is_rounded {
+            rounded::TOP_RIGHT
+        } else {
+            line::TOP_RIGHT
+        };
+        let bottom_left = if self.is_rounded {
+            rounded::BOTTOM_LEFT
+        } else {
+            line::BOTTOM_LEFT
+        };
+        let bottom_right = if self.is_rounded {
+            rounded::BOTTOM_RIGHT
+        } else {
+            line::BOTTOM_RIGHT
+        };
+        buf.set_symbol(loc_x, loc_y + 1, top_left);
+        buf.set_symbol(loc_x, loc_y + height, bottom_left);
+        buf.set_symbol(loc_x + width, loc_y + 1, top_right);
+        buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
     }
 }
 

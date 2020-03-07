@@ -102,6 +102,7 @@ where
             },
             ..Default::default()
         });
+        btn2.set_rounded(true);
 
         let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
         img.set_style(Style {
