@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 crossterm = "0.16.0"
 stretch = "0.3.2"
+image = "0.23.0"

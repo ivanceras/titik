@@ -7,6 +7,7 @@ pub use widget::{
     Box,
     Button,
     Control,
+    Image,
 };
 
 mod buffer;

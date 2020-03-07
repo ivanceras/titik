@@ -4,6 +4,7 @@ use crossterm::{
         Attribute,
         Color,
         ContentStyle,
+        ResetColor,
         SetAttributes,
         SetBackgroundColor,
         SetForegroundColor,
@@ -64,9 +65,13 @@ impl Buffer {
     }
 
     pub fn set_symbol<S: ToString>(&mut self, x: usize, y: usize, symbol: S) {
+        self.set_cell(x, y, Cell::new(symbol));
+    }
+
+    pub fn set_cell(&mut self, x: usize, y: usize, new_cell: Cell) {
         if let Some(mut line) = self.cells.get_mut(y) {
             if let Some(mut cell) = line.get_mut(x) {
-                *cell = Cell::new(symbol);
+                *cell = new_cell
             }
         }
     }
@@ -84,8 +89,9 @@ impl fmt::Display for Cell {
             queue!(f, SetAttributes(self.style.attributes))
                 .map_err(|_| fmt::Error)?;
         }
-
-        write!(f, "{}", self.symbol)
+        self.symbol.fmt(f)?;
+        queue!(f, ResetColor).map_err(|_| fmt::Error)?;
+        Ok(())
     }
 }
 

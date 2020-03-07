@@ -30,7 +30,10 @@ use std::{
     },
 };
 use stretch::{
-    geometry::Size,
+    geometry::{
+        Rect,
+        Size,
+    },
     number::Number,
     style::{
         Dimension,
@@ -46,6 +49,7 @@ use tuix::{
     Button,
     Cell,
     Control,
+    Image,
 };
 
 fn run<W>(w: &mut W) -> Result<()>
@@ -72,6 +76,11 @@ where
                 width: Dimension::Points(40.0),
                 height: Dimension::Points(3.0),
             },
+            margin: Rect {
+                start: Dimension::Points(1.0),
+                end: Dimension::Points(1.0),
+                ..Default::default()
+            },
             ..Default::default()
         });
 
@@ -80,6 +89,25 @@ where
             size: Size {
                 width: Dimension::Points(20.0),
                 height: Dimension::Points(3.0),
+            },
+            margin: Rect {
+                start: Dimension::Points(1.0),
+                end: Dimension::Points(1.0),
+                ..Default::default()
+            },
+            padding: Rect {
+                start: Dimension::Points(1.0),
+                end: Dimension::Points(1.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        });
+
+        let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
+        img.set_style(Style {
+            size: Size {
+                width: Dimension::Points(100.0),
+                height: Dimension::Points(40.0),
             },
             ..Default::default()
         });
@@ -91,12 +119,12 @@ where
                 height: Dimension::Points(height as f32),
             },
             flex_direction: FlexDirection::Column,
-            align_items: AlignItems::FlexStart,
             ..Default::default()
         });
         let mut ctrl = Control::Box(root_node);
         ctrl.add_child(btn);
         ctrl.add_child(btn2);
+        ctrl.add_child(img);
         let layout_tree = compute_layout(
             &mut ctrl,
             Size {

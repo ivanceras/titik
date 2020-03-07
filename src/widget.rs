@@ -1,9 +1,19 @@
 use crate::{
-    buffer::Buffer,
+    buffer::{
+        Buffer,
+        Cell,
+    },
     symbol::{
+        bar,
         line,
         rounded,
     },
+};
+use crossterm::style::Color;
+use image::{
+    self,
+    DynamicImage,
+    GenericImageView,
 };
 pub use layout::LayoutTree;
 use stretch::{
@@ -14,19 +24,29 @@ use stretch::{
     },
     number::Number,
     result::Layout,
-    style::Style,
+    style::{
+        Dimension,
+        Style,
+    },
 };
 
 mod layout;
 
 pub enum Control {
     Button(Button),
+    Image(Image),
     Box(Box),
 }
 
 #[derive(Default)]
 pub struct Button {
     pub label: String,
+    style: Style,
+    pub is_rounded: bool,
+}
+
+pub struct Image {
+    pub image: DynamicImage,
     style: Style,
 }
 
@@ -62,6 +82,10 @@ impl Button {
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
+        let padding_start = match self.style.padding.start {
+            Dimension::Points(p) => p.round() as usize,
+            _ => 0,
+        };
         for i in 0..width {
             buf.set_symbol(loc_x + i, loc_y + 1, line::HORIZONTAL);
             buf.set_symbol(loc_x + i, loc_y + height, line::HORIZONTAL);
@@ -71,18 +95,81 @@ impl Button {
             buf.set_symbol(loc_x + width, loc_y + 1 + j, line::VERTICAL);
         }
         for (t, ch) in self.label.chars().enumerate() {
-            buf.set_symbol(loc_x + 1 + t, loc_y + 2, ch);
+            buf.set_symbol(loc_x + 1 + padding_start + t, loc_y + 2, ch);
         }
-        buf.set_symbol(loc_x, loc_y + 1, rounded::TOP_LEFT);
-        buf.set_symbol(loc_x, loc_y + height, rounded::BOTTOM_LEFT);
-        buf.set_symbol(loc_x + width, loc_y + 1, rounded::TOP_RIGHT);
-        buf.set_symbol(loc_x + width, loc_y + height, rounded::BOTTOM_RIGHT);
+        if self.is_rounded {
+            buf.set_symbol(loc_x, loc_y + 1, rounded::TOP_LEFT);
+            buf.set_symbol(loc_x, loc_y + height, rounded::BOTTOM_LEFT);
+            buf.set_symbol(loc_x + width, loc_y + 1, rounded::TOP_RIGHT);
+            buf.set_symbol(
+                loc_x + width,
+                loc_y + height,
+                rounded::BOTTOM_RIGHT,
+            );
+        } else {
+            buf.set_symbol(loc_x, loc_y + 1, line::TOP_LEFT);
+            buf.set_symbol(loc_x, loc_y + height, line::BOTTOM_LEFT);
+            buf.set_symbol(loc_x + width, loc_y + 1, line::TOP_RIGHT);
+            buf.set_symbol(loc_x + width, loc_y + height, line::BOTTOM_RIGHT);
+        }
     }
 }
 
 impl From<Button> for Control {
     fn from(btn: Button) -> Self {
         Control::Button(btn)
+    }
+}
+
+impl Image {
+    pub fn new(bytes: Vec<u8>) -> Self {
+        Image {
+            image: image::load_from_memory(&bytes)
+                .expect("unable to load from memory"),
+            style: Style::default(),
+        }
+    }
+
+    pub fn set_style(&mut self, style: Style) {
+        self.style = style;
+    }
+
+    /// draw this button to the buffer, with the given computed layout
+    pub fn draw(&self, buf: &mut Buffer, layout_tree: LayoutTree) {
+        let layout = layout_tree.layout;
+        let loc_x = layout.location.x.round() as usize;
+        let loc_y = layout.location.y.round() as usize;
+        let width = layout.size.width.round() as usize;
+        let height = layout.size.height.round() as usize;
+        let img = self.image.thumbnail(width as u32, height as u32);
+        let (img_width, img_height) = img.dimensions();
+        let rgb = img.to_rgb();
+        for (y, j) in (0..img_height as usize).step_by(2).enumerate() {
+            for i in 0..img_width as usize {
+                let mut cell = Cell::new(bar::HALF);
+                let top_pixel = rgb.get_pixel(i as u32, j as u32);
+                let bottom_pixel = rgb.get_pixel(i as u32, (j + 1) as u32);
+                let top_color = Color::Rgb {
+                    r: top_pixel[0],
+                    g: top_pixel[1],
+                    b: top_pixel[2],
+                };
+                let bottom_color = Color::Rgb {
+                    r: bottom_pixel[0],
+                    g: bottom_pixel[1],
+                    b: bottom_pixel[2],
+                };
+                cell.background(top_color);
+                cell.color(bottom_color);
+                buf.set_cell(loc_x + 1 + i, loc_y + 1 + y, cell);
+            }
+        }
+    }
+}
+
+impl From<Image> for Control {
+    fn from(img: Image) -> Self {
+        Control::Image(img)
     }
 }
 
@@ -107,7 +194,8 @@ impl Control {
     fn get_style(&self) -> Style {
         match self {
             Control::Button(btn) => btn.style,
-            Control::Box(box_) => box_.style,
+            Control::Box(bax) => bax.style,
+            Control::Image(image) => image.style,
         }
     }
 
@@ -120,15 +208,15 @@ impl Control {
 
     fn children(&self) -> Option<&Vec<Control>> {
         match self {
-            Control::Box(box_) => Some(&box_.children),
-            Control::Button(_btn) => None,
+            Control::Box(bax) => Some(&bax.children),
+            _ => None,
         }
     }
 
     fn children_mut(&mut self) -> Option<&mut Vec<Control>> {
         match *self {
-            Control::Box(ref mut box_) => Some(&mut box_.children),
-            Control::Button(ref _btn) => None,
+            Control::Box(ref mut bax) => Some(&mut bax.children),
+            _ => None,
         }
     }
 
@@ -137,7 +225,6 @@ impl Control {
             children
                 .iter_mut()
                 .filter_map(|c| c.style_node(stretch))
-                .inspect(|n| println!("node: {:?}", n))
                 .collect()
         } else {
             vec![]
@@ -148,6 +235,7 @@ impl Control {
     pub fn draw(&self, buffer: &mut Buffer, layout_tree: LayoutTree) {
         match self {
             Control::Button(btn) => btn.draw(buffer, layout_tree),
+            Control::Image(img) => img.draw(buffer, layout_tree),
             Control::Box(bx) => bx.draw(buffer, layout_tree),
         }
     }
