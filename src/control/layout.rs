@@ -1,6 +1,9 @@
 use super::Control;
 use stretch::{
-    geometry::Size,
+    geometry::{
+        Point,
+        Size,
+    },
     node::{
         Node,
         Stretch,
@@ -9,6 +12,7 @@ use stretch::{
     result::Layout,
 };
 
+#[derive(Debug)]
 pub struct LayoutTree {
     pub layout: Layout,
     pub children_layout: Vec<LayoutTree>,
@@ -36,7 +40,15 @@ fn derive_layout_tree(node: Node, stretch: &Stretch) -> LayoutTree {
         stretch.children(node).expect("must get children");
     let children_layout: Vec<LayoutTree> = children
         .into_iter()
-        .map(|child| derive_layout_tree(child, stretch))
+        .map(|child| {
+            let mut child_tree = derive_layout_tree(child, stretch);
+            let orig_pos = child_tree.layout.location;
+            child_tree.layout.location = Point {
+                x: orig_pos.x + layout.location.x,
+                y: orig_pos.y + layout.location.y,
+            };
+            child_tree
+        })
         .collect();
     LayoutTree {
         layout,

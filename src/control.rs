@@ -157,4 +157,45 @@ mod tests {
 
         assert_eq!(layout1.location, Point { x: 30.0, y: 0.0 });
     }
+
+    #[test]
+    fn layout2() {
+        let mut bx = Box::new();
+        bx.vertical();
+        let mut control = Control::Box(bx);
+
+        let mut btn1 = Button::new("Hello");
+        btn1.set_size(Some(100.0), Some(20.0));
+
+        control.add_child(Into::<Control>::into(btn1));
+
+        let mut btn2 = Button::new("world");
+        btn2.set_size(Some(20.0), Some(10.0));
+
+        let mut btn3 = Button::new("world");
+        btn3.set_size(Some(20.0), Some(10.0));
+
+        let mut row = Box::new();
+        row.horizontal();
+
+        let mut hrow: Control = row.into();
+        hrow.add_child(Into::<Control>::into(btn2));
+        hrow.add_child(Into::<Control>::into(btn3));
+
+        control.add_child(hrow);
+
+        let layout_tree = compute_layout(
+            &mut control,
+            Size {
+                width: Number::Defined(100.0),
+                height: Number::Defined(100.0),
+            },
+        );
+
+        println!("{:#?}", layout_tree);
+
+        let layout_btn2 =
+            layout_tree.children_layout[1].children_layout[1].layout;
+        assert_eq!(layout_btn2.location, Point { x: 20.0, y: 20.0 });
+    }
 }
