@@ -31,6 +31,8 @@ use stretch::{
 pub struct Button {
     pub label: String,
     pub is_rounded: bool,
+    pub width: Option<f32>,
+    pub height: Option<f32>,
 }
 
 impl Button {
@@ -49,12 +51,24 @@ impl Button {
         self.label = label.to_string();
     }
 
+    pub fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
+        self.width = width;
+        self.height = height;
+    }
+
     pub fn style(&self) -> Style {
         Style {
             size: Size {
-                //width: Dimension::Points((self.label.len() + 1) as f32),
-                width: Dimension::Percent(1.0),
-                height: Dimension::Points(3.0),
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Points((self.label.len() + 1) as f32)
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Points(3.0)
+                },
             },
             ..Default::default()
         }
@@ -65,7 +79,7 @@ impl Button {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    pub fn draw(&self, buf: &mut Buffer, layout_tree: LayoutTree) {
+    pub fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;

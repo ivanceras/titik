@@ -118,7 +118,7 @@ mod test {
         let mut cell = Cell::new("H".to_string());
         write!(w, "{}", cell);
         println!("{}", w);
-        assert_eq!(w, "H");
+        assert_eq!(w, "H\u{1b}[0m");
     }
 
     #[test]
@@ -136,7 +136,7 @@ mod test {
         println!("{}", w);
         assert_eq!(
             w,
-            "\u{1b}[48;5;11m\u{1b}[38;5;9m\u{1b}[1m\u{1b}[3m\u{1b}[9mH"
+            "\u{1b}[48;5;11m\u{1b}[38;5;9m\u{1b}[1m\u{1b}[3m\u{1b}[9mH\u{1b}[0m"
         );
     }
 }

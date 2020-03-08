@@ -58,8 +58,15 @@ impl Control {
             Control::Checkbox(widget) => widget.style(),
             Control::TextInput(widget) => widget.style(),
             Control::Radio(widget) => widget.style(),
-            Control::Box(widget) => widget.style,
+            Control::Box(widget) => widget.style(),
             Control::Image(widget) => widget.style(),
+        }
+    }
+
+    pub fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
+        match self {
+            Control::Box(bax) => bax.set_size(width, height),
+            _ => (), //TODO: every control will have a style and can be merged/overriden
         }
     }
 
@@ -96,7 +103,7 @@ impl Control {
         stretch.new_node(self.get_style(), children_styles).ok()
     }
 
-    pub fn draw(&self, buffer: &mut Buffer, layout_tree: LayoutTree) {
+    pub fn draw(&self, buffer: &mut Buffer, layout_tree: &LayoutTree) {
         match self {
             Control::Button(widget) => widget.draw(buffer, layout_tree),
             Control::Checkbox(widget) => widget.draw(buffer, layout_tree),
@@ -119,60 +126,27 @@ mod tests {
 
     #[test]
     fn layout() {
-        let bx = Box {
-            style: Style {
-                max_size: Size {
-                    width: Dimension::Points(100.0),
-                    height: Dimension::Points(100.0),
-                },
-                flex_direction: FlexDirection::Row,
-                ..Default::default()
-            },
-            children: vec![
-                Control::Button(Button {
-                    style: Style {
-                        size: Size {
-                            width: Dimension::Points(30.0),
-                            height: Dimension::Points(34.0),
-                        },
-                        ..Default::default()
-                    },
-                    label: "Hello".to_string(),
-                }),
-                Control::Button(Button {
-                    style: Style {
-                        size: Size {
-                            width: Dimension::Points(20.0),
-                            height: Dimension::Points(10.0),
-                        },
-                        ..Default::default()
-                    },
-                    label: "world".to_string(),
-                }),
-            ],
-        };
-        let control = Control::Box(bx);
-        let (parent, stretch) = compute_layout(
-            &control,
+        let mut bx = Box::new();
+        bx.horizontal();
+        let mut btn = Button::new("Hello");
+        btn.set_size(Some(30.0), Some(34.0));
+
+        bx.add_child(Into::<Control>::into(btn));
+
+        let mut btn = Button::new("world");
+        btn.set_size(Some(20.0), Some(10.0));
+        bx.add_child(Into::<Control>::into(btn));
+
+        let mut control = Control::Box(bx);
+        let layout_tree = compute_layout(
+            &mut control,
             Size {
                 width: Number::Defined(100.0),
                 height: Number::Defined(100.0),
             },
         );
 
-        let parent = parent.expect("must have a node");
-        println!(
-            "parent layout: {:?}",
-            stretch.layout(parent).expect("must have a layout")
-        );
-        let children = stretch.children(parent).expect("must have children");
-        for child in children.iter() {
-            println!(
-                "child layout: {:?}",
-                stretch.layout(*child).expect("must have a layout")
-            );
-        }
-        let layout1 = stretch.layout(children[1]).expect("must have layout");
+        let layout1 = layout_tree.children_layout[1].layout;
         assert_eq!(
             layout1.size,
             Size {

@@ -78,7 +78,44 @@ where
 {
     init(w)?;
 
-    let mut events = vec![];
+    let (width, height) = buffer_size().unwrap();
+
+    let mut cb1 = Checkbox::new("Checkbox1");
+    cb1.set_checked(true);
+
+    let mut cb2 = Checkbox::new("Checkbox2");
+    cb2.set_checked(false);
+
+    let mut rb1 = Radio::new("Radio1");
+    rb1.set_checked(true);
+
+    let input1 = TextInput::new("Hello world!");
+
+    let mut rb2 = Radio::new("Radio2");
+
+    let mut btn2 = Button::new("Events");
+    btn2.set_rounded(true);
+
+    let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
+    img.set_size(Some(80.0), Some(40.0));
+
+    let mut root_node = Box::new();
+    root_node.set_size(Some((width - 2) as f32), Some(height as f32));
+    root_node.vertical();
+    let mut ctrl = Control::Box(root_node);
+    for i in 0..2 {
+        let btn = Button::new(format!("{}x{}", width, height));
+        ctrl.add_child(btn);
+    }
+    ctrl.add_child(btn2);
+    ctrl.add_child(img);
+    ctrl.add_child(cb2);
+    ctrl.add_child(cb1);
+
+    ctrl.add_child(rb1);
+    ctrl.add_child(rb2);
+    ctrl.add_child(input1);
+
     loop {
         queue!(
             w,
@@ -88,50 +125,6 @@ where
             cursor::MoveTo(1, 1)
         )?;
 
-        let (width, height) = buffer_size().unwrap();
-
-        let mut cb1 = Checkbox::new("Checkbox1");
-        cb1.set_checked(true);
-
-        let mut cb2 = Checkbox::new("Checkbox2");
-        cb2.set_checked(false);
-
-        let mut rb1 = Radio::new("Radio1");
-        rb1.set_checked(true);
-
-        let input1 = TextInput::new("Hello world!");
-
-        let mut rb2 = Radio::new("Radio2");
-
-        let mut btn2 = Button::new(format!("{:?}", events.pop()));
-        btn2.set_rounded(true);
-
-        let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
-        img.set_size(Some(80.0), Some(40.0));
-
-        let mut root_node = Box::default();
-        root_node.set_style(Style {
-            size: Size {
-                width: Dimension::Points((width - 2) as f32),
-                height: Dimension::Points(height as f32),
-            },
-            flex_direction: FlexDirection::Column,
-            ..Default::default()
-        });
-        let mut ctrl = Control::Box(root_node);
-        for i in 0..2 {
-            let btn = Button::new(format!("{}x{}", width, height));
-            ctrl.add_child(btn);
-        }
-        ctrl.add_child(btn2);
-        ctrl.add_child(img);
-        ctrl.add_child(cb2);
-        ctrl.add_child(cb1);
-
-        ctrl.add_child(rb1);
-        ctrl.add_child(rb2);
-        ctrl.add_child(input1);
-
         let layout_tree = compute_layout(
             &mut ctrl,
             Size {
@@ -140,12 +133,12 @@ where
             },
         );
         let mut buf = Buffer::new(width as usize, height as usize);
-        ctrl.draw(&mut buf, layout_tree);
+        ctrl.draw(&mut buf, &layout_tree);
         write!(w, "{}", buf);
         w.flush()?;
 
         if let Ok(ev) = event::read() {
-            events.push(format!("{:?}", ev));
+            //events.push(format!("{:?}", ev));
             match ev {
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
