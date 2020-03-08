@@ -7,7 +7,7 @@ description = "A cross platform text ui widget"
 repository = "https://github.com/ivanceras/titik"
 documentation = "https://docs.rs/titik"
 readme = "README.md"
-keywords = ["text", "tui", "widget"]
+keywords = ["text", "tui", "terminal", "widget"]
 edition = "2018"
 
 [dependencies]
