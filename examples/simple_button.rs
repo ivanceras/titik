@@ -42,7 +42,7 @@ use stretch::{
         *,
     },
 };
-use tuix::{
+use titik::{
     compute_layout,
     Box,
     Buffer,
@@ -52,14 +52,26 @@ use tuix::{
     Image,
 };
 
+fn init<W: Write>(w: &mut W) -> Result<()> {
+    execute!(w, terminal::EnterAlternateScreen)?;
+    terminal::enable_raw_mode()
+}
+
+fn finalize<W: Write>(w: &mut W) -> Result<()> {
+    execute!(
+        w,
+        style::ResetColor,
+        cursor::Show,
+        terminal::LeaveAlternateScreen
+    )?;
+    terminal::disable_raw_mode()
+}
+
 fn run<W>(w: &mut W) -> Result<()>
 where
     W: Write,
 {
-    execute!(w, terminal::EnterAlternateScreen)?;
-
-    terminal::enable_raw_mode()?;
-
+    //init(w)?;
     loop {
         queue!(
             w,
@@ -69,20 +81,6 @@ where
             cursor::MoveTo(1, 1)
         )?;
         let (width, height) = buffer_size().unwrap();
-
-        let mut btn = Button::new(format!("{}x{}", width, height));
-        btn.set_style(Style {
-            size: Size {
-                width: Dimension::Points(40.0),
-                height: Dimension::Points(3.0),
-            },
-            margin: Rect {
-                start: Dimension::Points(1.0),
-                end: Dimension::Points(1.0),
-                ..Default::default()
-            },
-            ..Default::default()
-        });
 
         let mut btn2 = Button::new("btn2");
         btn2.set_style(Style {
@@ -105,13 +103,8 @@ where
         btn2.set_rounded(true);
 
         let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
-        img.set_style(Style {
-            size: Size {
-                width: Dimension::Points(100.0),
-                height: Dimension::Points(40.0),
-            },
-            ..Default::default()
-        });
+        img.set_width(200.0);
+        img.set_height(80.0);
 
         let mut root_node = Box::default();
         root_node.set_style(Style {
@@ -123,7 +116,23 @@ where
             ..Default::default()
         });
         let mut ctrl = Control::Box(root_node);
-        ctrl.add_child(btn);
+        for i in 0..2 {
+            let mut btn = Button::new(format!("{}x{}", width, height));
+            btn.set_style(Style {
+                size: Size {
+                    width: Dimension::Points(40.0),
+                    height: Dimension::Points(3.0),
+                },
+                margin: Rect {
+                    start: Dimension::Points(1.0),
+                    end: Dimension::Points(1.0),
+                    ..Default::default()
+                },
+                ..Default::default()
+            });
+
+            ctrl.add_child(btn);
+        }
         ctrl.add_child(btn2);
         ctrl.add_child(img);
         let layout_tree = compute_layout(
@@ -144,15 +153,8 @@ where
             _ => {}
         };
     }
-
-    execute!(
-        w,
-        style::ResetColor,
-        cursor::Show,
-        terminal::LeaveAlternateScreen
-    )?;
-
-    terminal::disable_raw_mode()
+    //finalize(w)?;
+    Ok(())
 }
 
 pub fn read_char() -> Result<char> {
