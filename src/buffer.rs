@@ -12,6 +12,8 @@ use crossterm::{
 };
 use std::fmt;
 
+///TODO: Take into account double width symbole, otherwise the terminal will
+///casue overflow artifact
 #[derive(Clone)]
 pub struct Cell {
     pub symbol: String,

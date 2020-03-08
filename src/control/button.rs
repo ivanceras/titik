@@ -62,7 +62,8 @@ impl Button {
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    Dimension::Points((self.label.len() + 1) as f32)
+                    //Dimension::Points((self.label.len() + 1) as f32)
+                    Dimension::Percent(0.95)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)

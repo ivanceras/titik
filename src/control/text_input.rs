@@ -32,6 +32,8 @@ pub struct TextInput {
     pub value: String,
     pub is_rounded: bool,
     pub is_focused: bool,
+    pub width: Option<f32>,
+    pub height: Option<f32>,
 }
 
 impl TextInput {
@@ -53,8 +55,17 @@ impl TextInput {
     pub fn style(&self) -> Style {
         Style {
             size: Size {
-                width: Dimension::Points(20.0),
-                height: Dimension::Points(3.0),
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    //Dimension::Points((self.label.len() + 1) as f32)
+                    Dimension::Percent(0.95)
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Points(3.0)
+                },
             },
             ..Default::default()
         }
