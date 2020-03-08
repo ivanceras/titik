@@ -12,6 +12,7 @@ use crossterm::{
 };
 use std::fmt;
 
+#[derive(Clone)]
 pub struct Cell {
     pub symbol: String,
     pub style: ContentStyle,

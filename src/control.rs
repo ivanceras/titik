@@ -32,6 +32,7 @@ use stretch::{
         Style,
     },
 };
+pub use text_input::TextInput;
 
 mod box_control;
 mod button;
@@ -39,10 +40,12 @@ mod checkbox;
 mod image_control;
 mod layout;
 mod radio;
+mod text_input;
 
 pub enum Control {
     Button(Button),
     Checkbox(Checkbox),
+    TextInput(TextInput),
     Radio(Radio),
     Image(Image),
     Box(Box),
@@ -51,8 +54,9 @@ pub enum Control {
 impl Control {
     fn get_style(&self) -> Style {
         match self {
-            Control::Button(widget) => widget.style,
+            Control::Button(widget) => widget.style(),
             Control::Checkbox(widget) => widget.style(),
+            Control::TextInput(widget) => widget.style(),
             Control::Radio(widget) => widget.style(),
             Control::Box(widget) => widget.style,
             Control::Image(widget) => widget.style(),
@@ -96,6 +100,7 @@ impl Control {
         match self {
             Control::Button(widget) => widget.draw(buffer, layout_tree),
             Control::Checkbox(widget) => widget.draw(buffer, layout_tree),
+            Control::TextInput(widget) => widget.draw(buffer, layout_tree),
             Control::Radio(widget) => widget.draw(buffer, layout_tree),
             Control::Image(widget) => widget.draw(buffer, layout_tree),
             Control::Box(widget) => widget.draw(buffer, layout_tree),

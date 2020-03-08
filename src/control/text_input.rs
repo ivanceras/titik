@@ -28,32 +28,32 @@ use stretch::{
 };
 
 #[derive(Default)]
-pub struct Button {
-    pub label: String,
+pub struct TextInput {
+    pub value: String,
     pub is_rounded: bool,
+    pub is_focused: bool,
 }
 
-impl Button {
-    pub fn new<S>(label: S) -> Self
+impl TextInput {
+    pub fn new<S>(value: S) -> Self
     where
         S: ToString,
     {
-        Button {
-            label: label.to_string(),
-            is_rounded: true,
+        TextInput {
+            value: value.to_string(),
+            is_rounded: false,
             ..Default::default()
         }
     }
 
-    pub fn set_label<S: ToString>(&mut self, label: S) {
-        self.label = label.to_string();
+    pub fn set_label<S: ToString>(&mut self, value: S) {
+        self.value = value.to_string();
     }
 
     pub fn style(&self) -> Style {
         Style {
             size: Size {
-                //width: Dimension::Points((self.label.len() + 1) as f32),
-                width: Dimension::Percent(1.0),
+                width: Dimension::Points(20.0),
                 height: Dimension::Points(3.0),
             },
             ..Default::default()
@@ -62,6 +62,10 @@ impl Button {
 
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
+    }
+
+    pub fn set_focus(&mut self, focused: bool) {
+        self.is_focused = focused;
     }
 
     /// draw this button to the buffer, with the given computed layout
@@ -79,7 +83,7 @@ impl Button {
             buf.set_symbol(loc_x, loc_y + 1 + j, line::VERTICAL);
             buf.set_symbol(loc_x + width, loc_y + 1 + j, line::VERTICAL);
         }
-        for (t, ch) in self.label.chars().enumerate() {
+        for (t, ch) in self.value.chars().enumerate() {
             buf.set_symbol(loc_x + 1 + t, loc_y + 2, ch);
         }
 
@@ -110,8 +114,8 @@ impl Button {
     }
 }
 
-impl From<Button> for Control {
-    fn from(btn: Button) -> Self {
-        Control::Button(btn)
+impl From<TextInput> for Control {
+    fn from(btn: TextInput) -> Self {
+        Control::TextInput(btn)
     }
 }

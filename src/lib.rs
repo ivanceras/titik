@@ -13,6 +13,7 @@ pub use control::{
     Control,
     Image,
     Radio,
+    TextInput,
 };
 
 mod buffer;

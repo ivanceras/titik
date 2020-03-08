@@ -1,3 +1,4 @@
+use crossterm::event::EnableMouseCapture;
 pub use crossterm::{
     cursor,
     event::{
@@ -52,10 +53,12 @@ use titik::{
     Control,
     Image,
     Radio,
+    TextInput,
 };
 
 fn init<W: Write>(w: &mut W) -> Result<()> {
     execute!(w, terminal::EnterAlternateScreen)?;
+    execute!(w, EnableMouseCapture)?;
     terminal::enable_raw_mode()
 }
 
@@ -73,7 +76,9 @@ fn run<W>(w: &mut W) -> Result<()>
 where
     W: Write,
 {
-    //init(w)?;
+    init(w)?;
+
+    let mut events = vec![];
     loop {
         queue!(
             w,
@@ -82,6 +87,7 @@ where
             cursor::Hide,
             cursor::MoveTo(1, 1)
         )?;
+
         let (width, height) = buffer_size().unwrap();
 
         let mut cb1 = Checkbox::new("Checkbox1");
@@ -93,36 +99,20 @@ where
         let mut rb1 = Radio::new("Radio1");
         rb1.set_checked(true);
 
+        let input1 = TextInput::new("Hello world!");
+
         let mut rb2 = Radio::new("Radio2");
 
-        let mut btn2 = Button::new("btn2");
-        btn2.set_style(Style {
-            size: Size {
-                width: Dimension::Points(20.0),
-                height: Dimension::Points(3.0),
-            },
-            margin: Rect {
-                start: Dimension::Points(1.0),
-                end: Dimension::Points(1.0),
-                ..Default::default()
-            },
-            padding: Rect {
-                start: Dimension::Points(1.0),
-                end: Dimension::Points(1.0),
-                ..Default::default()
-            },
-            ..Default::default()
-        });
+        let mut btn2 = Button::new(format!("{:?}", events.pop()));
         btn2.set_rounded(true);
 
         let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
-        img.set_width(120.0);
-        img.set_height(60.0);
+        img.set_size(Some(80.0), Some(40.0));
 
         let mut root_node = Box::default();
         root_node.set_style(Style {
-            max_size: Size {
-                width: Dimension::Points(width as f32),
+            size: Size {
+                width: Dimension::Points((width - 2) as f32),
                 height: Dimension::Points(height as f32),
             },
             flex_direction: FlexDirection::Column,
@@ -130,20 +120,7 @@ where
         });
         let mut ctrl = Control::Box(root_node);
         for i in 0..2 {
-            let mut btn = Button::new(format!("{}x{}", width, height));
-            btn.set_style(Style {
-                size: Size {
-                    width: Dimension::Points(40.0),
-                    height: Dimension::Points(3.0),
-                },
-                margin: Rect {
-                    start: Dimension::Points(1.0),
-                    end: Dimension::Points(1.0),
-                    ..Default::default()
-                },
-                ..Default::default()
-            });
-
+            let btn = Button::new(format!("{}x{}", width, height));
             ctrl.add_child(btn);
         }
         ctrl.add_child(btn2);
@@ -153,6 +130,7 @@ where
 
         ctrl.add_child(rb1);
         ctrl.add_child(rb2);
+        ctrl.add_child(input1);
 
         let layout_tree = compute_layout(
             &mut ctrl,
@@ -166,27 +144,23 @@ where
         write!(w, "{}", buf);
         w.flush()?;
 
-        match read_char()? {
-            '4' => test::run(w)?,
-            'q' => break,
-            _ => {}
-        };
-    }
-    //finalize(w)?;
-    Ok(())
-}
-
-pub fn read_char() -> Result<char> {
-    loop {
-        let ev = event::read();
-        if let Ok(Event::Key(KeyEvent {
-            code: KeyCode::Char(c),
-            ..
-        })) = ev
-        {
-            return Ok(c);
+        if let Ok(ev) = event::read() {
+            events.push(format!("{:?}", ev));
+            match ev {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char(c),
+                    ..
+                }) => {
+                    if c == 'q' {
+                        break;
+                    }
+                }
+                _ => (),
+            }
         }
     }
+    finalize(w)?;
+    Ok(())
 }
 
 pub fn buffer_size() -> Result<(u16, u16)> {
@@ -196,82 +170,4 @@ pub fn buffer_size() -> Result<(u16, u16)> {
 fn main() -> Result<()> {
     let mut stderr = io::stdout();
     run(&mut stderr)
-}
-
-mod test {
-
-    use crossterm::{
-        cursor::position,
-        event::{
-            read,
-            EnableMouseCapture,
-            Event,
-            KeyCode,
-        },
-        execute,
-        Result,
-    };
-    use std::io::Write;
-
-    macro_rules! run_tests {
-    (
-        $dst:expr,
-        $(
-            $testfn:ident
-        ),*
-        $(,)?
-    ) => {
-        use crossterm::{queue, style, terminal, cursor};
-        $(
-            queue!(
-                $dst,
-                style::ResetColor,
-                terminal::Clear(terminal::ClearType::All),
-                cursor::MoveTo(1, 1),
-                cursor::Show,
-                cursor::EnableBlinking
-            )?;
-
-            $testfn($dst)?;
-
-            match $crate::read_char() {
-                Ok('q') => return Ok(()),
-                Err(e) => return Err(e),
-                _ => { },
-            };
-        )*
-    }
-}
-
-    fn test_event<W>(w: &mut W) -> Result<()>
-    where
-        W: Write,
-    {
-        execute!(w, EnableMouseCapture)?;
-
-        loop {
-            // Blocking read
-            let event = read()?;
-
-            println!("Event::{:?}\r", event);
-
-            if event == Event::Key(KeyCode::Char('c').into()) {
-                println!("Cursor position: {:?}\r", position());
-            }
-
-            if event == Event::Key(KeyCode::Char('q').into()) {
-                break;
-            }
-        }
-
-        Ok(())
-    }
-
-    pub fn run<W>(w: &mut W) -> Result<()>
-    where
-        W: Write,
-    {
-        run_tests!(w, test_event);
-        Ok(())
-    }
 }
