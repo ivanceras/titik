@@ -1,3 +1,6 @@
+//! Titik is a crossplatform TUI widget library.
+//! It uses crossterm as the underlying backend.
+//!
 pub use buffer::{
     Buffer,
     Cell,

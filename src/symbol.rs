@@ -41,3 +41,6 @@ pub mod rounded {
 }
 
 pub const DOT: &str = "•";
+pub const BOX_UNCHECKED: &str = "☐ ";
+pub const BOX_CHECKED: &str = "☑ ";
+pub const BOX_XMARKED: &str = "☒";
