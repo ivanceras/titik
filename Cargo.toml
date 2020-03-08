@@ -1,10 +1,14 @@
 [package]
-name = "tuix"
+name = "titik"
 version = "0.1.0"
-authors = ["lee"]
+authors = ["Jovansonlee Cesar <ivanceras@gmail.com>"]
+license = "MIT"
+description = "A cross platform text ui widget"
+repository = "https://github.com/ivanceras/titik"
+documentation = "https://docs.rs/titik"
+readme = "README.md"
+keywords = ["text", "tui", "widget"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 crossterm = "0.16.0"
