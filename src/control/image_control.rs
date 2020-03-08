@@ -4,12 +4,12 @@ use crate::{
         Buffer,
         Cell,
     },
+    control::layout::LayoutTree,
     symbol::{
         bar,
         line,
         rounded,
     },
-    widget::layout::LayoutTree,
 };
 use crossterm::style::Color;
 use image::{
@@ -81,9 +81,9 @@ impl Image {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
-        let width = (layout.size.width.round() * 2.0) as usize;
+        let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
-        let img = self.image.thumbnail(width as u32, height as u32);
+        let img = self.image.thumbnail(width as u32, height as u32 * 2);
         let (img_width, img_height) = img.dimensions();
         let rgb = img.to_rgb();
         for (y, j) in (0..img_height as usize).step_by(2).enumerate() {

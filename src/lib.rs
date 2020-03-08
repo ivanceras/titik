@@ -5,7 +5,7 @@ pub use buffer::{
     Buffer,
     Cell,
 };
-pub use widget::{
+pub use control::{
     compute_layout,
     Box,
     Button,
@@ -14,5 +14,5 @@ pub use widget::{
 };
 
 mod buffer;
+mod control;
 mod symbol;
-mod widget;

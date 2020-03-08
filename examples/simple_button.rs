@@ -103,8 +103,8 @@ where
         btn2.set_rounded(true);
 
         let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
-        img.set_width(200.0);
-        img.set_height(80.0);
+        img.set_width(120.0);
+        img.set_height(60.0);
 
         let mut root_node = Box::default();
         root_node.set_style(Style {
