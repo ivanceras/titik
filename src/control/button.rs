@@ -1,10 +1,12 @@
-use super::Control;
+use super::{
+    Control,
+    LayoutTree,
+};
 use crate::{
     buffer::{
         Buffer,
         Cell,
     },
-    control::layout::LayoutTree,
     symbol::{
         bar,
         line,

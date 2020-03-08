@@ -48,8 +48,10 @@ use titik::{
     Buffer,
     Button,
     Cell,
+    Checkbox,
     Control,
     Image,
+    Radio,
 };
 
 fn init<W: Write>(w: &mut W) -> Result<()> {
@@ -81,6 +83,17 @@ where
             cursor::MoveTo(1, 1)
         )?;
         let (width, height) = buffer_size().unwrap();
+
+        let mut cb1 = Checkbox::new("Checkbox1");
+        cb1.set_checked(true);
+
+        let mut cb2 = Checkbox::new("Checkbox2");
+        cb2.set_checked(false);
+
+        let mut rb1 = Radio::new("Radio1");
+        rb1.set_checked(true);
+
+        let mut rb2 = Radio::new("Radio2");
 
         let mut btn2 = Button::new("btn2");
         btn2.set_style(Style {
@@ -135,6 +148,12 @@ where
         }
         ctrl.add_child(btn2);
         ctrl.add_child(img);
+        ctrl.add_child(cb2);
+        ctrl.add_child(cb1);
+
+        ctrl.add_child(rb1);
+        ctrl.add_child(rb2);
+
         let layout_tree = compute_layout(
             &mut ctrl,
             Size {

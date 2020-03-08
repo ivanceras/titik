@@ -9,10 +9,16 @@ use crate::{
         rounded,
     },
 };
+pub use box_control::Box;
 pub use button::Button;
+pub use checkbox::Checkbox;
 use crossterm::style::Color;
 pub use image_control::Image;
-pub use layout::LayoutTree;
+pub use layout::{
+    compute_layout,
+    LayoutTree,
+};
+pub use radio::Radio;
 use stretch::{
     geometry::Size,
     node::{
@@ -27,45 +33,29 @@ use stretch::{
     },
 };
 
+mod box_control;
 mod button;
+mod checkbox;
 mod image_control;
 mod layout;
+mod radio;
 
 pub enum Control {
     Button(Button),
+    Checkbox(Checkbox),
+    Radio(Radio),
     Image(Image),
     Box(Box),
-}
-
-#[derive(Default)]
-pub struct Box {
-    children: Vec<Control>,
-    style: Style,
-}
-
-impl Box {
-    pub fn set_style(&mut self, style: Style) {
-        self.style = style;
-    }
-
-    pub fn draw(&self, buf: &mut Buffer, layout_tree: LayoutTree) {
-        self.children
-            .iter()
-            .zip(layout_tree.children_layout.into_iter())
-            .for_each(|(child, child_layout)| child.draw(buf, child_layout));
-    }
-
-    pub fn add_child<C: Into<Control>>(&mut self, child: C) {
-        self.children.push(child.into());
-    }
 }
 
 impl Control {
     fn get_style(&self) -> Style {
         match self {
-            Control::Button(btn) => btn.style,
-            Control::Box(bax) => bax.style,
-            Control::Image(image) => image.style(),
+            Control::Button(widget) => widget.style,
+            Control::Checkbox(widget) => widget.style(),
+            Control::Radio(widget) => widget.style(),
+            Control::Box(widget) => widget.style,
+            Control::Image(widget) => widget.style(),
         }
     }
 
@@ -104,40 +94,12 @@ impl Control {
 
     pub fn draw(&self, buffer: &mut Buffer, layout_tree: LayoutTree) {
         match self {
-            Control::Button(btn) => btn.draw(buffer, layout_tree),
-            Control::Image(img) => img.draw(buffer, layout_tree),
-            Control::Box(bx) => bx.draw(buffer, layout_tree),
+            Control::Button(widget) => widget.draw(buffer, layout_tree),
+            Control::Checkbox(widget) => widget.draw(buffer, layout_tree),
+            Control::Radio(widget) => widget.draw(buffer, layout_tree),
+            Control::Image(widget) => widget.draw(buffer, layout_tree),
+            Control::Box(widget) => widget.draw(buffer, layout_tree),
         }
-    }
-}
-
-/// Compute a flex layout of the node and it's children
-pub fn compute_layout(
-    control: &mut Control,
-    parent_size: Size<Number>,
-) -> LayoutTree {
-    let mut stretch = Stretch::new();
-    let node = control
-        .style_node(&mut stretch)
-        .expect("must compute style node");
-    stretch
-        .compute_layout(node, parent_size)
-        .expect("must compute layout");
-
-    derive_layout_tree(node, &stretch)
-}
-
-fn derive_layout_tree(node: Node, stretch: &Stretch) -> LayoutTree {
-    let layout = *stretch.layout(node).expect("must have layout");
-    let children: Vec<Node> =
-        stretch.children(node).expect("must get children");
-    let children_layout: Vec<LayoutTree> = children
-        .into_iter()
-        .map(|child| derive_layout_tree(child, stretch))
-        .collect();
-    LayoutTree {
-        layout,
-        children_layout,
     }
 }
 

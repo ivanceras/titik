@@ -9,8 +9,10 @@ pub use control::{
     compute_layout,
     Box,
     Button,
+    Checkbox,
     Control,
     Image,
+    Radio,
 };
 
 mod buffer;
