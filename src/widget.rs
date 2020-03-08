@@ -10,11 +10,7 @@ use crate::{
     },
 };
 use crossterm::style::Color;
-use image::{
-    self,
-    DynamicImage,
-    GenericImageView,
-};
+pub use image_widget::Image;
 pub use layout::LayoutTree;
 use stretch::{
     geometry::Size,
@@ -30,6 +26,7 @@ use stretch::{
     },
 };
 
+mod image_widget;
 mod layout;
 
 pub enum Control {
@@ -43,11 +40,6 @@ pub struct Button {
     pub label: String,
     style: Style,
     pub is_rounded: bool,
-}
-
-pub struct Image {
-    pub image: DynamicImage,
-    style: Style,
 }
 
 #[derive(Default)]
@@ -135,58 +127,6 @@ impl From<Button> for Control {
     }
 }
 
-impl Image {
-    pub fn new(bytes: Vec<u8>) -> Self {
-        Image {
-            image: image::load_from_memory(&bytes)
-                .expect("unable to load from memory"),
-            style: Style::default(),
-        }
-    }
-
-    pub fn set_style(&mut self, style: Style) {
-        self.style = style;
-    }
-
-    /// draw this button to the buffer, with the given computed layout
-    pub fn draw(&self, buf: &mut Buffer, layout_tree: LayoutTree) {
-        let layout = layout_tree.layout;
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
-        let width = layout.size.width.round() as usize;
-        let height = layout.size.height.round() as usize;
-        let img = self.image.thumbnail(width as u32, height as u32);
-        let (img_width, img_height) = img.dimensions();
-        let rgb = img.to_rgb();
-        for (y, j) in (0..img_height as usize).step_by(2).enumerate() {
-            for i in 0..img_width as usize {
-                let mut cell = Cell::new(bar::HALF);
-                let top_pixel = rgb.get_pixel(i as u32, j as u32);
-                let bottom_pixel = rgb.get_pixel(i as u32, (j + 1) as u32);
-                let top_color = Color::Rgb {
-                    r: top_pixel[0],
-                    g: top_pixel[1],
-                    b: top_pixel[2],
-                };
-                let bottom_color = Color::Rgb {
-                    r: bottom_pixel[0],
-                    g: bottom_pixel[1],
-                    b: bottom_pixel[2],
-                };
-                cell.background(top_color);
-                cell.color(bottom_color);
-                buf.set_cell(loc_x + 1 + i, loc_y + 1 + y, cell);
-            }
-        }
-    }
-}
-
-impl From<Image> for Control {
-    fn from(img: Image) -> Self {
-        Control::Image(img)
-    }
-}
-
 impl Box {
     pub fn set_style(&mut self, style: Style) {
         self.style = style;
@@ -209,7 +149,7 @@ impl Control {
         match self {
             Control::Button(btn) => btn.style,
             Control::Box(bax) => bax.style,
-            Control::Image(image) => image.style,
+            Control::Image(image) => image.style(),
         }
     }
 
