@@ -32,12 +32,7 @@ pub struct Box {
     pub children: Vec<Control>,
     pub width: Option<f32>,
     pub height: Option<f32>,
-    pub alignment: Alignment,
-}
-
-pub enum Alignment {
-    Vertical,
-    Horizontal,
+    pub flex_direction: FlexDirection,
 }
 
 impl Box {
@@ -46,7 +41,7 @@ impl Box {
             width: None,
             height: None,
             children: vec![],
-            alignment: Alignment::Horizontal,
+            flex_direction: FlexDirection::Row,
         }
     }
 
@@ -57,20 +52,17 @@ impl Box {
 
     /// set to vertical column direction
     pub fn vertical(&mut self) {
-        self.alignment = Alignment::Vertical;
+        self.flex_direction = FlexDirection::Column;
     }
 
     /// set to horizontal row direction
     pub fn horizontal(&mut self) {
-        self.alignment = Alignment::Horizontal;
+        self.flex_direction = FlexDirection::Row;
     }
 
     pub fn style(&self) -> Style {
         Style {
-            flex_direction: match self.alignment {
-                Alignment::Horizontal => FlexDirection::Row,
-                Alignment::Vertical => FlexDirection::Column,
-            },
+            flex_direction: self.flex_direction,
             size: Size {
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
