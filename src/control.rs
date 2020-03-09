@@ -42,6 +42,7 @@ mod layout;
 mod radio;
 mod text_input;
 
+//TODO: can be converted to trait, and the children can be stored as Vec<Box<Control>>
 pub enum Control {
     Button(Button),
     Checkbox(Checkbox),

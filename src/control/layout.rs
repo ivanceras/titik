@@ -73,6 +73,9 @@ pub fn compute_layout(
     derive_layout_tree(node, &stretch)
 }
 
+/// retrieve the layout for each of the invidual unit in the node.
+/// The locatio is in absolute position by adding the parent position to the child position
+/// in order to easily draw the widgets independently
 fn derive_layout_tree(node: Node, stretch: &Stretch) -> LayoutTree {
     let layout = *stretch.layout(node).expect("must have layout");
     let children: Vec<Node> =
