@@ -12,11 +12,18 @@ use stretch::{
     result::Layout,
 };
 
+/// Contains the layout information of all the controls in the tree
+/// This is needed for optimization purposes since recomputing layout is an expensive operation,
+/// therefore can not be executed every draw call
 #[derive(Debug)]
 pub struct LayoutTree {
     pub layout: Layout,
     pub children_layout: Vec<LayoutTree>,
 }
+
+//TODO: keep track of the focused element,
+// area and position of the layout also determines
+// if the element is hit with a click
 
 /// Compute a flex layout of the node and it's children
 pub fn compute_layout(
