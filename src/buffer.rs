@@ -11,9 +11,8 @@ use crossterm::{
     },
 };
 use std::fmt;
+use unicode_width::UnicodeWidthStr;
 
-///TODO: Take into account double width symbole, otherwise the terminal will
-///casue overflow artifact
 #[derive(Clone)]
 pub struct Cell {
     pub symbol: String,
@@ -33,6 +32,10 @@ impl Cell {
             symbol: symbol.to_string(),
             style: ContentStyle::default(),
         }
+    }
+
+    pub fn unicode_width(&self) -> usize {
+        UnicodeWidthStr::width(&*self.symbol)
     }
 
     pub fn empty() -> Self {
@@ -74,7 +77,13 @@ impl Buffer {
     pub fn set_cell(&mut self, x: usize, y: usize, new_cell: Cell) {
         if let Some(mut line) = self.cells.get_mut(y) {
             if let Some(mut cell) = line.get_mut(x) {
-                *cell = new_cell
+                let unicode_width = new_cell.unicode_width();
+                *cell = new_cell;
+                if unicode_width > 1 {
+                    for i in 1..unicode_width {
+                        self.set_symbol(x, y + i, '\0');
+                    }
+                }
             }
         }
     }
@@ -112,6 +121,7 @@ impl fmt::Display for Buffer {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::symbol;
     use std::fmt::Write;
 
     #[test]
@@ -121,6 +131,16 @@ mod test {
         write!(w, "{}", cell);
         println!("{}", w);
         assert_eq!(w, "H\u{1b}[0m");
+        assert_eq!(cell.unicode_width(), 1);
+    }
+
+    #[test]
+    fn cell_width() {
+        let mut w = String::new();
+        let mut cell = Cell::new(symbol::RADIO_UNCHECKED);
+        write!(w, "{}", cell);
+        println!("{}", w);
+        assert_eq!(cell.unicode_width(), 2);
     }
 
     #[test]

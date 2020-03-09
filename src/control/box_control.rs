@@ -83,6 +83,18 @@ impl Box {
                     Dimension::Auto
                 },
             },
+            max_size: Size {
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Auto
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Auto
+                },
+            },
             ..Default::default()
         }
     }
