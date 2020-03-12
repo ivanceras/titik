@@ -32,7 +32,6 @@ pub mod command {
         terminal::ClearType,
     };
     use std::{
-        io,
         io::Write,
     };
 

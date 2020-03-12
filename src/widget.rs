@@ -11,7 +11,7 @@ use crate::{
 };
 pub use button::Button;
 pub use checkbox::Checkbox;
-use crossterm::style::Color;
+
 pub use flex_box::FlexBox;
 pub use image_control::Image;
 pub use layout::{
@@ -73,8 +73,6 @@ mod tests {
     use std::boxed;
     use stretch::{
         geometry::*,
-        result::*,
-        style::*,
     };
 
     #[test]

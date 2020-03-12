@@ -6,8 +6,6 @@ use crate::{
     },
     symbol::{
         bar,
-        line,
-        rounded,
     },
     Widget,
 };
@@ -17,15 +15,9 @@ use image::{
     DynamicImage,
     GenericImageView,
 };
-use std::boxed;
+
 use stretch::{
     geometry::Size,
-    node::{
-        Node,
-        Stretch,
-    },
-    number::Number,
-    result::Layout,
     style::{
         Dimension,
         Style,
@@ -74,7 +66,7 @@ impl Image {
         let cells = (0..img_height as usize)
             .step_by(2)
             .enumerate()
-            .map(|(y, j)| {
+            .map(|(_y, j)| {
                 (0..img_width as usize)
                     .map(|i| {
                         let mut cell = Cell::new(bar::HALF);

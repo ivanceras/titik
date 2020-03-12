@@ -24,8 +24,6 @@ pub use crossterm::{
     Result,
 };
 use std::{
-    boxed,
-    fmt::Display,
     io::{
         self,
         Write,
@@ -48,7 +46,6 @@ use titik::{
     compute_layout,
     Buffer,
     Button,
-    Cell,
     Checkbox,
     FlexBox,
     Image,
@@ -92,7 +89,7 @@ where
 
     let input1 = TextInput::new("Hello world!");
 
-    let mut rb2 = Radio::new("Radio2");
+    let rb2 = Radio::new("Radio2");
 
     let mut btn2 = Button::new("Events");
     btn2.set_rounded(true);
@@ -103,7 +100,7 @@ where
     let mut root_node = FlexBox::new();
     root_node.set_size(Some((width - 2) as f32), Some(height as f32));
     root_node.vertical();
-    for i in 0..2 {
+    for _i in 0..2 {
         let btn = Button::new(format!("{}x{}", width, height));
         root_node.add_child(Box::new(btn));
     }

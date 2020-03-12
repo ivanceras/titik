@@ -59,15 +59,15 @@ impl LayoutTree {
 
 /// Get the widget with the node_idx by traversing to through the root_widget specified
 pub fn trace_widget(
-    root_widget: &dyn Widget,
-    node_idx: usize,
-) -> Option<&Widget> {
+    _root_widget: &dyn Widget,
+    _node_idx: usize,
+) -> Option<&dyn Widget> {
     todo!();
 }
 
 /// Compute a flex layout of the node and it's children
 pub fn compute_layout(
-    control: &mut Widget,
+    control: &mut dyn Widget,
     parent_size: Size<Number>,
 ) -> LayoutTree {
     let mut stretch = Stretch::new();
@@ -110,7 +110,7 @@ fn derive_layout_tree(node: Node, stretch: &Stretch) -> LayoutTree {
 mod test {
     use super::*;
     use crate::*;
-    use std::boxed;
+    
 
     #[test]
     fn layout() {

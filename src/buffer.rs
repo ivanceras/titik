@@ -127,7 +127,7 @@ mod test {
     #[test]
     fn cell1() {
         let mut w = String::new();
-        let mut cell = Cell::new("H".to_string());
+        let cell = Cell::new("H".to_string());
         write!(w, "{}", cell);
         println!("{}", w);
         assert_eq!(w, "H\u{1b}[0m");
@@ -137,7 +137,7 @@ mod test {
     #[test]
     fn cell_width() {
         let mut w = String::new();
-        let mut cell = Cell::new(symbol::RADIO_UNCHECKED);
+        let cell = Cell::new(symbol::RADIO_UNCHECKED);
         write!(w, "{}", cell);
         println!("{}", w);
         assert_eq!(cell.unicode_width(), 2);
