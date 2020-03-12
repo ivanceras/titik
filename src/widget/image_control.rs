@@ -1,7 +1,4 @@
-use super::{
-    Control,
-    LayoutTree,
-};
+use super::LayoutTree;
 use crate::{
     buffer::{
         Buffer,
@@ -12,6 +9,7 @@ use crate::{
         line,
         rounded,
     },
+    Widget,
 };
 use crossterm::style::Color;
 use image::{
@@ -19,6 +17,7 @@ use image::{
     DynamicImage,
     GenericImageView,
 };
+use std::boxed;
 use stretch::{
     geometry::Size,
     node::{
@@ -65,24 +64,6 @@ impl Image {
         }
     }
 
-    pub fn style(&self) -> Style {
-        Style {
-            size: Size {
-                width: if let Some(width) = self.width {
-                    Dimension::Points(width)
-                } else {
-                    Dimension::Auto
-                },
-                height: if let Some(height) = self.height {
-                    Dimension::Points(height / 2.0)
-                } else {
-                    Dimension::Auto
-                },
-            },
-            ..Default::default()
-        }
-    }
-
     /// the cells will be stored in the image control to avoid re-creation every after redraw
     fn create_cells(&mut self) {
         let width = self.width.unwrap_or(10.0);
@@ -119,9 +100,29 @@ impl Image {
             .collect();
         self.cells = cells;
     }
+}
+
+impl Widget for Image {
+    fn style(&self) -> Style {
+        Style {
+            size: Size {
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Auto
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height / 2.0)
+                } else {
+                    Dimension::Auto
+                },
+            },
+            ..Default::default()
+        }
+    }
 
     /// draw this button to the buffer, with the given computed layout
-    pub fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -130,11 +131,5 @@ impl Image {
                 buf.set_cell(loc_x + 1 + i, loc_y + 1 + y, cell.clone());
             }
         }
-    }
-}
-
-impl From<Image> for Control {
-    fn from(img: Image) -> Self {
-        Control::Image(img)
     }
 }

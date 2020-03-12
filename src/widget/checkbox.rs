@@ -1,7 +1,4 @@
-use super::{
-    Control,
-    LayoutTree,
-};
+use super::LayoutTree;
 use crate::{
     buffer::{
         Buffer,
@@ -13,7 +10,9 @@ use crate::{
         line,
         rounded,
     },
+    Widget,
 };
+use std::boxed;
 use stretch::{
     geometry::Size,
     node::{
@@ -49,7 +48,13 @@ impl Checkbox {
         self.label = label.to_string();
     }
 
-    pub fn style(&self) -> Style {
+    pub fn set_checked(&mut self, checked: bool) {
+        self.is_checked = checked;
+    }
+}
+
+impl Widget for Checkbox {
+    fn style(&self) -> Style {
         Style {
             size: Size {
                 width: Dimension::Points((self.label.len() + 3) as f32),
@@ -59,12 +64,8 @@ impl Checkbox {
         }
     }
 
-    pub fn set_checked(&mut self, checked: bool) {
-        self.is_checked = checked;
-    }
-
     /// draw this button to the buffer, with the given computed layout
-    pub fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -78,11 +79,5 @@ impl Checkbox {
         for (t, ch) in self.label.chars().enumerate() {
             buf.set_symbol(loc_x + 4 + t, loc_y + 1, ch);
         }
-    }
-}
-
-impl From<Checkbox> for Control {
-    fn from(btn: Checkbox) -> Self {
-        Control::Checkbox(btn)
     }
 }

@@ -24,6 +24,7 @@ pub use crossterm::{
     Result,
 };
 use std::{
+    boxed,
     fmt::Display,
     io::{
         self,
@@ -45,15 +46,15 @@ use stretch::{
 };
 use titik::{
     compute_layout,
-    Box,
     Buffer,
     Button,
     Cell,
     Checkbox,
-    Control,
+    FlexBox,
     Image,
     Radio,
     TextInput,
+    Widget,
 };
 
 fn init<W: Write>(w: &mut W) -> Result<()> {
@@ -99,22 +100,21 @@ where
     let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(80.0), Some(40.0));
 
-    let mut root_node = Box::new();
+    let mut root_node = FlexBox::new();
     root_node.set_size(Some((width - 2) as f32), Some(height as f32));
     root_node.vertical();
-    let mut ctrl = Control::Box(root_node);
     for i in 0..2 {
         let btn = Button::new(format!("{}x{}", width, height));
-        ctrl.add_child(btn);
+        root_node.add_child(boxed::Box::new(btn));
     }
-    ctrl.add_child(btn2);
-    ctrl.add_child(img);
-    ctrl.add_child(cb2);
-    ctrl.add_child(cb1);
+    root_node.add_child(boxed::Box::new(btn2));
+    root_node.add_child(boxed::Box::new(img));
+    root_node.add_child(boxed::Box::new(cb2));
+    root_node.add_child(boxed::Box::new(cb1));
 
-    ctrl.add_child(rb1);
-    ctrl.add_child(rb2);
-    ctrl.add_child(input1);
+    root_node.add_child(boxed::Box::new(rb1));
+    root_node.add_child(boxed::Box::new(rb2));
+    root_node.add_child(boxed::Box::new(input1));
 
     loop {
         queue!(
@@ -126,14 +126,14 @@ where
         )?;
 
         let layout_tree = compute_layout(
-            &mut ctrl,
+            &mut root_node,
             Size {
                 width: Number::Defined(width as f32),
                 height: Number::Defined(height as f32),
             },
         );
         let mut buf = Buffer::new(width as usize, height as usize);
-        ctrl.draw(&mut buf, &layout_tree);
+        root_node.draw(&mut buf, &layout_tree);
         write!(w, "{}", buf);
         w.flush()?;
 

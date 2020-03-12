@@ -5,22 +5,22 @@ pub use buffer::{
     Buffer,
     Cell,
 };
-pub use control::{
+pub use crossterm;
+pub use stretch;
+pub use widget::{
     compute_layout,
-    Box,
     Button,
     Checkbox,
-    Control,
+    FlexBox,
     Image,
     Radio,
     TextInput,
+    Widget,
 };
-pub use crossterm;
-pub use stretch;
 
 mod buffer;
-mod control;
 mod symbol;
+mod widget;
 
 pub mod command {
     use crossterm::{

@@ -1,7 +1,4 @@
-use super::{
-    Control,
-    LayoutTree,
-};
+use super::LayoutTree;
 use crate::{
     buffer::{
         Buffer,
@@ -12,7 +9,9 @@ use crate::{
         line,
         rounded,
     },
+    Widget,
 };
+use std::boxed;
 use stretch::{
     geometry::Size,
     node::{
@@ -28,16 +27,16 @@ use stretch::{
     },
 };
 
-pub struct Box {
-    pub children: Vec<Control>,
+pub struct FlexBox {
+    pub children: Vec<boxed::Box<Widget>>,
     pub width: Option<f32>,
     pub height: Option<f32>,
     pub flex_direction: FlexDirection,
 }
 
-impl Box {
+impl FlexBox {
     pub fn new() -> Self {
-        Box {
+        FlexBox {
             width: None,
             height: None,
             children: vec![],
@@ -59,8 +58,10 @@ impl Box {
     pub fn horizontal(&mut self) {
         self.flex_direction = FlexDirection::Row;
     }
+}
 
-    pub fn style(&self) -> Style {
+impl Widget for FlexBox {
+    fn style(&self) -> Style {
         Style {
             flex_direction: self.flex_direction,
             size: Size {
@@ -91,20 +92,19 @@ impl Box {
         }
     }
 
-    pub fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
         self.children
             .iter()
             .zip(layout_tree.children_layout.iter())
             .for_each(|(child, child_layout)| child.draw(buf, child_layout));
     }
 
-    pub fn add_child<C: Into<Control>>(&mut self, child: C) {
-        self.children.push(child.into());
+    fn add_child(&mut self, child: boxed::Box<Widget>) -> bool {
+        self.children.push(child);
+        true
     }
-}
 
-impl From<Box> for Control {
-    fn from(bax: Box) -> Self {
-        Control::Box(bax)
+    fn children(&self) -> Option<&[boxed::Box<dyn Widget>]> {
+        Some(&self.children)
     }
 }

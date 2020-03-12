@@ -1,4 +1,4 @@
-use super::Control;
+use crate::Widget;
 use stretch::{
     geometry::{
         Point,
@@ -59,7 +59,7 @@ impl LayoutTree {
 
 /// Compute a flex layout of the node and it's children
 pub fn compute_layout(
-    control: &mut Control,
+    control: &mut Widget,
     parent_size: Size<Number>,
 ) -> LayoutTree {
     let mut stretch = Stretch::new();
@@ -102,21 +102,21 @@ fn derive_layout_tree(node: Node, stretch: &Stretch) -> LayoutTree {
 mod test {
     use super::*;
     use crate::*;
+    use std::boxed;
 
     #[test]
     fn layout() {
-        let mut bx = Box::new();
-        bx.vertical();
+        let mut control = FlexBox::new();
+        control.vertical();
         let mut btn1 = Button::new("Hello");
         btn1.set_size(Some(30.0), Some(34.0));
 
-        bx.add_child(Into::<Control>::into(btn1));
+        control.add_child(boxed::Box::new(btn1));
 
         let mut btn2 = Button::new("world");
         btn2.set_size(Some(20.0), Some(10.0));
-        bx.add_child(Into::<Control>::into(btn2));
+        control.add_child(boxed::Box::new(btn2));
 
-        let mut control = Control::Box(bx);
         let layout_tree = compute_layout(
             &mut control,
             Size {

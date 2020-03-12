@@ -1,7 +1,4 @@
-use super::{
-    Control,
-    LayoutTree,
-};
+use super::LayoutTree;
 use crate::{
     buffer::{
         Buffer,
@@ -12,6 +9,7 @@ use crate::{
         line,
         rounded,
     },
+    Widget,
 };
 use stretch::{
     geometry::Size,
@@ -56,7 +54,13 @@ impl Button {
         self.height = height;
     }
 
-    pub fn style(&self) -> Style {
+    pub fn set_rounded(&mut self, rounded: bool) {
+        self.is_rounded = rounded;
+    }
+}
+
+impl Widget for Button {
+    fn style(&self) -> Style {
         Style {
             size: Size {
                 width: if let Some(width) = self.width {
@@ -75,12 +79,8 @@ impl Button {
         }
     }
 
-    pub fn set_rounded(&mut self, rounded: bool) {
-        self.is_rounded = rounded;
-    }
-
     /// draw this button to the buffer, with the given computed layout
-    pub fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -122,11 +122,5 @@ impl Button {
         buf.set_symbol(loc_x, loc_y + height, bottom_left);
         buf.set_symbol(loc_x + width, loc_y + 1, top_right);
         buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
-    }
-}
-
-impl From<Button> for Control {
-    fn from(btn: Button) -> Self {
-        Control::Button(btn)
     }
 }

@@ -1,7 +1,4 @@
-use super::{
-    Control,
-    LayoutTree,
-};
+use super::LayoutTree;
 use crate::{
     buffer::{
         Buffer,
@@ -12,7 +9,9 @@ use crate::{
         line,
         rounded,
     },
+    Widget,
 };
+use std::boxed;
 use stretch::{
     geometry::Size,
     node::{
@@ -52,7 +51,17 @@ impl TextInput {
         self.value = value.to_string();
     }
 
-    pub fn style(&self) -> Style {
+    pub fn set_rounded(&mut self, rounded: bool) {
+        self.is_rounded = rounded;
+    }
+
+    pub fn set_focus(&mut self, focused: bool) {
+        self.is_focused = focused;
+    }
+}
+
+impl Widget for TextInput {
+    fn style(&self) -> Style {
         Style {
             size: Size {
                 width: if let Some(width) = self.width {
@@ -71,16 +80,8 @@ impl TextInput {
         }
     }
 
-    pub fn set_rounded(&mut self, rounded: bool) {
-        self.is_rounded = rounded;
-    }
-
-    pub fn set_focus(&mut self, focused: bool) {
-        self.is_focused = focused;
-    }
-
     /// draw this button to the buffer, with the given computed layout
-    pub fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -122,11 +123,5 @@ impl TextInput {
         buf.set_symbol(loc_x, loc_y + height, bottom_left);
         buf.set_symbol(loc_x + width, loc_y + 1, top_right);
         buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
-    }
-}
-
-impl From<TextInput> for Control {
-    fn from(btn: TextInput) -> Self {
-        Control::TextInput(btn)
     }
 }
