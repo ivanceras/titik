@@ -11,7 +11,6 @@ use crate::{
     },
     Widget,
 };
-use std::boxed;
 use stretch::{
     geometry::Size,
     node::{
@@ -28,7 +27,7 @@ use stretch::{
 };
 
 pub struct FlexBox {
-    pub children: Vec<boxed::Box<Widget>>,
+    pub children: Vec<Box<Widget>>,
     pub width: Option<f32>,
     pub height: Option<f32>,
     pub flex_direction: FlexDirection,
@@ -99,12 +98,12 @@ impl Widget for FlexBox {
             .for_each(|(child, child_layout)| child.draw(buf, child_layout));
     }
 
-    fn add_child(&mut self, child: boxed::Box<Widget>) -> bool {
+    fn add_child(&mut self, child: Box<Widget>) -> bool {
         self.children.push(child);
         true
     }
 
-    fn children(&self) -> Option<&[boxed::Box<dyn Widget>]> {
+    fn children(&self) -> Option<&[Box<dyn Widget>]> {
         Some(&self.children)
     }
 }

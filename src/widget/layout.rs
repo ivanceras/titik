@@ -111,11 +111,11 @@ mod test {
         let mut btn1 = Button::new("Hello");
         btn1.set_size(Some(30.0), Some(34.0));
 
-        control.add_child(boxed::Box::new(btn1));
+        control.add_child(Box::new(btn1));
 
         let mut btn2 = Button::new("world");
         btn2.set_size(Some(20.0), Some(10.0));
-        control.add_child(boxed::Box::new(btn2));
+        control.add_child(Box::new(btn2));
 
         let layout_tree = compute_layout(
             &mut control,

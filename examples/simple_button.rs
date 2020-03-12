@@ -105,16 +105,16 @@ where
     root_node.vertical();
     for i in 0..2 {
         let btn = Button::new(format!("{}x{}", width, height));
-        root_node.add_child(boxed::Box::new(btn));
+        root_node.add_child(Box::new(btn));
     }
-    root_node.add_child(boxed::Box::new(btn2));
-    root_node.add_child(boxed::Box::new(img));
-    root_node.add_child(boxed::Box::new(cb2));
-    root_node.add_child(boxed::Box::new(cb1));
+    root_node.add_child(Box::new(btn2));
+    root_node.add_child(Box::new(img));
+    root_node.add_child(Box::new(cb2));
+    root_node.add_child(Box::new(cb1));
 
-    root_node.add_child(boxed::Box::new(rb1));
-    root_node.add_child(boxed::Box::new(rb2));
-    root_node.add_child(boxed::Box::new(input1));
+    root_node.add_child(Box::new(rb1));
+    root_node.add_child(Box::new(rb2));
+    root_node.add_child(Box::new(input1));
 
     loop {
         queue!(
