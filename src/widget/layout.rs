@@ -57,6 +57,14 @@ impl LayoutTree {
 // area and position of the layout also determines
 // if the element is hit with a click
 
+/// Get the widget with the node_idx by traversing to through the root_widget specified
+pub fn trace_widget(
+    root_widget: &dyn Widget,
+    node_idx: usize,
+) -> Option<&Widget> {
+    todo!();
+}
+
 /// Compute a flex layout of the node and it's children
 pub fn compute_layout(
     control: &mut Widget,

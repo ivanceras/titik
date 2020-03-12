@@ -75,8 +75,8 @@ impl Buffer {
     }
 
     pub fn set_cell(&mut self, x: usize, y: usize, new_cell: Cell) {
-        if let Some(mut line) = self.cells.get_mut(y) {
-            if let Some(mut cell) = line.get_mut(x) {
+        if let Some(line) = self.cells.get_mut(y) {
+            if let Some(cell) = line.get_mut(x) {
                 let unicode_width = new_cell.unicode_width();
                 *cell = new_cell;
                 if unicode_width > 1 {

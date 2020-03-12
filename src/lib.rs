@@ -19,6 +19,7 @@ pub use widget::{
 };
 
 mod buffer;
+#[allow(unused)]
 mod symbol;
 mod widget;
 

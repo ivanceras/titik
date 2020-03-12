@@ -45,7 +45,7 @@ mod text_input;
 
 pub trait Widget {
     fn style(&self) -> Style;
-    fn add_child(&mut self, child: boxed::Box<Widget>) -> bool {
+    fn add_child(&mut self, _child: boxed::Box<dyn Widget>) -> bool {
         false
     }
 
