@@ -19,7 +19,11 @@ pub use layout::{
     LayoutTree,
 };
 pub use radio::Radio;
-use std::boxed;
+use std::{
+    any::Any,
+    boxed,
+    fmt,
+};
 use stretch::{
     geometry::Size,
     node::{
@@ -43,7 +47,10 @@ mod layout;
 mod radio;
 mod text_input;
 
-pub trait Widget {
+pub trait Widget
+where
+    Self: fmt::Debug,
+{
     fn style(&self) -> Style;
     fn add_child(&mut self, _child: boxed::Box<dyn Widget>) -> bool {
         false
@@ -65,15 +72,14 @@ pub trait Widget {
         };
         stretch.new_node(self.style(), children_styles).ok()
     }
+    fn as_any(&self) -> &dyn Any;
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::boxed;
-    use stretch::{
-        geometry::*,
-    };
+    use stretch::geometry::*;
 
     #[test]
     fn layout() {

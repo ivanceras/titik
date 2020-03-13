@@ -59,10 +59,27 @@ impl LayoutTree {
 
 /// Get the widget with the node_idx by traversing to through the root_widget specified
 pub fn trace_widget(
-    _root_widget: &dyn Widget,
-    _node_idx: usize,
+    root_widget: &dyn Widget,
+    node_idx: usize,
 ) -> Option<&dyn Widget> {
-    todo!();
+    find_node(root_widget, node_idx, &mut 0)
+}
+
+fn find_node<'a>(
+    node: &'a dyn Widget,
+    node_idx: usize,
+    cur_index: &mut usize,
+) -> Option<&'a dyn Widget> {
+    if let Some(children) = node.children() {
+        children.iter().find_map(|child| {
+            *cur_index += 1;
+            find_node(child.as_ref(), node_idx, cur_index)
+        })
+    } else if node_idx == *cur_index {
+        return Some(node);
+    } else {
+        None
+    }
 }
 
 /// Compute a flex layout of the node and it's children
@@ -110,7 +127,6 @@ fn derive_layout_tree(node: Node, stretch: &Stretch) -> LayoutTree {
 mod test {
     use super::*;
     use crate::*;
-    
 
     #[test]
     fn layout() {
@@ -118,6 +134,7 @@ mod test {
         control.vertical();
         let mut btn1 = Button::new("Hello");
         btn1.set_size(Some(30.0), Some(34.0));
+        let btn1_clone = btn1.clone();
 
         control.add_child(Box::new(btn1));
 
@@ -147,6 +164,13 @@ mod test {
         assert_eq!(hit1.len(), 2);
         println!("hit1: {:?}", hit1);
         assert_eq!(hit1.pop(), Some(1));
+        let trace_btn1: &Button = trace_widget(&control, 1)
+            .expect("must return a widget")
+            .as_any()
+            .downcast_ref::<Button>()
+            .expect("must be button");
+        assert_eq!(trace_btn1, &btn1_clone);
+        println!("trace btn1: {:?}", trace_btn1);
 
         let layout2 = layout_tree.children_layout[1].layout;
         assert_eq!(

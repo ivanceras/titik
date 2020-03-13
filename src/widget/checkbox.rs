@@ -12,6 +12,7 @@ use crate::{
     },
     Widget,
 };
+use std::any::Any;
 use stretch::{
     geometry::Size,
     style::{
@@ -20,7 +21,7 @@ use stretch::{
     },
 };
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Checkbox {
     pub label: String,
     pub is_checked: bool,
@@ -72,5 +73,9 @@ impl Widget for Checkbox {
         for (t, ch) in self.label.chars().enumerate() {
             buf.set_symbol(loc_x + 4 + t, loc_y + 1, ch);
         }
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

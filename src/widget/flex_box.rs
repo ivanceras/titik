@@ -11,6 +11,7 @@ use crate::{
     },
     Widget,
 };
+use std::any::Any;
 use stretch::{
     geometry::Size,
     style::{
@@ -20,6 +21,7 @@ use stretch::{
     },
 };
 
+#[derive(Default, Debug)]
 pub struct FlexBox {
     pub children: Vec<Box<dyn Widget>>,
     pub width: Option<f32>,
@@ -99,5 +101,9 @@ impl Widget for FlexBox {
 
     fn children(&self) -> Option<&[Box<dyn Widget>]> {
         Some(&self.children)
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

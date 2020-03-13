@@ -11,6 +11,7 @@ use crate::{
     },
     Widget,
 };
+use std::any::Any;
 use stretch::{
     geometry::Size,
     style::{
@@ -19,7 +20,7 @@ use stretch::{
     },
 };
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq, Clone)]
 pub struct Button {
     pub label: String,
     pub is_rounded: bool,
@@ -116,5 +117,9 @@ impl Widget for Button {
         buf.set_symbol(loc_x, loc_y + height, bottom_left);
         buf.set_symbol(loc_x + width, loc_y + 1, top_right);
         buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

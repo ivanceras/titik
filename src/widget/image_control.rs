@@ -4,9 +4,7 @@ use crate::{
         Buffer,
         Cell,
     },
-    symbol::{
-        bar,
-    },
+    symbol::bar,
     Widget,
 };
 use crossterm::style::Color;
@@ -15,7 +13,9 @@ use image::{
     DynamicImage,
     GenericImageView,
 };
+use std::any::Any;
 
+use std::fmt;
 use stretch::{
     geometry::Size,
     style::{
@@ -123,5 +123,15 @@ impl Widget for Image {
                 buf.set_cell(loc_x + 1 + i, loc_y + 1 + y, cell.clone());
             }
         }
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+impl fmt::Debug for Image {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Image")
     }
 }
