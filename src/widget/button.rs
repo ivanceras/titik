@@ -26,6 +26,7 @@ pub struct Button {
     pub is_rounded: bool,
     pub width: Option<f32>,
     pub height: Option<f32>,
+    focused: bool,
 }
 
 impl Button {
@@ -117,6 +118,10 @@ impl Widget for Button {
         buf.set_symbol(loc_x, loc_y + height, bottom_left);
         buf.set_symbol(loc_x + width, loc_y + 1, top_right);
         buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
+    }
+
+    fn set_focused(&mut self, focused: bool) {
+        self.focused = focused;
     }
 
     fn as_any(&self) -> &dyn Any {

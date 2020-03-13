@@ -18,7 +18,6 @@ pub use image_control::Image;
 pub use radio::Radio;
 use std::{
     any::Any,
-    boxed,
     fmt,
 };
 use stretch::{
@@ -48,13 +47,14 @@ where
     Self: fmt::Debug,
 {
     fn style(&self) -> Style;
-    fn add_child(&mut self, _child: boxed::Box<dyn Widget>) -> bool {
+    fn add_child(&mut self, _child: Box<dyn Widget>) -> bool {
         false
     }
 
-    fn children(&self) -> Option<&[boxed::Box<dyn Widget>]> {
+    fn children(&self) -> Option<&[Box<dyn Widget>]> {
         None
     }
+
     fn draw(&self, but: &mut Buffer, layout_tree: &LayoutTree);
 
     fn style_node(&self, stretch: &mut Stretch) -> Option<Node> {
@@ -68,6 +68,9 @@ where
         };
         stretch.new_node(self.style(), children_styles).ok()
     }
+
+    fn set_focused(&mut self, focused: bool) {}
+
     fn as_any(&self) -> &dyn Any;
 }
 

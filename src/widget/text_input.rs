@@ -24,7 +24,7 @@ use stretch::{
 pub struct TextInput {
     pub value: String,
     pub is_rounded: bool,
-    pub is_focused: bool,
+    focused: bool,
     pub width: Option<f32>,
     pub height: Option<f32>,
 }
@@ -47,10 +47,6 @@ impl TextInput {
 
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
-    }
-
-    pub fn set_focus(&mut self, focused: bool) {
-        self.is_focused = focused;
     }
 }
 
@@ -117,6 +113,10 @@ impl Widget for TextInput {
         buf.set_symbol(loc_x, loc_y + height, bottom_left);
         buf.set_symbol(loc_x + width, loc_y + 1, top_right);
         buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
+    }
+
+    fn set_focused(&mut self, focused: bool) {
+        self.focused = focused;
     }
 
     fn as_any(&self) -> &dyn Any {
