@@ -47,6 +47,7 @@ use stretch::{
 };
 use titik::{
     compute_layout,
+    find_widget,
     widget_hit_at,
     widget_node_idx_at,
     Buffer,
@@ -82,6 +83,7 @@ where
     init(w)?;
 
     let mut focused_widget_idx = None;
+    let mut focused_widget = None;
 
     loop {
         queue!(
@@ -108,10 +110,9 @@ where
         img.set_size(Some(80.0), Some(40.0));
         root_node.set_size(Some((width - 2) as f32), Some(height as f32));
         root_node.vertical();
-        for _i in 0..2 {
-            let btn = Button::new(format!("{}x{}", width, height));
-            root_node.add_child(Box::new(btn));
-        }
+
+        let btn1 = Button::new(format!("{:?}", focused_widget));
+        root_node.add_child(Box::new(btn1));
         root_node.add_child(Box::new(btn2));
         root_node.add_child(Box::new(img));
         root_node.add_child(Box::new(cb2));
@@ -120,6 +121,11 @@ where
         root_node.add_child(Box::new(rb1));
         root_node.add_child(Box::new(rb2));
         root_node.add_child(Box::new(input1));
+
+        focused_widget = focused_widget_idx
+            .map(|idx| find_widget(&root_node, idx))
+            .flatten()
+            .map(|w| format!("{:?}", w));
 
         let layout_tree = compute_layout(
             &mut root_node,
