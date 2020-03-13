@@ -65,6 +65,22 @@ pub fn find_widget(
     find_node(root_widget, node_idx, &mut 0)
 }
 
+/// return the widget that is hit at this location
+/// base on the layout tree
+pub fn widget_hit_at<'a>(
+    root_widget: &'a dyn Widget,
+    layout_tree: &LayoutTree,
+    x: f32,
+    y: f32,
+) -> Option<&'a dyn Widget> {
+    if let Some(hit) = layout_tree.hit(x, y).pop() {
+        find_widget(root_widget, hit)
+    } else {
+        None
+    }
+}
+
+/// Traverse the node tree until the node_idx is found
 fn find_node<'a>(
     node: &'a dyn Widget,
     node_idx: usize,
@@ -173,6 +189,14 @@ mod test {
         assert_eq!(trace_btn1, &btn1_clone);
         println!("trace btn1: {:?}", trace_btn1);
 
+        let widget_hit1 = widget_hit_at(&control, &layout_tree, 1.0, 1.0)
+            .expect("must hit something")
+            .as_any()
+            .downcast_ref::<Button>()
+            .expect("must be button");
+
+        assert_eq!(widget_hit1, &btn1_clone);
+
         let layout2 = layout_tree.children_layout[1].layout;
         assert_eq!(
             layout2.size,
@@ -200,5 +224,13 @@ mod test {
             .downcast_ref::<Button>()
             .expect("must be a button");
         assert_eq!(trace_btn2, &btn2_clone);
+
+        let widget_hit2 = widget_hit_at(&control, &layout_tree, 1.0, 35.0)
+            .expect("must hit something")
+            .as_any()
+            .downcast_ref::<Button>()
+            .expect("must be button");
+
+        assert_eq!(widget_hit2, &btn2_clone);
     }
 }
