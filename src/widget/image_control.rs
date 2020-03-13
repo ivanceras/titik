@@ -1,10 +1,10 @@
-use super::LayoutTree;
 use crate::{
     buffer::{
         Buffer,
         Cell,
     },
     symbol::bar,
+    LayoutTree,
     Widget,
 };
 use crossterm::style::Color;

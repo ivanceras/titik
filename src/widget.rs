@@ -8,16 +8,13 @@ use crate::{
         line,
         rounded,
     },
+    LayoutTree,
 };
 pub use button::Button;
 pub use checkbox::Checkbox;
 
 pub use flex_box::FlexBox;
 pub use image_control::Image;
-pub use layout::{
-    compute_layout,
-    LayoutTree,
-};
 pub use radio::Radio;
 use std::{
     any::Any,
@@ -43,7 +40,6 @@ mod button;
 mod checkbox;
 mod flex_box;
 mod image_control;
-mod layout;
 mod radio;
 mod text_input;
 

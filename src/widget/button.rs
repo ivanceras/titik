@@ -1,4 +1,3 @@
-use super::LayoutTree;
 use crate::{
     buffer::{
         Buffer,
@@ -9,6 +8,7 @@ use crate::{
         line,
         rounded,
     },
+    LayoutTree,
     Widget,
 };
 use std::any::Any;

@@ -6,9 +6,15 @@ pub use buffer::{
     Cell,
 };
 pub use crossterm;
+pub use layout::{
+    compute_layout,
+    find_widget,
+    widget_hit_at,
+    widget_node_idx_at,
+    LayoutTree,
+};
 pub use stretch;
 pub use widget::{
-    compute_layout,
     Button,
     Checkbox,
     FlexBox,
@@ -19,6 +25,7 @@ pub use widget::{
 };
 
 mod buffer;
+mod layout;
 #[allow(unused)]
 mod symbol;
 mod widget;
@@ -31,9 +38,7 @@ pub mod command {
         terminal,
         terminal::ClearType,
     };
-    use std::{
-        io::Write,
-    };
+    use std::io::Write;
 
     pub fn reset_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
         crossterm::queue!(

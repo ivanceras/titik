@@ -80,6 +80,14 @@ pub fn widget_hit_at<'a>(
     }
 }
 
+pub fn widget_node_idx_at<'a>(
+    layout_tree: &LayoutTree,
+    x: f32,
+    y: f32,
+) -> Option<usize> {
+    layout_tree.hit(x, y).pop()
+}
+
 /// Traverse the node tree until the node_idx is found
 fn find_node<'a>(
     node: &'a dyn Widget,
