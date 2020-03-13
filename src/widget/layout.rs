@@ -58,7 +58,7 @@ impl LayoutTree {
 // if the element is hit with a click
 
 /// Get the widget with the node_idx by traversing to through the root_widget specified
-pub fn trace_widget(
+pub fn find_widget(
     root_widget: &dyn Widget,
     node_idx: usize,
 ) -> Option<&dyn Widget> {
@@ -140,6 +140,7 @@ mod test {
 
         let mut btn2 = Button::new("world");
         btn2.set_size(Some(20.0), Some(10.0));
+        let btn2_clone = btn2.clone();
         control.add_child(Box::new(btn2));
 
         let layout_tree = compute_layout(
@@ -164,7 +165,7 @@ mod test {
         assert_eq!(hit1.len(), 2);
         println!("hit1: {:?}", hit1);
         assert_eq!(hit1.pop(), Some(1));
-        let trace_btn1: &Button = trace_widget(&control, 1)
+        let trace_btn1: &Button = find_widget(&control, 1)
             .expect("must return a widget")
             .as_any()
             .downcast_ref::<Button>()
@@ -192,5 +193,12 @@ mod test {
         let mut hit2 = layout_tree.hit(1.0, 35.0);
         assert_eq!(hit2.len(), 2);
         assert_eq!(hit2.pop(), Some(2));
+
+        let trace_btn2 = find_widget(&control, 2)
+            .expect("must return a widget")
+            .as_any()
+            .downcast_ref::<Button>()
+            .expect("must be a button");
+        assert_eq!(trace_btn2, &btn2_clone);
     }
 }
