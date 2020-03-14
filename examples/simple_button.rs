@@ -50,6 +50,7 @@ use titik::{
     compute_layout,
     find_widget,
     find_widget_mut,
+    set_focused_node,
     widget_hit_at,
     widget_node_idx_at,
     Buffer,
@@ -187,7 +188,6 @@ where
                                     .as_any_mut()
                                     .downcast_mut::<TextInput>()
                                 {
-                                    txt_input1.set_focused(true);
                                     txt_input1.process_key(key_event);
                                 }
                             }
@@ -201,9 +201,7 @@ where
                     if let Some(idx) = focused_widget_idx.as_ref() {
                         let active_widget: Option<&mut dyn Widget> =
                             find_widget_mut(&mut root_node, *idx);
-                        if let Some(focused_widget) = active_widget {
-                            focused_widget.set_focused(true);
-                        }
+                        set_focused_node(&mut root_node, *idx);
                     }
                 }
                 _ => (),

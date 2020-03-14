@@ -130,6 +130,29 @@ fn find_node_mut<'a>(
     }
 }
 
+pub fn set_focused_node<'a>(node: &'a mut dyn Widget, node_idx: usize) {
+    set_focused_widget(node, node_idx, &mut 0)
+}
+
+/// Set the node at node_idx as focused, while the rest
+/// should be set to false
+fn set_focused_widget<'a>(
+    node: &'a mut dyn Widget,
+    node_idx: usize,
+    cur_index: &mut usize,
+) {
+    if node_idx == *cur_index {
+        node.set_focused(true);
+    } else if let Some(children) = node.children_mut() {
+        children.iter_mut().for_each(|child| {
+            *cur_index += 1;
+            set_focused_widget(child.as_mut(), node_idx, cur_index)
+        })
+    } else {
+        node.set_focused(false);
+    }
+}
+
 /// Compute a flex layout of the node and it's children
 pub fn compute_layout(
     control: &mut dyn Widget,
