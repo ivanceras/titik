@@ -6,6 +6,7 @@ pub use crossterm::{
         Event,
         KeyCode,
         KeyEvent,
+        KeyModifiers,
         MouseEvent,
     },
     execute,
@@ -64,7 +65,8 @@ use titik::{
 fn init<W: Write>(w: &mut W) -> Result<()> {
     execute!(w, terminal::EnterAlternateScreen)?;
     execute!(w, EnableMouseCapture)?;
-    terminal::enable_raw_mode()
+    terminal::enable_raw_mode()?;
+    Ok(())
 }
 
 fn finalize<W: Write>(w: &mut W) -> Result<()> {
@@ -74,7 +76,8 @@ fn finalize<W: Write>(w: &mut W) -> Result<()> {
         cursor::Show,
         terminal::LeaveAlternateScreen
     )?;
-    terminal::disable_raw_mode()
+    terminal::disable_raw_mode()?;
+    Ok(())
 }
 
 fn run<W>(w: &mut W) -> Result<()>
@@ -85,6 +88,8 @@ where
 
     let mut focused_widget_idx = None;
     let mut focused_widget = None;
+    let mut buffer = String::new();
+    let mut events = String::new();
 
     loop {
         queue!(
@@ -103,9 +108,10 @@ where
         cb2.set_checked(false);
         let mut rb1 = Radio::new("Radio1");
         rb1.set_checked(true);
-        let input1 = TextInput::new("Hello world!");
+        let mut input1 = TextInput::new("Hello world!");
+        input1.set_value(&buffer);
         let rb2 = Radio::new("Radio2");
-        let mut btn2 = Button::new("Events");
+        let mut btn2 = Button::new(format!("Events: {}", events));
         btn2.set_rounded(true);
         let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
         img.set_size(Some(80.0), Some(40.0));
@@ -148,14 +154,24 @@ where
         w.flush()?;
 
         if let Ok(ev) = event::read() {
-            //events.push(format!("{:?}", ev));
+            events = format!("{:?}", ev);
             match ev {
                 Event::Key(KeyEvent {
                     code: KeyCode::Char(c),
-                    ..
+                    modifiers,
                 }) => {
-                    if c == 'q' {
-                        break;
+                    // To quite, press any of the following:
+                    //  - CTRL-c
+                    //  - CTRL-q
+                    //  - CTRL-d
+                    //  - CTRL-z
+                    if modifiers.contains(KeyModifiers::CONTROL) {
+                        match c {
+                            'c' | 'q' | 'd' | 'z' => break,
+                            _ => (),
+                        }
+                    } else {
+                        buffer.push(c);
                     }
                 }
                 Event::Mouse(MouseEvent::Down(btn, x, y, _modifier)) => {

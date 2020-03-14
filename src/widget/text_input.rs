@@ -42,7 +42,7 @@ impl TextInput {
         }
     }
 
-    pub fn set_label<S: ToString>(&mut self, value: S) {
+    pub fn set_value<S: ToString>(&mut self, value: S) {
         self.value = value.to_string();
     }
 
