@@ -9,9 +9,11 @@ use crate::{
         line,
         rounded,
     },
+    Cmd,
     LayoutTree,
     Widget,
 };
+use crossterm::Command;
 use std::any::Any;
 use stretch::{
     geometry::Size,
@@ -59,7 +61,7 @@ impl Widget for Radio {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -73,6 +75,7 @@ impl Widget for Radio {
         for (t, ch) in self.label.chars().enumerate() {
             buf.set_symbol(loc_x + 3 + x_offset + t, loc_y + 1, ch);
         }
+        vec![]
     }
 
     fn as_any(&self) -> &dyn Any {

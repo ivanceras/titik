@@ -9,10 +9,15 @@ use crate::{
         line,
         rounded,
     },
+    Cmd,
     LayoutTree,
     Widget,
 };
-use std::any::Any;
+use crossterm::Command;
+use std::{
+    any::Any,
+    fmt,
+};
 use stretch::{
     geometry::Size,
     style::{
@@ -59,7 +64,7 @@ impl Widget for Checkbox {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -73,6 +78,7 @@ impl Widget for Checkbox {
         for (t, ch) in self.label.chars().enumerate() {
             buf.set_symbol(loc_x + 4 + t, loc_y + 1, ch);
         }
+        vec![]
     }
 
     fn as_any(&self) -> &dyn Any {

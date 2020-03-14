@@ -8,11 +8,12 @@ use crate::{
         line,
         rounded,
     },
+    Cmd,
     LayoutTree,
 };
 pub use button::Button;
 pub use checkbox::Checkbox;
-
+use crossterm::Command;
 pub use flex_box::FlexBox;
 pub use image_control::Image;
 pub use radio::Radio;
@@ -63,7 +64,7 @@ where
         None
     }
 
-    fn draw(&self, but: &mut Buffer, layout_tree: &LayoutTree);
+    fn draw(&self, but: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd>;
 
     fn style_node(&self, stretch: &mut Stretch) -> Option<Node> {
         let children_styles = if let Some(children) = self.children() {

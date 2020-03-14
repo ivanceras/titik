@@ -8,10 +8,15 @@ use crate::{
         line,
         rounded,
     },
+    Cmd,
     LayoutTree,
     Widget,
 };
-use std::any::Any;
+use crossterm::Command;
+use std::{
+    any::Any,
+    fmt,
+};
 use stretch::{
     geometry::Size,
     style::{
@@ -87,11 +92,12 @@ impl Widget for FlexBox {
         }
     }
 
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         self.children
             .iter()
             .zip(layout_tree.children_layout.iter())
-            .for_each(|(child, child_layout)| child.draw(buf, child_layout));
+            .flat_map(|(child, child_layout)| child.draw(buf, child_layout))
+            .collect()
     }
 
     fn add_child(&mut self, child: Box<dyn Widget>) -> bool {

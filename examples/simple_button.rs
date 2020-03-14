@@ -92,6 +92,7 @@ where
     let mut focused_widget = None;
     let mut input_buffer = InputBuffer::new();
     let mut events = String::new();
+    let mut commands = String::new();
 
     loop {
         queue!(
@@ -112,6 +113,10 @@ where
         rb1.set_checked(true);
         let mut input1 = TextInput::new("Hello world!");
         input1.set_value(input_buffer.get_content());
+
+        let mut input2 = TextInput::new("Commands");
+        input2.set_value(&commands);
+
         let rb2 = Radio::new("Radio2");
         let mut btn2 = Button::new(format!("Events: {}", events));
         btn2.set_rounded(true);
@@ -130,6 +135,7 @@ where
         root_node.add_child(Box::new(rb1));
         root_node.add_child(Box::new(rb2));
         root_node.add_child(Box::new(input1));
+        root_node.add_child(Box::new(input2));
 
         focused_widget = focused_widget_idx
             .map(|idx| find_widget(&root_node, idx))
@@ -151,8 +157,17 @@ where
             }
         }
         let mut buf = Buffer::new(width as usize, height as usize);
-        root_node.draw(&mut buf, &layout_tree);
+        let cmds = root_node.draw(&mut buf, &layout_tree);
         write!(w, "{}", buf);
+        cmds.iter()
+            .for_each(|cmd| cmd.execute(w).expect("must execute"));
+
+        commands = cmds
+            .iter()
+            .map(|cmd| format!("{:?}", cmd))
+            .collect::<Vec<String>>()
+            .join(", ");
+
         w.flush()?;
 
         if let Ok(ev) = event::read() {

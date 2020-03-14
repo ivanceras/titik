@@ -5,6 +5,7 @@ pub use buffer::{
     Buffer,
     Cell,
 };
+pub use cmd::Cmd;
 pub use crossterm;
 pub use input_buffer::InputBuffer;
 pub use layout::{
@@ -27,6 +28,7 @@ pub use widget::{
 };
 
 mod buffer;
+mod cmd;
 mod input_buffer;
 mod layout;
 #[allow(unused)]

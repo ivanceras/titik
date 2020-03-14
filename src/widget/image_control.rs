@@ -4,10 +4,14 @@ use crate::{
         Cell,
     },
     symbol::bar,
+    Cmd,
     LayoutTree,
     Widget,
 };
-use crossterm::style::Color;
+use crossterm::{
+    style::Color,
+    Command,
+};
 use image::{
     self,
     DynamicImage,
@@ -114,7 +118,7 @@ impl Widget for Image {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -123,6 +127,7 @@ impl Widget for Image {
                 buf.set_cell(loc_x + 1 + i, loc_y + 1 + y, cell.clone());
             }
         }
+        vec![]
     }
 
     fn as_any(&self) -> &dyn Any {
