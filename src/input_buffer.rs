@@ -26,6 +26,8 @@ impl InputBuffer {
         }
     }
 
+    /// create an instance of this input buffer with the buffer
+    /// content set to value.
     pub fn new_with_value<S: ToString>(value: S) -> Self {
         let value = value.to_string();
         let value_len = value.len();
@@ -52,11 +54,15 @@ impl InputBuffer {
         self.cursor_loc
     }
 
+    /// append a character to the buffer and move the cursor location
+    /// to the right
     fn add_char(&mut self, c: char) {
         self.content.insert(self.cursor_loc, c);
         self.cursor_loc += 1;
     }
 
+    /// move the cursor location to the left and remove the character
+    /// on this new location
     fn backspace(&mut self) {
         if self.content.len() > 0 && self.cursor_loc > 0 {
             self.cursor_loc -= 1;
@@ -64,12 +70,14 @@ impl InputBuffer {
         }
     }
 
+    /// move the cursor 1 cell to the left
     fn left(&mut self) {
         if self.cursor_loc > 0 {
             self.cursor_loc -= 1;
         }
     }
 
+    /// move the cursor 1 cell to the right
     fn right(&mut self) {
         if self.cursor_loc < self.content.len() {
             self.cursor_loc += 1;
