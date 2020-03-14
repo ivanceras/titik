@@ -78,6 +78,7 @@ fn finalize<W: Write>(w: &mut W) -> Result<()> {
         terminal::LeaveAlternateScreen
     )?;
     terminal::disable_raw_mode()?;
+    w.flush()?;
     Ok(())
 }
 
@@ -169,7 +170,10 @@ where
                         match code {
                             KeyCode::Char(c) => {
                                 match c {
-                                    'c' | 'q' | 'd' | 'z' => break,
+                                    'c' | 'q' | 'd' | 'z' => {
+                                        finalize(w);
+                                        break;
+                                    }
                                     _ => (),
                                 }
                             }
