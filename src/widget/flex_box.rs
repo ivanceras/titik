@@ -44,6 +44,11 @@ impl FlexBox {
         }
     }
 
+    /// remove all children of this flex_box
+    pub fn clear_children(&mut self) {
+        self.children = vec![];
+    }
+
     pub fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
         self.width = width;
         self.height = height;
