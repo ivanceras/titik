@@ -13,7 +13,10 @@ use crate::{
 };
 pub use button::Button;
 pub use checkbox::Checkbox;
-use crossterm::Command;
+use crossterm::{
+    event::Event,
+    Command,
+};
 pub use flex_box::FlexBox;
 pub use image_control::Image;
 pub use radio::Radio;
@@ -84,6 +87,9 @@ where
     fn as_any_mut(&mut self) -> &mut dyn Any;
 
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>);
+
+    /// let the widget react to the event
+    fn process_event(&mut self, event: Event);
 }
 
 #[cfg(test)]

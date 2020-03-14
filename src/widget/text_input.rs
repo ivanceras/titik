@@ -16,7 +16,10 @@ use crate::{
 };
 use crossterm::{
     cursor,
-    event::KeyEvent,
+    event::{
+        Event,
+        KeyEvent,
+    },
     Command,
 };
 use std::any::Any;
@@ -149,7 +152,7 @@ impl Widget for TextInput {
         buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
         let cursor_loc_x = loc_x + self.input_buffer.get_cursor_location();
         if self.focused {
-            vec![Cmd::MoveTo(cursor_loc_x + 3, loc_y + 1)]
+            vec![Cmd::ShowCursor, Cmd::MoveTo(cursor_loc_x + 3, loc_y + 1)]
         } else {
             vec![]
         }
@@ -170,5 +173,14 @@ impl Widget for TextInput {
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
         self.width = width;
         self.height = height;
+    }
+
+    fn process_event(&mut self, event: Event) {
+        match event {
+            //TODO: also trigger the input event listener here
+            Event::Key(ke) => self.process_key(ke),
+            //TODO: deal with mouse click, to move the cursor location
+            _ => (),
+        }
     }
 }

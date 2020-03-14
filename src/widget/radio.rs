@@ -13,7 +13,10 @@ use crate::{
     LayoutTree,
     Widget,
 };
-use crossterm::Command;
+use crossterm::{
+    event::Event,
+    Command,
+};
 use std::any::Any;
 use stretch::{
     geometry::Size,
@@ -87,4 +90,7 @@ impl Widget for Radio {
     }
 
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {}
+
+    /// TODO: process the attached event click event here
+    fn process_event(&mut self, event: Event) {}
 }
