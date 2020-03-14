@@ -57,6 +57,7 @@ use titik::{
     Checkbox,
     FlexBox,
     Image,
+    InputBuffer,
     Radio,
     TextInput,
     Widget,
@@ -88,7 +89,7 @@ where
 
     let mut focused_widget_idx = None;
     let mut focused_widget = None;
-    let mut buffer = String::new();
+    let mut input_buffer = InputBuffer::new();
     let mut events = String::new();
 
     loop {
@@ -96,7 +97,7 @@ where
             w,
             style::ResetColor,
             terminal::Clear(ClearType::All),
-            cursor::Hide,
+            cursor::Show,
             cursor::MoveTo(1, 1)
         )?;
 
@@ -109,19 +110,19 @@ where
         let mut rb1 = Radio::new("Radio1");
         rb1.set_checked(true);
         let mut input1 = TextInput::new("Hello world!");
-        input1.set_value(&buffer);
+        input1.set_value(input_buffer.get_content());
         let rb2 = Radio::new("Radio2");
         let mut btn2 = Button::new(format!("Events: {}", events));
         btn2.set_rounded(true);
-        let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
-        img.set_size(Some(80.0), Some(40.0));
+        //let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
+        //img.set_size(Some(80.0), Some(40.0));
         root_node.set_size(Some((width - 2) as f32), Some(height as f32));
         root_node.vertical();
 
         let btn1 = Button::new(format!("{:?}", focused_widget));
         root_node.add_child(Box::new(btn1));
         root_node.add_child(Box::new(btn2));
-        root_node.add_child(Box::new(img));
+        //root_node.add_child(Box::new(img));
         root_node.add_child(Box::new(cb2));
         root_node.add_child(Box::new(cb1));
 
@@ -156,22 +157,26 @@ where
         if let Ok(ev) = event::read() {
             events = format!("{:?}", ev);
             match ev {
-                Event::Key(KeyEvent {
-                    code: KeyCode::Char(c),
-                    modifiers,
-                }) => {
+                Event::Key(key_event) => {
+                    let code = key_event.code;
+                    let modifiers = key_event.modifiers;
                     // To quite, press any of the following:
                     //  - CTRL-c
                     //  - CTRL-q
                     //  - CTRL-d
                     //  - CTRL-z
                     if modifiers.contains(KeyModifiers::CONTROL) {
-                        match c {
-                            'c' | 'q' | 'd' | 'z' => break,
+                        match code {
+                            KeyCode::Char(c) => {
+                                match c {
+                                    'c' | 'q' | 'd' | 'z' => break,
+                                    _ => (),
+                                }
+                            }
                             _ => (),
                         }
                     } else {
-                        buffer.push(c);
+                        input_buffer.process_key_event(key_event);
                     }
                 }
                 Event::Mouse(MouseEvent::Down(btn, x, y, _modifier)) => {

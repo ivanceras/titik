@@ -12,6 +12,7 @@ use crossterm::event::{
 /// will be remove and all the elements on the right side will be shifted to the left.
 ///
 /// TODO: deal with character that spans more than 1 cell
+#[derive(Default, Debug, PartialEq)]
 pub struct InputBuffer {
     content: String,
     cursor_loc: usize,
@@ -23,6 +24,32 @@ impl InputBuffer {
             content: String::new(),
             cursor_loc: 0,
         }
+    }
+
+    pub fn new_with_value<S: ToString>(value: S) -> Self {
+        let value = value.to_string();
+        let value_len = value.len();
+        InputBuffer {
+            content: value,
+            cursor_loc: value_len,
+        }
+    }
+
+    /// replace the value of the input buffer with `value`
+    /// the cursor_location is also set to the end of the buffer.
+    pub fn set_value<S: ToString>(&mut self, value: S) {
+        self.content = value.to_string();
+        self.cursor_loc = self.content.len();
+    }
+
+    /// return the content of the buffer
+    pub fn get_content(&self) -> &str {
+        &self.content
+    }
+
+    /// return the cursor location of the buffer
+    pub fn get_cursor_location(&self) -> usize {
+        self.cursor_loc
     }
 
     fn add_char(&mut self, c: char) {
@@ -65,7 +92,10 @@ impl InputBuffer {
     // - Delete
     // - Backspace
     // - Char(char)
-    fn process_key_event(&mut self, KeyEvent { code, modifiers }: KeyEvent) {
+    pub fn process_key_event(
+        &mut self,
+        KeyEvent { code, modifiers }: KeyEvent,
+    ) {
         match code {
             KeyCode::Char(c) => {
                 self.add_char(c);

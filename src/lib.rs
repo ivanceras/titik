@@ -6,6 +6,7 @@ pub use buffer::{
     Cell,
 };
 pub use crossterm;
+pub use input_buffer::InputBuffer;
 pub use layout::{
     compute_layout,
     find_widget,

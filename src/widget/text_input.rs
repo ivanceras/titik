@@ -9,8 +9,13 @@ use crate::{
         rounded,
         thick_line,
     },
+    InputBuffer,
     LayoutTree,
     Widget,
+};
+use crossterm::{
+    cursor,
+    event::KeyEvent,
 };
 use std::any::Any;
 use stretch::{
@@ -23,7 +28,7 @@ use stretch::{
 
 #[derive(Default, Debug, PartialEq)]
 pub struct TextInput {
-    pub value: String,
+    pub input_buffer: InputBuffer,
     pub is_rounded: bool,
     focused: bool,
     pub width: Option<f32>,
@@ -36,14 +41,22 @@ impl TextInput {
         S: ToString,
     {
         TextInput {
-            value: value.to_string(),
+            input_buffer: InputBuffer::new_with_value(value),
             is_rounded: false,
             ..Default::default()
         }
     }
 
+    pub fn process_key(&mut self, key_event: KeyEvent) {
+        self.input_buffer.process_key_event(key_event);
+    }
+
     pub fn set_value<S: ToString>(&mut self, value: S) {
-        self.value = value.to_string();
+        self.input_buffer.set_value(value);
+    }
+
+    pub fn get_value(&self) -> &str {
+        self.input_buffer.get_content()
     }
 
     pub fn set_rounded(&mut self, rounded: bool) {
@@ -123,7 +136,7 @@ impl Widget for TextInput {
             buf.set_symbol(loc_x, loc_y + 1 + j, vertical);
             buf.set_symbol(loc_x + width, loc_y + 1 + j, vertical);
         }
-        for (t, ch) in self.value.chars().enumerate() {
+        for (t, ch) in self.get_value().chars().enumerate() {
             buf.set_symbol(loc_x + 1 + t, loc_y + 2, ch);
         }
 
