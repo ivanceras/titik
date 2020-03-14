@@ -65,6 +65,13 @@ pub fn find_widget(
     find_node(root_widget, node_idx, &mut 0)
 }
 
+pub fn find_widget_mut(
+    root_widget: &mut dyn Widget,
+    node_idx: usize,
+) -> Option<&mut dyn Widget> {
+    find_node_mut(root_widget, node_idx, &mut 0)
+}
+
 /// return the widget that is hit at this location
 /// base on the layout tree
 pub fn widget_hit_at<'a>(
@@ -101,6 +108,23 @@ fn find_node<'a>(
         })
     } else if node_idx == *cur_index {
         return Some(node);
+    } else {
+        None
+    }
+}
+
+fn find_node_mut<'a>(
+    node: &'a mut dyn Widget,
+    node_idx: usize,
+    cur_index: &mut usize,
+) -> Option<&'a mut dyn Widget> {
+    if node_idx == *cur_index {
+        return Some(node);
+    } else if let Some(children) = node.children_mut() {
+        children.iter_mut().find_map(|child| {
+            *cur_index += 1;
+            find_node_mut(child.as_mut(), node_idx, cur_index)
+        })
     } else {
         None
     }

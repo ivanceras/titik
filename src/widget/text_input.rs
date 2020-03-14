@@ -7,6 +7,7 @@ use crate::{
         bar,
         line,
         rounded,
+        thick_line,
     },
     LayoutTree,
     Widget,
@@ -77,38 +78,55 @@ impl Widget for TextInput {
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
+
+        let mut top_left = if self.is_rounded {
+            rounded::TOP_LEFT
+        } else {
+            line::TOP_LEFT
+        };
+
+        let mut top_right = if self.is_rounded {
+            rounded::TOP_RIGHT
+        } else {
+            line::TOP_RIGHT
+        };
+        let mut bottom_left = if self.is_rounded {
+            rounded::BOTTOM_LEFT
+        } else {
+            line::BOTTOM_LEFT
+        };
+        let mut bottom_right = if self.is_rounded {
+            rounded::BOTTOM_RIGHT
+        } else {
+            line::BOTTOM_RIGHT
+        };
+
+        let mut horizontal = line::HORIZONTAL;
+        let mut vertical = line::VERTICAL;
+
+        // Note: the rounded border is override with square thick line since there is no thick
+        // rounded corner
+        if self.focused {
+            top_left = thick_line::TOP_LEFT;
+            top_right = thick_line::TOP_RIGHT;
+            bottom_left = thick_line::BOTTOM_LEFT;
+            bottom_right = thick_line::BOTTOM_RIGHT;
+            horizontal = thick_line::HORIZONTAL;
+            vertical = thick_line::VERTICAL;
+        }
+
         for i in 0..width {
-            buf.set_symbol(loc_x + i, loc_y + 1, line::HORIZONTAL);
-            buf.set_symbol(loc_x + i, loc_y + height, line::HORIZONTAL);
+            buf.set_symbol(loc_x + i, loc_y + 1, horizontal);
+            buf.set_symbol(loc_x + i, loc_y + height, horizontal);
         }
         for j in 0..height {
-            buf.set_symbol(loc_x, loc_y + 1 + j, line::VERTICAL);
-            buf.set_symbol(loc_x + width, loc_y + 1 + j, line::VERTICAL);
+            buf.set_symbol(loc_x, loc_y + 1 + j, vertical);
+            buf.set_symbol(loc_x + width, loc_y + 1 + j, vertical);
         }
         for (t, ch) in self.value.chars().enumerate() {
             buf.set_symbol(loc_x + 1 + t, loc_y + 2, ch);
         }
 
-        let top_left = if self.is_rounded {
-            rounded::TOP_LEFT
-        } else {
-            line::TOP_LEFT
-        };
-        let top_right = if self.is_rounded {
-            rounded::TOP_RIGHT
-        } else {
-            line::TOP_RIGHT
-        };
-        let bottom_left = if self.is_rounded {
-            rounded::BOTTOM_LEFT
-        } else {
-            line::BOTTOM_LEFT
-        };
-        let bottom_right = if self.is_rounded {
-            rounded::BOTTOM_RIGHT
-        } else {
-            line::BOTTOM_RIGHT
-        };
         buf.set_symbol(loc_x, loc_y + 1, top_left);
         buf.set_symbol(loc_x, loc_y + height, bottom_left);
         buf.set_symbol(loc_x + width, loc_y + 1, top_right);

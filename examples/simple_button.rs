@@ -48,6 +48,7 @@ use stretch::{
 use titik::{
     compute_layout,
     find_widget,
+    find_widget_mut,
     widget_hit_at,
     widget_node_idx_at,
     Buffer,
@@ -134,6 +135,13 @@ where
                 height: Number::Defined(height as f32),
             },
         );
+
+        if let Some(idx) = focused_widget_idx.as_ref() {
+            if let Some(focused_widget) = find_widget_mut(&mut root_node, *idx)
+            {
+                focused_widget.set_focused(true);
+            }
+        }
         let mut buf = Buffer::new(width as usize, height as usize);
         root_node.draw(&mut buf, &layout_tree);
         write!(w, "{}", buf);

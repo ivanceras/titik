@@ -9,6 +9,7 @@ pub use crossterm;
 pub use layout::{
     compute_layout,
     find_widget,
+    find_widget_mut,
     widget_hit_at,
     widget_node_idx_at,
     LayoutTree,
