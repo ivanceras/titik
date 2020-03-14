@@ -103,7 +103,43 @@ impl Widget for FlexBox {
         Some(&self.children)
     }
 
+    fn child_mut<'a>(
+        &'a mut self,
+        index: usize,
+    ) -> Option<&'a mut Box<dyn Widget>> {
+        self.children.get_mut(index)
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::*;
+
+    #[test]
+    fn test_mut() {
+        let mut fb = FlexBox::new();
+        let btn1 = Button::new("Btn1");
+        println!("btn1: {:?}", btn1);
+        fb.add_child(Box::new(btn1));
+
+        let mut btn1_mut = fb.child_mut(0);
+        if let Some(btn1_mut) = btn1_mut {
+            let mut btn1_cast = btn1_mut
+                .as_any_mut()
+                .downcast_mut::<Button>()
+                .expect("must be a button");
+            btn1_cast.set_size(Some(20.0), Some(10.0));
+            println!("btn1_cast: {:?}", btn1_cast);
+            assert_eq!(Some(20.0), btn1_cast.width);
+            assert_eq!(Some(10.0), btn1_cast.height);
+        }
     }
 }

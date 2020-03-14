@@ -55,6 +55,10 @@ where
         None
     }
 
+    fn child_mut(&mut self, index: usize) -> Option<&mut Box<dyn Widget>> {
+        None
+    }
+
     fn draw(&self, but: &mut Buffer, layout_tree: &LayoutTree);
 
     fn style_node(&self, stretch: &mut Stretch) -> Option<Node> {
@@ -72,11 +76,13 @@ where
     fn set_focused(&mut self, focused: bool) {}
 
     fn as_any(&self) -> &dyn Any;
+    fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::*;
     use std::boxed;
     use stretch::geometry::*;
 
