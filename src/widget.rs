@@ -55,6 +55,10 @@ where
         None
     }
 
+    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget>]> {
+        None
+    }
+
     fn child_mut(&mut self, index: usize) -> Option<&mut Box<dyn Widget>> {
         None
     }

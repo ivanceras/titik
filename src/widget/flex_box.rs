@@ -103,6 +103,10 @@ impl Widget for FlexBox {
         Some(&self.children)
     }
 
+    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget>]> {
+        Some(&mut self.children)
+    }
+
     fn child_mut<'a>(
         &'a mut self,
         index: usize,
@@ -130,16 +134,32 @@ mod test {
         println!("btn1: {:?}", btn1);
         fb.add_child(Box::new(btn1));
 
-        let mut btn1_mut = fb.child_mut(0);
-        if let Some(btn1_mut) = btn1_mut {
-            let mut btn1_cast = btn1_mut
-                .as_any_mut()
-                .downcast_mut::<Button>()
-                .expect("must be a button");
-            btn1_cast.set_size(Some(20.0), Some(10.0));
-            println!("btn1_cast: {:?}", btn1_cast);
-            assert_eq!(Some(20.0), btn1_cast.width);
-            assert_eq!(Some(10.0), btn1_cast.height);
-        }
+        let mut btn1_mut = fb.child_mut(0).expect("must have a child 0");
+        let mut btn1_cast = btn1_mut
+            .as_any_mut()
+            .downcast_mut::<Button>()
+            .expect("must be a button");
+        btn1_cast.set_size(Some(20.0), Some(10.0));
+        println!("btn1_cast: {:?}", btn1_cast);
+        assert_eq!(Some(20.0), btn1_cast.width);
+        assert_eq!(Some(10.0), btn1_cast.height);
+    }
+
+    #[test]
+    fn test_children_mut() {
+        let mut fb = FlexBox::new();
+        let btn1 = Button::new("Btn1");
+        println!("btn1: {:?}", btn1);
+        fb.add_child(Box::new(btn1));
+
+        let mut children = fb.children_mut().expect("must have children");
+        let mut btn0 = children[0]
+            .as_any_mut()
+            .downcast_mut::<Button>()
+            .expect("must be a button");
+
+        btn0.set_size(Some(40.0), Some(100.0));
+        assert_eq!(Some(40.0), btn0.width);
+        assert_eq!(Some(100.0), btn0.height);
     }
 }
