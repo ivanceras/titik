@@ -12,7 +12,7 @@ use crossterm::event::{
 /// will be remove and all the elements on the right side will be shifted to the left.
 ///
 /// TODO: deal with character that spans more than 1 cell
-#[derive(Default, Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq, Clone)]
 pub struct InputBuffer {
     content: String,
     cursor_loc: usize,

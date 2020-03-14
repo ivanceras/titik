@@ -112,7 +112,8 @@ where
         let mut rb1 = Radio::new("Radio1");
         rb1.set_checked(true);
         let mut input1 = TextInput::new("Hello world!");
-        input1.set_value(input_buffer.get_content());
+        input1.input_buffer = input_buffer.clone();
+        //input1.set_value(input_buffer.get_content());
 
         let mut input2 = TextInput::new("Commands");
         input2.set_value(&commands);
@@ -174,15 +175,13 @@ where
             events = format!("{:?}", ev);
             match ev {
                 Event::Key(key_event) => {
-                    let code = key_event.code;
-                    let modifiers = key_event.modifiers;
                     // To quite, press any of the following:
                     //  - CTRL-c
                     //  - CTRL-q
                     //  - CTRL-d
                     //  - CTRL-z
-                    if modifiers.contains(KeyModifiers::CONTROL) {
-                        match code {
+                    if key_event.modifiers.contains(KeyModifiers::CONTROL) {
+                        match key_event.code {
                             KeyCode::Char(c) => {
                                 match c {
                                     'c' | 'q' | 'd' | 'z' => {
