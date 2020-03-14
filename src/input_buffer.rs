@@ -76,12 +76,19 @@ impl InputBuffer {
         }
     }
 
+    /// move the cursor location to the start of the buffer
     fn home(&mut self) {
         self.cursor_loc = 0;
     }
 
+    /// move the cursor location to the end of the buffer
     fn end(&mut self) {
         self.cursor_loc = self.content.len();
+    }
+
+    /// delete the first character to the right of the cursor
+    fn delete(&mut self) {
+        self.content.remove(self.cursor_loc);
     }
 
     // Keys to be processed:
@@ -114,6 +121,9 @@ impl InputBuffer {
             }
             KeyCode::End => {
                 self.end();
+            }
+            KeyCode::Delete => {
+                self.delete();
             }
             _ => (),
         }
