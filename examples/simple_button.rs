@@ -103,7 +103,6 @@ where
     init(w)?;
 
     let mut focused_widget_idx = None;
-    let mut focused_widget = None;
     let mut events = String::new();
     let mut commands = String::new();
 
@@ -128,7 +127,7 @@ where
     root_node.set_size(Some((width - 2) as f32), Some(height as f32));
     root_node.vertical();
 
-    let btn1 = Button::new(format!("{:?}", focused_widget));
+    let btn1 = Button::new("Button 1");
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
     root_node.add_child(Box::new(img));
@@ -141,11 +140,6 @@ where
     root_node.add_child(Box::new(input2));
 
     loop {
-        focused_widget = focused_widget_idx
-            .map(|idx| find_widget(&root_node, idx))
-            .flatten()
-            .map(|w| format!("{:?}", w));
-
         let layout_tree = compute_layout(
             &mut root_node,
             Size {
@@ -171,7 +165,6 @@ where
                             KeyCode::Char(c) => {
                                 match c {
                                     'c' | 'q' | 'd' | 'z' => {
-                                        finalize(w);
                                         break;
                                     }
                                     _ => (),
@@ -207,16 +200,6 @@ where
                 _ => (),
             }
         }
-
-        let cmds = draw_buffer(w, &root_node, &layout_tree, width, height);
-
-        commands = cmds
-            .iter()
-            .map(|cmd| format!("{:?}", cmd))
-            .collect::<Vec<String>>()
-            .join(", ");
-
-        w.flush()?;
     }
     finalize(w)?;
     Ok(())
@@ -228,7 +211,7 @@ fn draw_buffer<W: Write>(
     layout_tree: &LayoutTree,
     width: u16,
     height: u16,
-) -> Vec<Cmd> {
+) {
     let mut buf = Buffer::new(width as usize, height as usize);
     clear(w);
     let cmds = root_node.draw(&mut buf, &layout_tree);
@@ -236,7 +219,6 @@ fn draw_buffer<W: Write>(
     cmds.iter()
         .for_each(|cmd| cmd.execute(w).expect("must execute"));
     w.flush();
-    cmds
 }
 
 pub fn buffer_size() -> Result<(u16, u16)> {

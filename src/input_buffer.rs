@@ -96,7 +96,9 @@ impl InputBuffer {
 
     /// delete the first character to the right of the cursor
     fn delete(&mut self) {
-        self.content.remove(self.cursor_loc);
+        if self.cursor_loc < self.content.len() {
+            self.content.remove(self.cursor_loc);
+        }
     }
 
     // Keys to be processed:
