@@ -26,6 +26,7 @@ pub use widget::{
 };
 
 mod buffer;
+mod input_buffer;
 mod layout;
 #[allow(unused)]
 mod symbol;
