@@ -51,15 +51,6 @@ impl Image {
         image
     }
 
-    pub fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
-        let size_changed = self.width != width || self.height != height;
-        if size_changed {
-            self.width = width;
-            self.height = height;
-            self.create_cells();
-        }
-    }
-
     /// the cells will be stored in the image control to avoid re-creation every after redraw
     fn create_cells(&mut self) {
         let width = self.width.unwrap_or(10.0);
@@ -136,6 +127,15 @@ impl Widget for Image {
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
+    }
+
+    fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
+        let size_changed = self.width != width || self.height != height;
+        if size_changed {
+            self.width = width;
+            self.height = height;
+            self.create_cells();
+        }
     }
 }
 

@@ -82,6 +82,8 @@ where
 
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
+
+    fn set_size(&mut self, width: Option<f32>, height: Option<f32>);
 }
 
 #[cfg(test)]

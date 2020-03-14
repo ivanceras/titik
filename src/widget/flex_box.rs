@@ -49,11 +49,6 @@ impl FlexBox {
         self.children = vec![];
     }
 
-    pub fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
-        self.width = width;
-        self.height = height;
-    }
-
     /// set to vertical column direction
     pub fn vertical(&mut self) {
         self.flex_direction = FlexDirection::Column;
@@ -131,6 +126,11 @@ impl Widget for FlexBox {
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
+    }
+
+    fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
+        self.width = width;
+        self.height = height;
     }
 }
 

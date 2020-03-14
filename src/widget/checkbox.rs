@@ -88,4 +88,6 @@ impl Widget for Checkbox {
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
+
+    fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {}
 }

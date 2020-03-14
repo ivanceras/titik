@@ -47,11 +47,6 @@ impl Button {
         self.label = label.to_string();
     }
 
-    pub fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
-        self.width = width;
-        self.height = height;
-    }
-
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }
@@ -133,5 +128,10 @@ impl Widget for Button {
 
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
+    }
+
+    fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
+        self.width = width;
+        self.height = height;
     }
 }
