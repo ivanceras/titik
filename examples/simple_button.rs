@@ -119,13 +119,13 @@ where
     input2.set_value(&commands);
 
     let rb2 = Radio::new("Radio2");
-    let mut btn2 = Button::new(format!("Events: {}", events));
+    let mut btn2: Button<()> = Button::new(format!("Events: {}", events));
     btn2.set_rounded(true);
     let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(80.0), Some(40.0));
     root_node.vertical();
 
-    let btn1 = Button::new("Button 1");
+    let btn1: Button<()> = Button::new("Button 1");
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
     root_node.add_child(Box::new(img));
