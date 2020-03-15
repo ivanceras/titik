@@ -107,7 +107,6 @@ where
     let mut commands = String::new();
 
     let mut root_node = FlexBox::new();
-    let (width, height) = buffer_size().unwrap();
     let mut cb1 = Checkbox::new(format!("{:?}", focused_widget_idx));
     cb1.set_checked(true);
     let mut cb2 = Checkbox::new("Checkbox2");
@@ -124,7 +123,6 @@ where
     btn2.set_rounded(true);
     let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(80.0), Some(40.0));
-    root_node.set_size(Some((width - 2) as f32), Some(height as f32));
     root_node.vertical();
 
     let btn1 = Button::new("Button 1");
@@ -140,6 +138,8 @@ where
     root_node.add_child(Box::new(input2));
 
     loop {
+        let (width, height) = buffer_size().unwrap();
+        root_node.set_size(Some((width - 2) as f32), Some(height as f32));
         let layout_tree = compute_layout(
             &mut root_node,
             Size {
@@ -213,7 +213,7 @@ fn draw_buffer<W: Write>(
     height: u16,
 ) {
     let mut buf = Buffer::new(width as usize, height as usize);
-    clear(w);
+    queue!(w, cursor::MoveTo(1, 1));
     let cmds = root_node.draw(&mut buf, &layout_tree);
     write!(w, "{}", buf);
     cmds.iter()
