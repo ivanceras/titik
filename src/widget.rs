@@ -87,9 +87,6 @@ where
     fn as_any_mut(&mut self) -> &mut dyn Any;
 
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>);
-
-    /// let the widget react to the event
-    fn process_event(&mut self, event: Event);
 }
 
 #[cfg(test)]

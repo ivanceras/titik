@@ -46,6 +46,10 @@ pub mod command {
     };
     use std::io::Write;
 
+    pub fn move_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
+        crossterm::execute!(w, cursor::Hide, cursor::MoveTo(1, 1))
+    }
+
     pub fn reset_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
         crossterm::queue!(
             w,

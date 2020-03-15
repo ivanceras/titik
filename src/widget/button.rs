@@ -13,10 +13,18 @@ use crate::{
     Widget,
 };
 use crossterm::{
-    event::Event,
+    event::{
+        Event,
+        MouseEvent,
+    },
     Command,
 };
-use std::any::Any;
+use sauron_vdom::Callback;
+use std::{
+    any::Any,
+    fmt,
+    fmt::Debug,
+};
 use stretch::{
     geometry::Size,
     style::{
@@ -25,16 +33,44 @@ use stretch::{
     },
 };
 
-#[derive(Default, Debug, PartialEq, Clone)]
-pub struct Button {
+#[derive(PartialEq, Clone)]
+pub struct Button<MSG>
+where
+    MSG: 'static,
+{
     pub label: String,
     pub is_rounded: bool,
     pub width: Option<f32>,
     pub height: Option<f32>,
     focused: bool,
+    pub on_click: Vec<Callback<Event, MSG>>,
 }
 
-impl Button {
+impl<MSG> Default for Button<MSG> {
+    fn default() -> Self {
+        Button {
+            label: String::new(),
+            is_rounded: false,
+            width: None,
+            height: None,
+            focused: false,
+            on_click: vec![],
+        }
+    }
+}
+
+impl<MSG> Debug for Button<MSG> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("Button")
+            .field("label", &self.label)
+            .finish()
+    }
+}
+
+impl<MSG> Button<MSG>
+where
+    MSG: 'static,
+{
     pub fn new<S>(label: S) -> Self
     where
         S: ToString,
@@ -53,9 +89,22 @@ impl Button {
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }
+
+    /// TODO: process the attached event click event here
+    pub fn process_event(&mut self, event: Event) -> Vec<MSG> {
+        match event {
+            Event::Mouse(MouseEvent::Down(..)) => {
+                self.on_click.iter().map(|cb| cb.emit(event)).collect()
+            }
+            _ => vec![],
+        }
+    }
 }
 
-impl Widget for Button {
+impl<MSG> Widget for Button<MSG>
+where
+    MSG: 'static,
+{
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -137,7 +186,4 @@ impl Widget for Button {
         self.width = width;
         self.height = height;
     }
-
-    /// TODO: process the attached event click event here
-    fn process_event(&mut self, event: Event) {}
 }

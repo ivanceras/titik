@@ -138,9 +138,6 @@ impl Widget for Image {
             self.create_cells();
         }
     }
-
-    /// TODO: process the attached event click event here
-    fn process_event(&mut self, event: Event) {}
 }
 
 impl fmt::Debug for Image {

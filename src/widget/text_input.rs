@@ -67,6 +67,15 @@ impl TextInput {
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }
+
+    pub fn process_event(&mut self, event: Event) {
+        match event {
+            //TODO: also trigger the input event listener here
+            Event::Key(ke) => self.process_key(ke),
+            //TODO: deal with mouse click, to move the cursor location
+            _ => (),
+        }
+    }
 }
 
 impl Widget for TextInput {
@@ -173,14 +182,5 @@ impl Widget for TextInput {
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
         self.width = width;
         self.height = height;
-    }
-
-    fn process_event(&mut self, event: Event) {
-        match event {
-            //TODO: also trigger the input event listener here
-            Event::Key(ke) => self.process_key(ke),
-            //TODO: deal with mouse click, to move the cursor location
-            _ => (),
-        }
     }
 }

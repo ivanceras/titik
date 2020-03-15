@@ -135,9 +135,6 @@ impl Widget for FlexBox {
         self.width = width;
         self.height = height;
     }
-
-    /// TODO: process the attached event click event here
-    fn process_event(&mut self, event: Event) {}
 }
 
 #[cfg(test)]

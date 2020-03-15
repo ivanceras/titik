@@ -15,3 +15,4 @@ crossterm = "0.16.0"
 stretch = "0.3.2"
 image = "0.23.0"
 unicode-width = "0.1.7"
+sauron_vdom = { path = "../sauron/crates/sauron_vdom"}
