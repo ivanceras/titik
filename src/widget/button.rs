@@ -112,7 +112,7 @@ where
                     Dimension::Points(width)
                 } else {
                     //Dimension::Points((self.label.len() + 1) as f32)
-                    Dimension::Percent(0.95)
+                    Dimension::Percent(1.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
@@ -137,7 +137,7 @@ where
         }
         for j in 0..height {
             buf.set_symbol(loc_x, loc_y + 1 + j, line::VERTICAL);
-            buf.set_symbol(loc_x + width, loc_y + 1 + j, line::VERTICAL);
+            buf.set_symbol(loc_x + width - 1, loc_y + 1 + j, line::VERTICAL);
         }
         for (t, ch) in self.label.chars().enumerate() {
             buf.set_symbol(loc_x + 1 + t, loc_y + 2, ch);
@@ -165,8 +165,8 @@ where
         };
         buf.set_symbol(loc_x, loc_y + 1, top_left);
         buf.set_symbol(loc_x, loc_y + height, bottom_left);
-        buf.set_symbol(loc_x + width, loc_y + 1, top_right);
-        buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
+        buf.set_symbol(loc_x + width - 1, loc_y + 1, top_right);
+        buf.set_symbol(loc_x + width - 1, loc_y + height, bottom_right);
         vec![]
     }
 

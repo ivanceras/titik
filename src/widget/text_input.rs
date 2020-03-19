@@ -86,7 +86,8 @@ impl Widget for TextInput {
                     Dimension::Points(width)
                 } else {
                     //Dimension::Points((self.label.len() + 1) as f32)
-                    Dimension::Percent(0.95)
+                    //Dimension::Percent(0.95)
+                    Dimension::Percent(1.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
@@ -148,17 +149,19 @@ impl Widget for TextInput {
         }
         for j in 0..height {
             buf.set_symbol(loc_x, loc_y + 1 + j, vertical);
-            buf.set_symbol(loc_x + width, loc_y + 1 + j, vertical);
+            buf.set_symbol(loc_x + width -1, loc_y + 1 + j, vertical);
         }
         let text_loc_y = loc_y + 2;
         for (t, ch) in self.get_value().chars().enumerate() {
-            buf.set_symbol(loc_x + 1 + t, text_loc_y, ch);
+            if loc_x + t < (width  - 2 ){
+                buf.set_symbol(loc_x + 1 + t, text_loc_y, ch);
+            }
         }
 
         buf.set_symbol(loc_x, loc_y + 1, top_left);
         buf.set_symbol(loc_x, loc_y + height, bottom_left);
-        buf.set_symbol(loc_x + width, loc_y + 1, top_right);
-        buf.set_symbol(loc_x + width, loc_y + height, bottom_right);
+        buf.set_symbol(loc_x + width -1, loc_y + 1, top_right);
+        buf.set_symbol(loc_x + width -1, loc_y + height, bottom_right);
         let cursor_loc_x = loc_x + self.input_buffer.get_cursor_location();
         if self.focused {
             vec![Cmd::ShowCursor, Cmd::MoveTo(cursor_loc_x + 3, loc_y + 1)]
