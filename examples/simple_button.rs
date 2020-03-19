@@ -122,7 +122,7 @@ where
     let mut btn2: Button<()> = Button::new(format!("Events: {}", events));
     btn2.set_rounded(true);
     let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
-    img.set_size(Some(80.0), Some(40.0));
+    img.set_size(Some(60.0), Some(20.0));
     root_node.vertical();
 
     let btn1: Button<()> = Button::new("Button 1");

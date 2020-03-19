@@ -55,7 +55,7 @@ impl Image {
     /// the cells will be stored in the image control to avoid re-creation every after redraw
     fn create_cells(&mut self) {
         let width = self.width.unwrap_or(10.0);
-        let height = self.height.unwrap_or(10.0);
+        let height = self.height.unwrap_or(10.0) * 2.0;
         let img = self.image.thumbnail(width as u32, height as u32);
         let (img_width, img_height) = img.dimensions();
         let rgb = img.to_rgb();
@@ -100,7 +100,7 @@ impl Widget for Image {
                     Dimension::Auto
                 },
                 height: if let Some(height) = self.height {
-                    Dimension::Points(height / 2.0)
+                    Dimension::Points(height)
                 } else {
                     Dimension::Auto
                 },
@@ -116,7 +116,11 @@ impl Widget for Image {
         let loc_y = layout.location.y.round() as usize;
         for (y, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
-                buf.set_cell(loc_x + 1 + i, loc_y + 1 + y, cell.clone());
+                if i < layout.size.width as usize {
+                    buf.set_cell(loc_x + i, loc_y +1 + y, cell.clone());
+                }else{
+                    buf.set_symbol(loc_x + i, loc_y +1 + y, '#');
+                }
             }
         }
         vec![]
