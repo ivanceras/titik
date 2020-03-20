@@ -77,7 +77,7 @@ impl TextInput {
                 vec![]
             }
             Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
-                self.input_buffer.set_cursor_loc(x as usize - layout.location.x.round() as usize - 3);
+                //self.input_buffer.set_cursor_loc(x as usize - layout.location.x.round() as usize - 3);
                 vec![]
             }
             _ => vec![]
@@ -172,7 +172,7 @@ impl <MSG>Widget<MSG> for TextInput {
         buf.set_symbol(loc_x + width -1, loc_y + height, bottom_right);
         let cursor_loc_x = loc_x + self.input_buffer.get_cursor_location();
         if self.focused {
-            vec![Cmd::ShowCursor, Cmd::MoveTo(cursor_loc_x + 3, loc_y + 1)]
+            vec![Cmd::ShowCursor, Cmd::MoveTo(cursor_loc_x +1 , text_loc_y)]
         } else {
             vec![]
         }

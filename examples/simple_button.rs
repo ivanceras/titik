@@ -128,17 +128,19 @@ where
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
     root_node.add_child(Box::new(img));
-    root_node.add_child(Box::new(cb2));
-    root_node.add_child(Box::new(cb1));
+    //root_node.add_child(Box::new(cb2));
+    //root_node.add_child(Box::new(cb1));
 
-    root_node.add_child(Box::new(rb1));
-    root_node.add_child(Box::new(rb2));
+    //root_node.add_child(Box::new(rb1));
+    //root_node.add_child(Box::new(rb2));
     root_node.add_child(Box::new(input1));
     root_node.add_child(Box::new(input2));
 
+    let (width, height) = buffer_size().unwrap();
+
     loop {
         let (width, height) = buffer_size().unwrap();
-        root_node.set_size(Some((width -2) as f32), Some(height as f32));
+        root_node.set_size(Some((width -2 ) as f32), Some(height as f32));
         let layout_tree = compute_layout(
             &mut root_node,
             Size {
@@ -147,8 +149,14 @@ where
             },
         );
 
-        //draw before and after the event reader
-        draw_buffer(w, &root_node, &layout_tree, width, height);
+        let mut buf = Buffer::new(width as usize, height as usize);
+        buf.reset();
+        let cmds = root_node.draw(&mut buf, &layout_tree);
+        buf.render(w);
+        cmds.iter()
+            .for_each(|cmd| cmd.execute(w).expect("must execute"));
+        w.flush();
+
 
         if let Ok(event) = event::read() {
             match event {
@@ -211,7 +219,7 @@ where
             }
             if let Some((x, y)) = extract_location(&event) {
                 let hits = layout_tree.hit(x as f32, y as f32);
-                println!("hit at: {:?}", hits);
+                //println!("hit at: {:?}", hits);
             }
         }
     }
@@ -229,22 +237,6 @@ fn extract_location(event: &Event) -> Option<(u16, u16)> {
         Event::Mouse(MouseEvent::ScrollUp(x, y, _modifier)) => Some((*x, *y)),
         Event::Resize(_, _) => None,
     }
-}
-
-fn draw_buffer<W: Write>(
-    w: &mut W,
-    root_node: &Widget<()>,
-    layout_tree: &LayoutTree,
-    width: u16,
-    height: u16,
-) {
-    let mut buf = Buffer::new(width as usize, height as usize);
-    queue!(w, cursor::MoveTo(1, 1));
-    let cmds = root_node.draw(&mut buf, &layout_tree);
-    write!(w, "{}", buf);
-    cmds.iter()
-        .for_each(|cmd| cmd.execute(w).expect("must execute"));
-    w.flush();
 }
 
 pub fn buffer_size() -> Result<(u16, u16)> {

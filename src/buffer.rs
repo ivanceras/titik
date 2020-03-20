@@ -1,7 +1,9 @@
 use crossterm::{
+    cursor,
     queue,
     style::{
         Attribute,
+        Attributes,
         Color,
         ContentStyle,
         ResetColor,
@@ -10,13 +12,22 @@ use crossterm::{
         SetForegroundColor,
     },
 };
-use std::fmt;
+use std::{
+    fmt,
+    io::Write,
+};
 use unicode_width::UnicodeWidthStr;
 
-#[derive(Clone)]
+#[derive(Clone, Default, PartialEq, Debug)]
 pub struct Cell {
+    /// the character symbol
     pub symbol: String,
-    pub style: ContentStyle,
+    /// The foreground color.
+    pub foreground_color: Option<Color>,
+    /// The background color.
+    pub background_color: Option<Color>,
+    /// List of attributes.
+    pub attributes: Attributes,
 }
 
 pub struct Buffer {
@@ -30,7 +41,7 @@ impl Cell {
     {
         Cell {
             symbol: symbol.to_string(),
-            style: ContentStyle::default(),
+            ..Default::default()
         }
     }
 
@@ -41,22 +52,22 @@ impl Cell {
     pub fn empty() -> Self {
         Cell {
             symbol: " ".to_string(),
-            style: ContentStyle::default(),
+            ..Default::default()
         }
     }
 
     pub fn attributes(&mut self, attributes: Vec<Attribute>) {
         for attr in attributes {
-            self.style.attributes.set(attr);
+            self.attributes.set(attr);
         }
     }
 
     pub fn color(&mut self, color: Color) {
-        self.style.foreground_color = Some(color);
+        self.foreground_color = Some(color);
     }
 
     pub fn background(&mut self, color: Color) {
-        self.style.background_color = Some(color);
+        self.background_color = Some(color);
     }
 }
 
@@ -68,6 +79,12 @@ impl Buffer {
             .map(|_| (0..width).into_iter().map(|_| Cell::empty()).collect())
             .collect();
         Buffer { cells }
+    }
+
+    pub fn reset(&mut self) {
+        self.cells.iter_mut().for_each(|line| {
+            line.iter_mut().for_each(|cell| *cell = Cell::empty())
+        })
     }
 
     pub fn set_symbol<S: ToString>(&mut self, x: usize, y: usize, symbol: S) {
@@ -87,18 +104,44 @@ impl Buffer {
             }
         }
     }
+
+    /// get the diff of 2 buffers
+    pub fn diff<'a>(&self, new: &'a Self) -> Vec<(usize, usize, &'a Cell)> {
+        let mut patches = vec![];
+        for (j, new_line) in new.cells.iter().enumerate() {
+            for (i, new_cell) in new_line.iter().enumerate() {
+                let old_cell =
+                    self.cells.get(j).map(|line| line.get(i)).flatten();
+                if old_cell != Some(new_cell) {
+                    patches.push((i, j, new_cell))
+                }
+            }
+        }
+        patches
+    }
+
+    pub fn render<W: Write>(&self, w: &mut W) -> crossterm::Result<()> {
+        crossterm::queue!(w, cursor::Hide);
+        for (j, line) in self.cells.iter().enumerate() {
+            for (i, cell) in line.iter().enumerate() {
+                crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16));
+                write!(w, "{}", cell);
+            }
+        }
+        Ok(())
+    }
 }
 
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if let Some(bg) = self.style.background_color {
+        if let Some(bg) = self.background_color {
             queue!(f, SetBackgroundColor(bg)).map_err(|_| fmt::Error)?;
         }
-        if let Some(fg) = self.style.foreground_color {
+        if let Some(fg) = self.foreground_color {
             queue!(f, SetForegroundColor(fg)).map_err(|_| fmt::Error)?;
         }
-        if !self.style.attributes.is_empty() {
-            queue!(f, SetAttributes(self.style.attributes))
+        if !self.attributes.is_empty() {
+            queue!(f, SetAttributes(self.attributes))
                 .map_err(|_| fmt::Error)?;
         }
         self.symbol.fmt(f)?;
@@ -160,5 +203,26 @@ mod test {
             w,
             "\u{1b}[48;5;11m\u{1b}[38;5;9m\u{1b}[1m\u{1b}[3m\u{1b}[9mH\u{1b}[0m"
         );
+    }
+
+    #[test]
+    fn diff1() {
+        let mut buf = Buffer::new(10, 10);
+        buf.set_symbol(1, 1, 'H');
+        buf.set_symbol(1, 2, 'e');
+
+        let mut buf2 = Buffer::new(10, 10);
+        buf2.set_symbol(1, 1, 'A');
+        buf2.set_symbol(1, 2, 'B');
+
+        let dif = buf.diff(&buf2);
+        for (x, y, cell) in dif.iter() {
+            println!("diff: {},{}: {}", x, y, cell);
+        }
+        assert_eq!((1, 1, &Cell::new('A')), dif[0]);
+        assert_eq!((1, 2, &Cell::new('B')), dif[1]);
+        buf2.reset();
+        assert_eq!(Cell::new(' '), buf2.cells[1][1]);
+        assert_eq!(Cell::new(' '), buf2.cells[1][2]);
     }
 }
