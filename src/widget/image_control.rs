@@ -19,7 +19,7 @@ use image::{
     GenericImageView,
 };
 use std::any::Any;
-
+use std::marker::PhantomData;
 use std::fmt;
 use stretch::{
     geometry::Size,
@@ -29,7 +29,7 @@ use stretch::{
     },
 };
 
-pub struct Image {
+pub struct Image<MSG> {
     pub image: DynamicImage,
     /// the width of cells used for this image
     pub width: Option<f32>,
@@ -37,9 +37,10 @@ pub struct Image {
     /// style layout
     pub height: Option<f32>,
     pub cells: Vec<Vec<Cell>>,
+    _phantom_msg: PhantomData<MSG>,
 }
 
-impl Image {
+impl<MSG> Image<MSG> {
     pub fn new(bytes: Vec<u8>) -> Self {
         let mut image = Image {
             image: image::load_from_memory(&bytes)
@@ -47,6 +48,7 @@ impl Image {
             width: None,
             height: None,
             cells: vec![],
+            _phantom_msg: PhantomData,
         };
         image.create_cells();
         image
@@ -90,7 +92,7 @@ impl Image {
     }
 }
 
-impl Widget for Image {
+impl<MSG> Widget<MSG> for Image<MSG> where MSG: 'static{
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -144,7 +146,7 @@ impl Widget for Image {
     }
 }
 
-impl fmt::Debug for Image {
+impl<MSG> fmt::Debug for Image<MSG> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Image")
     }

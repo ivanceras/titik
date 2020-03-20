@@ -55,7 +55,7 @@ impl Checkbox {
     }
 }
 
-impl Widget for Checkbox {
+impl<MSG> Widget<MSG> for Checkbox {
     fn style(&self) -> Style {
         Style {
             size: Size {

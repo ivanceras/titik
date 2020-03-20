@@ -46,24 +46,24 @@ mod image_control;
 mod radio;
 mod text_input;
 
-pub trait Widget
+pub trait Widget<MSG>
 where
     Self: fmt::Debug,
 {
     fn style(&self) -> Style;
-    fn add_child(&mut self, _child: Box<dyn Widget>) -> bool {
+    fn add_child(&mut self, _child: Box<dyn Widget<MSG>>) -> bool {
         false
     }
 
-    fn children(&self) -> Option<&[Box<dyn Widget>]> {
+    fn children(&self) -> Option<&[Box<dyn Widget<MSG>>]> {
         None
     }
 
-    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget>]> {
+    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget<MSG>>]> {
         None
     }
 
-    fn child_mut(&mut self, index: usize) -> Option<&mut Box<dyn Widget>> {
+    fn child_mut(&mut self, index: usize) -> Option<&mut Box<dyn Widget<MSG>>> {
         None
     }
 
@@ -87,7 +87,19 @@ where
     fn as_any_mut(&mut self) -> &mut dyn Any;
 
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>);
+
+    fn as_mut(&mut self) -> Option<&mut Self>
+    where
+        Self: Sized + 'static,
+    {
+        self.as_any_mut()
+            .downcast_mut::<Self>()
+    }
+    fn process_event(&mut self, event: Event) -> Vec<MSG>{
+        vec![]
+    }
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -98,14 +110,14 @@ mod tests {
 
     #[test]
     fn layout() {
-        let mut control = FlexBox::new();
+        let mut control = FlexBox::<()>::new();
         control.horizontal();
-        let mut btn = Button::new("Hello");
+        let mut btn = Button::<()>::new("Hello");
         btn.set_size(Some(30.0), Some(34.0));
 
         control.add_child(boxed::Box::new(btn));
 
-        let mut btn = Button::new("world");
+        let mut btn = Button::<()>::new("world");
         btn.set_size(Some(20.0), Some(10.0));
         control.add_child(boxed::Box::new(btn));
 
@@ -131,21 +143,21 @@ mod tests {
 
     #[test]
     fn layout2() {
-        let mut control = FlexBox::new();
+        let mut control = FlexBox::<()>::new();
         control.vertical();
 
-        let mut btn1 = Button::new("Hello");
+        let mut btn1 = Button::<()>::new("Hello");
         btn1.set_size(Some(100.0), Some(20.0));
 
         control.add_child(boxed::Box::new(btn1));
 
-        let mut btn2 = Button::new("world");
+        let mut btn2 = Button::<()>::new("world");
         btn2.set_size(Some(20.0), Some(10.0));
 
-        let mut btn3 = Button::new("world");
+        let mut btn3 = Button::<()>::new("world");
         btn3.set_size(Some(20.0), Some(10.0));
 
-        let mut hrow = FlexBox::new();
+        let mut hrow = FlexBox::<()>::new();
         hrow.horizontal();
 
         hrow.add_child(boxed::Box::new(btn2));

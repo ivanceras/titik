@@ -52,7 +52,7 @@ impl Radio {
     }
 }
 
-impl Widget for Radio {
+impl<MSG> Widget<MSG> for Radio {
     fn style(&self) -> Style {
         Style {
             size: Size {

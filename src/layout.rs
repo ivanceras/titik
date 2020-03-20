@@ -28,6 +28,13 @@ impl LayoutTree {
     /// The last added element is the deepest child that is hit.
     fn at_location(&self, x: f32, y: f32, cur_index: &mut usize) -> Vec<usize> {
         let mut hits: Vec<usize> = vec![];
+        let loc = self.layout.location;
+        let width = self.layout.size.width;
+        let height = self.layout.size.height;
+        if x >= loc.x && x <= loc.x + width && y >= loc.y && y <= loc.y + height
+        {
+            hits.push(*cur_index);
+        }
         let child_hits: Vec<usize> = self
             .children_layout
             .iter()
@@ -37,13 +44,6 @@ impl LayoutTree {
             })
             .collect();
 
-        let loc = self.layout.location;
-        let width = self.layout.size.width;
-        let height = self.layout.size.height;
-        if x >= loc.x && x <= loc.x + width && y >= loc.y && y <= loc.y + height
-        {
-            hits.push(*cur_index);
-        }
         hits.extend(child_hits);
         hits
     }
@@ -58,28 +58,28 @@ impl LayoutTree {
 // if the element is hit with a click
 
 /// Get the widget with the node_idx by traversing to through the root_widget specified
-pub fn find_widget(
-    root_widget: &dyn Widget,
+pub fn find_widget<MSG>(
+    root_widget: &dyn Widget<MSG>,
     node_idx: usize,
-) -> Option<&dyn Widget> {
+) -> Option<&dyn Widget<MSG>> {
     find_node(root_widget, node_idx, &mut 0)
 }
 
-pub fn find_widget_mut(
-    root_widget: &mut dyn Widget,
+pub fn find_widget_mut<MSG>(
+    root_widget: &mut dyn Widget<MSG>,
     node_idx: usize,
-) -> Option<&mut dyn Widget> {
+) -> Option<&mut dyn Widget<MSG>> {
     find_node_mut(root_widget, node_idx, &mut 0)
 }
 
 /// return the widget that is hit at this location
 /// base on the layout tree
-pub fn widget_hit_at<'a>(
-    root_widget: &'a dyn Widget,
+pub fn widget_hit_at<'a,MSG>(
+    root_widget: &'a dyn Widget<MSG>,
     layout_tree: &LayoutTree,
     x: f32,
     y: f32,
-) -> Option<&'a dyn Widget> {
+) -> Option<&'a dyn Widget<MSG>> {
     if let Some(hit) = layout_tree.hit(x, y).pop() {
         find_widget(root_widget, hit)
     } else {
@@ -96,11 +96,11 @@ pub fn widget_node_idx_at<'a>(
 }
 
 /// Traverse the node tree until the node_idx is found
-fn find_node<'a>(
-    node: &'a dyn Widget,
+fn find_node<'a, MSG>(
+    node: &'a dyn Widget<MSG>,
     node_idx: usize,
     cur_index: &mut usize,
-) -> Option<&'a dyn Widget> {
+) -> Option<&'a dyn Widget<MSG>> {
     if let Some(children) = node.children() {
         children.iter().find_map(|child| {
             *cur_index += 1;
@@ -113,11 +113,11 @@ fn find_node<'a>(
     }
 }
 
-fn find_node_mut<'a>(
-    node: &'a mut dyn Widget,
+fn find_node_mut<'a,MSG>(
+    node: &'a mut dyn Widget<MSG>,
     node_idx: usize,
     cur_index: &mut usize,
-) -> Option<&'a mut dyn Widget> {
+) -> Option<&'a mut dyn Widget<MSG>> {
     if node_idx == *cur_index {
         return Some(node);
     } else if let Some(children) = node.children_mut() {
@@ -130,14 +130,14 @@ fn find_node_mut<'a>(
     }
 }
 
-pub fn set_focused_node<'a>(node: &'a mut dyn Widget, node_idx: usize) {
+pub fn set_focused_node<'a, MSG>(node: &'a mut dyn Widget<MSG>, node_idx: usize) {
     set_focused_widget(node, node_idx, &mut 0)
 }
 
 /// Set the node at node_idx as focused, while the rest
 /// should be set to false
-fn set_focused_widget<'a>(
-    node: &'a mut dyn Widget,
+fn set_focused_widget<'a,MSG>(
+    node: &'a mut dyn Widget<MSG>,
     node_idx: usize,
     cur_index: &mut usize,
 ) {
@@ -154,8 +154,8 @@ fn set_focused_widget<'a>(
 }
 
 /// Compute a flex layout of the node and it's children
-pub fn compute_layout(
-    control: &mut dyn Widget,
+pub fn compute_layout<MSG>(
+    control: &mut dyn Widget<MSG>,
     parent_size: Size<Number>,
 ) -> LayoutTree {
     let mut stretch = Stretch::new();
@@ -201,15 +201,15 @@ mod test {
 
     #[test]
     fn layout() {
-        let mut control = FlexBox::new();
+        let mut control = FlexBox::<()>::new();
         control.vertical();
-        let mut btn1 = Button::new("Hello");
+        let mut btn1 = Button::<()>::new("Hello");
         btn1.set_size(Some(30.0), Some(34.0));
         let btn1_clone = btn1.clone();
 
         control.add_child(Box::new(btn1));
 
-        let mut btn2 = Button::new("world");
+        let mut btn2 = Button::<()>::new("world");
         btn2.set_size(Some(20.0), Some(10.0));
         let btn2_clone = btn2.clone();
         control.add_child(Box::new(btn2));
@@ -236,10 +236,10 @@ mod test {
         assert_eq!(hit1.len(), 2);
         println!("hit1: {:?}", hit1);
         assert_eq!(hit1.pop(), Some(1));
-        let trace_btn1: &Button = find_widget(&control, 1)
+        let trace_btn1: &Button<()> = find_widget(&control, 1)
             .expect("must return a widget")
             .as_any()
-            .downcast_ref::<Button>()
+            .downcast_ref::<Button<()>>()
             .expect("must be button");
         assert_eq!(trace_btn1, &btn1_clone);
         println!("trace btn1: {:?}", trace_btn1);
@@ -247,7 +247,7 @@ mod test {
         let widget_hit1 = widget_hit_at(&control, &layout_tree, 1.0, 1.0)
             .expect("must hit something")
             .as_any()
-            .downcast_ref::<Button>()
+            .downcast_ref::<Button<()>>()
             .expect("must be button");
 
         assert_eq!(widget_hit1, &btn1_clone);
@@ -276,14 +276,14 @@ mod test {
         let trace_btn2 = find_widget(&control, 2)
             .expect("must return a widget")
             .as_any()
-            .downcast_ref::<Button>()
+            .downcast_ref::<Button<()>>()
             .expect("must be a button");
         assert_eq!(trace_btn2, &btn2_clone);
 
         let widget_hit2 = widget_hit_at(&control, &layout_tree, 1.0, 35.0)
             .expect("must hit something")
             .as_any()
-            .downcast_ref::<Button>()
+            .downcast_ref::<Button<()>>()
             .expect("must be button");
 
         assert_eq!(widget_hit2, &btn2_clone);

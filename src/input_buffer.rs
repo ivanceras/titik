@@ -94,6 +94,12 @@ impl InputBuffer {
         self.cursor_loc = self.content.len();
     }
 
+    pub fn set_cursor_loc(&mut self, x: usize) {
+        if x >= 0 && x < self.content.len() {
+            self.cursor_loc = x;
+        }
+    }
+
     /// delete the first character to the right of the cursor
     fn delete(&mut self) {
         if self.cursor_loc < self.content.len() {

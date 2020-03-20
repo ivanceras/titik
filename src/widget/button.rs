@@ -90,18 +90,9 @@ where
         self.is_rounded = rounded;
     }
 
-    /// TODO: process the attached event click event here
-    pub fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        match event {
-            Event::Mouse(MouseEvent::Down(..)) => {
-                self.on_click.iter().map(|cb| cb.emit(event)).collect()
-            }
-            _ => vec![],
-        }
-    }
 }
 
-impl<MSG> Widget for Button<MSG>
+impl<MSG> Widget<MSG> for Button<MSG>
 where
     MSG: 'static,
 {
@@ -186,4 +177,14 @@ where
         self.width = width;
         self.height = height;
     }
+
+    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+        match event {
+            Event::Mouse(MouseEvent::Down(..)) => {
+                self.on_click.iter().map(|cb| cb.emit(event)).collect()
+            }
+            _ => vec![],
+        }
+    }
 }
+

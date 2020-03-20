@@ -19,6 +19,7 @@ use crossterm::{
     event::{
         Event,
         KeyEvent,
+        MouseEvent,
     },
     Command,
 };
@@ -29,6 +30,7 @@ use stretch::{
         Dimension,
         Style,
     },
+    result::Layout,
 };
 
 #[derive(Default, Debug, PartialEq)]
@@ -68,17 +70,23 @@ impl TextInput {
         self.is_rounded = rounded;
     }
 
-    pub fn process_event(&mut self, event: Event) {
+    pub fn process_event<MSG>(&mut self, event: Event, layout: &Layout) ->Vec<MSG> {
         match event {
-            //TODO: also trigger the input event listener here
-            Event::Key(ke) => self.process_key(ke),
-            //TODO: deal with mouse click, to move the cursor location
-            _ => (),
+            Event::Key(ke) => {
+                self.process_key(ke);
+                vec![]
+            }
+            Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
+                self.input_buffer.set_cursor_loc(x as usize - layout.location.x.round() as usize - 3);
+                vec![]
+            }
+            _ => vec![]
         }
     }
+
 }
 
-impl Widget for TextInput {
+impl <MSG>Widget<MSG> for TextInput {
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -186,4 +194,5 @@ impl Widget for TextInput {
         self.width = width;
         self.height = height;
     }
+
 }

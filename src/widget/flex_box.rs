@@ -30,14 +30,14 @@ use stretch::{
 };
 
 #[derive(Default, Debug)]
-pub struct FlexBox {
-    pub children: Vec<Box<dyn Widget>>,
+pub struct FlexBox<MSG> {
+    pub children: Vec<Box<dyn Widget<MSG>>>,
     pub width: Option<f32>,
     pub height: Option<f32>,
     pub flex_direction: FlexDirection,
 }
 
-impl FlexBox {
+impl<MSG> FlexBox<MSG> {
     pub fn new() -> Self {
         FlexBox {
             width: None,
@@ -63,7 +63,9 @@ impl FlexBox {
     }
 }
 
-impl Widget for FlexBox {
+impl<MSG> Widget<MSG> for FlexBox<MSG> 
+where MSG: fmt::Debug + 'static,
+{
     fn style(&self) -> Style {
         Style {
             flex_direction: self.flex_direction,
@@ -103,23 +105,23 @@ impl Widget for FlexBox {
             .collect()
     }
 
-    fn add_child(&mut self, child: Box<dyn Widget>) -> bool {
+    fn add_child(&mut self, child: Box<dyn Widget<MSG>>) -> bool {
         self.children.push(child);
         true
     }
 
-    fn children(&self) -> Option<&[Box<dyn Widget>]> {
+    fn children(&self) -> Option<&[Box<dyn Widget<MSG>>]> {
         Some(&self.children)
     }
 
-    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget>]> {
+    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget<MSG>>]> {
         Some(&mut self.children)
     }
 
     fn child_mut<'a>(
         &'a mut self,
         index: usize,
-    ) -> Option<&'a mut Box<dyn Widget>> {
+    ) -> Option<&'a mut Box<dyn Widget<MSG>>> {
         self.children.get_mut(index)
     }
 
@@ -143,7 +145,7 @@ mod test {
 
     #[test]
     fn test_mut() {
-        let mut fb = FlexBox::new();
+        let mut fb = FlexBox::<()>::new();
         let btn1 = Button::new("Btn1");
         println!("btn1: {:?}", btn1);
         fb.add_child(Box::new(btn1));
@@ -151,7 +153,7 @@ mod test {
         let mut btn1_mut = fb.child_mut(0).expect("must have a child 0");
         let mut btn1_cast = btn1_mut
             .as_any_mut()
-            .downcast_mut::<Button>()
+            .downcast_mut::<Button<()>>()
             .expect("must be a button");
         btn1_cast.set_size(Some(20.0), Some(10.0));
         println!("btn1_cast: {:?}", btn1_cast);
@@ -161,7 +163,7 @@ mod test {
 
     #[test]
     fn test_children_mut() {
-        let mut fb = FlexBox::new();
+        let mut fb = FlexBox::<()>::new();
         let btn1 = Button::new("Btn1");
         println!("btn1: {:?}", btn1);
         fb.add_child(Box::new(btn1));
@@ -169,7 +171,7 @@ mod test {
         let mut children = fb.children_mut().expect("must have children");
         let mut btn0 = children[0]
             .as_any_mut()
-            .downcast_mut::<Button>()
+            .downcast_mut::<Button<()>>()
             .expect("must be a button");
 
         btn0.set_size(Some(40.0), Some(100.0));

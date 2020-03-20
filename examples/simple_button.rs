@@ -103,8 +103,6 @@ where
     init(w)?;
 
     let mut focused_widget_idx = None;
-    let mut events = String::new();
-    let mut commands = String::new();
 
     let mut root_node = FlexBox::new();
     let mut cb1 = Checkbox::new(format!("{:?}", focused_widget_idx));
@@ -115,13 +113,14 @@ where
     rb1.set_checked(true);
     let mut input1 = TextInput::new("Hello world!");
 
-    let mut input2 = TextInput::new("Commands");
-    input2.set_value(&commands);
+    let mut input2 =
+        TextInput::new("The quick brown fox jumps over the lazy dog...");
 
     let rb2 = Radio::new("Radio2");
-    let mut btn2: Button<()> = Button::new(format!("Events: {}", events));
+    let mut btn2: Button<()> = Button::new("Button2");
     btn2.set_rounded(true);
-    let mut img = Image::new(include_bytes!("../horse.jpg").to_vec());
+    let mut img: Image<()> =
+        Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(60.0), Some(20.0));
     root_node.vertical();
 
@@ -139,7 +138,7 @@ where
 
     loop {
         let (width, height) = buffer_size().unwrap();
-        root_node.set_size(Some((width - 2) as f32), Some(height as f32));
+        root_node.set_size(Some((width -2) as f32), Some(height as f32));
         let layout_tree = compute_layout(
             &mut root_node,
             Size {
@@ -151,9 +150,8 @@ where
         //draw before and after the event reader
         draw_buffer(w, &root_node, &layout_tree, width, height);
 
-        if let Ok(ev) = event::read() {
-            events = format!("{:?}", ev);
-            match ev {
+        if let Ok(event) = event::read() {
+            match event {
                 Event::Key(key_event) => {
                     // To quite, press any of the following:
                     //  - CTRL-c
@@ -174,14 +172,14 @@ where
                         }
                     } else {
                         if let Some(idx) = focused_widget_idx.as_ref() {
-                            let active_widget: Option<&mut dyn Widget> =
+                            let active_widget: Option<&mut dyn Widget<()>> =
                                 find_widget_mut(&mut root_node, *idx);
                             if let Some(focused_widget) = active_widget {
-                                if let Some(txt_input1) = focused_widget
+                                if let Some(txt_input) = focused_widget
                                     .as_any_mut()
                                     .downcast_mut::<TextInput>()
                                 {
-                                    txt_input1.process_key(key_event);
+                                    txt_input.process_key(key_event);
                                 }
                             }
                         }
@@ -192,12 +190,28 @@ where
                         widget_node_idx_at(&layout_tree, x as f32, y as f32);
 
                     if let Some(idx) = focused_widget_idx.as_ref() {
-                        let active_widget: Option<&mut dyn Widget> =
+                        let mut active_widget: Option<&mut dyn Widget<()>> =
                             find_widget_mut(&mut root_node, *idx);
+
+                        if let Some(active_widget) = &mut active_widget {
+                            if let Some(txt_input) = active_widget
+                                .as_any_mut()
+                                .downcast_mut::<TextInput>(
+                            ) {
+                                let msg = txt_input.process_event::<()>(
+                                    event,
+                                    &layout_tree.layout,
+                                );
+                            }
+                        }
                         set_focused_node(&mut root_node, *idx);
                     }
                 }
                 _ => (),
+            }
+            if let Some((x, y)) = extract_location(&event) {
+                let hits = layout_tree.hit(x as f32, y as f32);
+                println!("hit at: {:?}", hits);
             }
         }
     }
@@ -205,9 +219,21 @@ where
     Ok(())
 }
 
+fn extract_location(event: &Event) -> Option<(u16, u16)> {
+    match event {
+        Event::Key(_) => None,
+        Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => Some((*x, *y)),
+        Event::Mouse(MouseEvent::Up(_btn, x, y, _modifier)) => Some((*x, *y)),
+        Event::Mouse(MouseEvent::Drag(_btn, x, y, _modifier)) => Some((*x, *y)),
+        Event::Mouse(MouseEvent::ScrollDown(x, y, _modifier)) => Some((*x, *y)),
+        Event::Mouse(MouseEvent::ScrollUp(x, y, _modifier)) => Some((*x, *y)),
+        Event::Resize(_, _) => None,
+    }
+}
+
 fn draw_buffer<W: Write>(
     w: &mut W,
-    root_node: &Widget,
+    root_node: &Widget<()>,
     layout_tree: &LayoutTree,
     width: u16,
     height: u16,
