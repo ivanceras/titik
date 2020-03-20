@@ -63,8 +63,9 @@ impl<MSG> FlexBox<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for FlexBox<MSG> 
-where MSG: fmt::Debug + 'static,
+impl<MSG> Widget<MSG> for FlexBox<MSG>
+where
+    MSG: fmt::Debug + 'static,
 {
     fn style(&self) -> Style {
         Style {

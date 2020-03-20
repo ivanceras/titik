@@ -92,14 +92,12 @@ where
     where
         Self: Sized + 'static,
     {
-        self.as_any_mut()
-            .downcast_mut::<Self>()
+        self.as_any_mut().downcast_mut::<Self>()
     }
-    fn process_event(&mut self, event: Event) -> Vec<MSG>{
+    fn process_event(&mut self, event: Event) -> Vec<MSG> {
         vec![]
     }
 }
-
 
 #[cfg(test)]
 mod tests {

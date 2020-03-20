@@ -76,10 +76,10 @@ impl<MSG> Widget<MSG> for Checkbox {
         } else {
             symbol::BOX_UNCHECKED
         };
-        buf.set_symbol(loc_x , loc_y, box_symbol);
+        buf.set_symbol(loc_x, loc_y, box_symbol);
 
         for (t, ch) in self.label.chars().enumerate() {
-            buf.set_symbol(loc_x + 3 + t, loc_y , ch);
+            buf.set_symbol(loc_x + 3 + t, loc_y, ch);
         }
         vec![]
     }

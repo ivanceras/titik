@@ -74,7 +74,7 @@ pub fn find_widget_mut<MSG>(
 
 /// return the widget that is hit at this location
 /// base on the layout tree
-pub fn widget_hit_at<'a,MSG>(
+pub fn widget_hit_at<'a, MSG>(
     root_widget: &'a dyn Widget<MSG>,
     layout_tree: &LayoutTree,
     x: f32,
@@ -113,7 +113,7 @@ fn find_node<'a, MSG>(
     }
 }
 
-fn find_node_mut<'a,MSG>(
+fn find_node_mut<'a, MSG>(
     node: &'a mut dyn Widget<MSG>,
     node_idx: usize,
     cur_index: &mut usize,
@@ -130,13 +130,16 @@ fn find_node_mut<'a,MSG>(
     }
 }
 
-pub fn set_focused_node<'a, MSG>(node: &'a mut dyn Widget<MSG>, node_idx: usize) {
+pub fn set_focused_node<'a, MSG>(
+    node: &'a mut dyn Widget<MSG>,
+    node_idx: usize,
+) {
     set_focused_widget(node, node_idx, &mut 0)
 }
 
 /// Set the node at node_idx as focused, while the rest
 /// should be set to false
-fn set_focused_widget<'a,MSG>(
+fn set_focused_widget<'a, MSG>(
     node: &'a mut dyn Widget<MSG>,
     node_idx: usize,
     cur_index: &mut usize,

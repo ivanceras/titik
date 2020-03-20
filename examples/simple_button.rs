@@ -140,7 +140,7 @@ where
 
     loop {
         let (width, height) = buffer_size().unwrap();
-        root_node.set_size(Some((width ) as f32), Some(height as f32));
+        root_node.set_size(Some((width) as f32), Some(height as f32));
         let layout_tree = compute_layout(
             &mut root_node,
             Size {
@@ -156,7 +156,6 @@ where
         cmds.iter()
             .for_each(|cmd| cmd.execute(w).expect("must execute"));
         w.flush();
-
 
         if let Ok(event) = event::read() {
             match event {

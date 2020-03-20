@@ -171,7 +171,7 @@ impl<MSG> Widget<MSG> for TextInput {
 
         buf.set_symbol(loc_x, loc_y, top_left);
         buf.set_symbol(loc_x, loc_y + height - 1, bottom_left);
-        buf.set_symbol(loc_x + width - 1, loc_y , top_right);
+        buf.set_symbol(loc_x + width - 1, loc_y, top_right);
         buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
         let cursor_loc_x = loc_x + self.input_buffer.get_cursor_location();
         if self.focused {

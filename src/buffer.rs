@@ -6,11 +6,11 @@ use crossterm::{
         Attributes,
         Color,
         ContentStyle,
+        Print,
         ResetColor,
         SetAttributes,
         SetBackgroundColor,
         SetForegroundColor,
-        Print,
     },
 };
 use std::{
@@ -136,7 +136,7 @@ impl Buffer {
                 crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16));
                 //TODO: when the previous character is unicode with 2 width,
                 //ig got erased with a blank
-                if !cell.is_filler(){
+                if !cell.is_filler() {
                     crossterm::queue!(w, Print(cell));
                 }
             }

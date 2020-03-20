@@ -121,11 +121,11 @@ where
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
-        for i in 0..width  {
+        for i in 0..width {
             buf.set_symbol(loc_x + i, loc_y, line::HORIZONTAL);
             buf.set_symbol(loc_x + i, loc_y + height - 1, line::HORIZONTAL);
         }
-        for j in 0..height  {
+        for j in 0..height {
             buf.set_symbol(loc_x, loc_y + j, line::VERTICAL);
             buf.set_symbol(loc_x + width - 1, loc_y + j, line::VERTICAL);
         }

@@ -73,10 +73,10 @@ impl<MSG> Widget<MSG> for Radio {
         } else {
             (symbol::RADIO_UNCHECKED, 0)
         };
-        buf.set_symbol(loc_x , loc_y , box_symbol);
+        buf.set_symbol(loc_x, loc_y, box_symbol);
 
         for (t, ch) in self.label.chars().enumerate() {
-            buf.set_symbol(loc_x + 3 + x_offset + t, loc_y , ch);
+            buf.set_symbol(loc_x + 3 + x_offset + t, loc_y, ch);
         }
         vec![]
     }
