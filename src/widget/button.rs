@@ -89,7 +89,6 @@ where
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }
-
 }
 
 impl<MSG> Widget<MSG> for Button<MSG>
@@ -122,16 +121,16 @@ where
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
-        for i in 0..width {
-            buf.set_symbol(loc_x + i, loc_y + 1, line::HORIZONTAL);
-            buf.set_symbol(loc_x + i, loc_y + height, line::HORIZONTAL);
+        for i in 0..width  {
+            buf.set_symbol(loc_x + i, loc_y, line::HORIZONTAL);
+            buf.set_symbol(loc_x + i, loc_y + height - 1, line::HORIZONTAL);
         }
-        for j in 0..height {
-            buf.set_symbol(loc_x, loc_y + 1 + j, line::VERTICAL);
-            buf.set_symbol(loc_x + width - 1, loc_y + 1 + j, line::VERTICAL);
+        for j in 0..height  {
+            buf.set_symbol(loc_x, loc_y + j, line::VERTICAL);
+            buf.set_symbol(loc_x + width - 1, loc_y + j, line::VERTICAL);
         }
         for (t, ch) in self.label.chars().enumerate() {
-            buf.set_symbol(loc_x + 1 + t, loc_y + 2, ch);
+            buf.set_symbol(loc_x + 1 + t, loc_y + 1, ch);
         }
 
         let top_left = if self.is_rounded {
@@ -154,10 +153,10 @@ where
         } else {
             line::BOTTOM_RIGHT
         };
-        buf.set_symbol(loc_x, loc_y + 1, top_left);
-        buf.set_symbol(loc_x, loc_y + height, bottom_left);
-        buf.set_symbol(loc_x + width - 1, loc_y + 1, top_right);
-        buf.set_symbol(loc_x + width - 1, loc_y + height, bottom_right);
+        buf.set_symbol(loc_x, loc_y, top_left);
+        buf.set_symbol(loc_x, loc_y + height - 1, bottom_left);
+        buf.set_symbol(loc_x + width - 1, loc_y, top_right);
+        buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
         vec![]
     }
 
@@ -187,4 +186,3 @@ where
         }
     }
 }
-

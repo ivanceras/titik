@@ -18,9 +18,11 @@ use image::{
     DynamicImage,
     GenericImageView,
 };
-use std::any::Any;
-use std::marker::PhantomData;
-use std::fmt;
+use std::{
+    any::Any,
+    fmt,
+    marker::PhantomData,
+};
 use stretch::{
     geometry::Size,
     style::{
@@ -92,7 +94,10 @@ impl<MSG> Image<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for Image<MSG> where MSG: 'static{
+impl<MSG> Widget<MSG> for Image<MSG>
+where
+    MSG: 'static,
+{
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -119,9 +124,7 @@ impl<MSG> Widget<MSG> for Image<MSG> where MSG: 'static{
         for (y, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
                 if i < layout.size.width as usize {
-                    buf.set_cell(loc_x + i, loc_y +1 + y, cell.clone());
-                }else{
-                    buf.set_symbol(loc_x + i, loc_y +1 + y, '#');
+                    buf.set_cell(loc_x + i, loc_y + y, cell.clone());
                 }
             }
         }

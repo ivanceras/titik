@@ -26,11 +26,11 @@ use crossterm::{
 use std::any::Any;
 use stretch::{
     geometry::Size,
+    result::Layout,
     style::{
         Dimension,
         Style,
     },
-    result::Layout,
 };
 
 #[derive(Default, Debug, PartialEq)]
@@ -70,7 +70,11 @@ impl TextInput {
         self.is_rounded = rounded;
     }
 
-    pub fn process_event<MSG>(&mut self, event: Event, layout: &Layout) ->Vec<MSG> {
+    pub fn process_event<MSG>(
+        &mut self,
+        event: Event,
+        layout: &Layout,
+    ) -> Vec<MSG> {
         match event {
             Event::Key(ke) => {
                 self.process_key(ke);
@@ -80,13 +84,12 @@ impl TextInput {
                 //self.input_buffer.set_cursor_loc(x as usize - layout.location.x.round() as usize - 3);
                 vec![]
             }
-            _ => vec![]
+            _ => vec![],
         }
     }
-
 }
 
-impl <MSG>Widget<MSG> for TextInput {
+impl<MSG> Widget<MSG> for TextInput {
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -152,27 +155,27 @@ impl <MSG>Widget<MSG> for TextInput {
         }
 
         for i in 0..width {
-            buf.set_symbol(loc_x + i, loc_y + 1, horizontal);
-            buf.set_symbol(loc_x + i, loc_y + height, horizontal);
+            buf.set_symbol(loc_x + i, loc_y, horizontal);
+            buf.set_symbol(loc_x + i, loc_y + height - 1, horizontal);
         }
         for j in 0..height {
-            buf.set_symbol(loc_x, loc_y + 1 + j, vertical);
-            buf.set_symbol(loc_x + width -1, loc_y + 1 + j, vertical);
+            buf.set_symbol(loc_x, loc_y + j, vertical);
+            buf.set_symbol(loc_x + width - 1, loc_y + j, vertical);
         }
-        let text_loc_y = loc_y + 2;
+        let text_loc_y = loc_y + 1;
         for (t, ch) in self.get_value().chars().enumerate() {
-            if loc_x + t < (width  - 2 ){
+            if loc_x + t < (width - 2) {
                 buf.set_symbol(loc_x + 1 + t, text_loc_y, ch);
             }
         }
 
-        buf.set_symbol(loc_x, loc_y + 1, top_left);
-        buf.set_symbol(loc_x, loc_y + height, bottom_left);
-        buf.set_symbol(loc_x + width -1, loc_y + 1, top_right);
-        buf.set_symbol(loc_x + width -1, loc_y + height, bottom_right);
+        buf.set_symbol(loc_x, loc_y, top_left);
+        buf.set_symbol(loc_x, loc_y + height - 1, bottom_left);
+        buf.set_symbol(loc_x + width - 1, loc_y , top_right);
+        buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
         let cursor_loc_x = loc_x + self.input_buffer.get_cursor_location();
         if self.focused {
-            vec![Cmd::ShowCursor, Cmd::MoveTo(cursor_loc_x +1 , text_loc_y)]
+            vec![Cmd::ShowCursor, Cmd::MoveTo(cursor_loc_x + 1, text_loc_y)]
         } else {
             vec![]
         }
@@ -194,5 +197,4 @@ impl <MSG>Widget<MSG> for TextInput {
         self.width = width;
         self.height = height;
     }
-
 }

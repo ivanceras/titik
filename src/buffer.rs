@@ -10,6 +10,7 @@ use crossterm::{
         SetAttributes,
         SetBackgroundColor,
         SetForegroundColor,
+        Print,
     },
 };
 use std::{
@@ -54,6 +55,14 @@ impl Cell {
             symbol: " ".to_string(),
             ..Default::default()
         }
+    }
+
+    pub fn is_blank(&self) -> bool {
+        self.symbol == " "
+    }
+
+    pub fn is_filler(&self) -> bool {
+        self.symbol == "\0"
     }
 
     pub fn attributes(&mut self, attributes: Vec<Attribute>) {
@@ -125,7 +134,11 @@ impl Buffer {
         for (j, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
                 crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16));
-                write!(w, "{}", cell);
+                //TODO: when the previous character is unicode with 2 width,
+                //ig got erased with a blank
+                if !cell.is_filler(){
+                    crossterm::queue!(w, Print(cell));
+                }
             }
         }
         Ok(())

@@ -69,14 +69,14 @@ impl<MSG> Widget<MSG> for Radio {
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let (box_symbol, x_offset) = if self.is_checked {
-            (symbol::RADIO_CHECKED, 1)
+            (symbol::RADIO_CHECKED, 0)
         } else {
             (symbol::RADIO_UNCHECKED, 0)
         };
-        buf.set_symbol(loc_x + 1, loc_y + 1, box_symbol);
+        buf.set_symbol(loc_x , loc_y , box_symbol);
 
         for (t, ch) in self.label.chars().enumerate() {
-            buf.set_symbol(loc_x + 3 + x_offset + t, loc_y + 1, ch);
+            buf.set_symbol(loc_x + 3 + x_offset + t, loc_y , ch);
         }
         vec![]
     }
