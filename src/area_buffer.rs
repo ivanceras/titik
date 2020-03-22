@@ -42,9 +42,34 @@ impl AreaBuffer {
                 self.add_char(c);
             }
             KeyCode::Enter => {
-                self.content.push(vec![]);
-                self.cursor_loc_y += 1;
-                self.cursor_loc_x = 0;
+                if let Some(mut line) = self.content.get_mut(self.cursor_loc_y){
+                    let new_line = line.split_off(self.cursor_loc_x);
+                    self.cursor_loc_y += 1;
+                    self.cursor_loc_x = 0;
+                    self.content.insert(self.cursor_loc_y, new_line);
+                }
+            }
+            KeyCode::Left => {
+                if self.cursor_loc_x > 0 {
+                    self.cursor_loc_x -= 1;
+                }
+            }
+            KeyCode::Right => {
+                if let Some(line) = self.content.get(self.cursor_loc_y) {
+                    if self.cursor_loc_x < line.len() {
+                        self.cursor_loc_x += 1;
+                    }
+                }
+            }
+            KeyCode::Up => {
+                if self.cursor_loc_y > 0 {
+                    self.cursor_loc_y -= 1;
+                }
+            }
+            KeyCode::Down => {
+                if self.cursor_loc_y < self.content.len()-1 {
+                    self.cursor_loc_y += 1;
+                }
             }
             _ => (),
         }
