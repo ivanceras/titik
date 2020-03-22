@@ -3,7 +3,7 @@ use crossterm::event::{
     KeyEvent,
 };
 
-/// Input buffer is a one dimensional text buffer.
+/// Input buffer is a 1 dimensional text buffer.
 /// It process keystroke and create a string representation
 /// depending on each key added to it.
 /// If arrow key (ie. left, right) is pressed the cursor location will be changed
@@ -35,13 +35,6 @@ impl InputBuffer {
             content: value,
             cursor_loc: value_len,
         }
-    }
-
-    /// replace the value of the input buffer with `value`
-    /// the cursor_location is also set to the end of the buffer.
-    pub fn set_value<S: ToString>(&mut self, value: S) {
-        self.content = value.to_string();
-        self.cursor_loc = self.content.len();
     }
 
     /// return the content of the buffer
@@ -98,6 +91,16 @@ impl InputBuffer {
         if x >= 0 && x < self.content.len() {
             self.cursor_loc = x;
         }
+    }
+
+    pub fn set_cursor_loc_corrected(&mut self, mut x: usize) {
+        if x < 0 {
+            x = 0;
+        }
+        if x > self.content.len() {
+            x = self.content.len()
+        }
+        self.set_cursor_loc(x);
     }
 
     /// delete the first character to the right of the cursor

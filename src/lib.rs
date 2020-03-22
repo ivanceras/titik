@@ -8,6 +8,7 @@ pub use buffer::{
 pub use cmd::Cmd;
 pub use crossterm;
 pub use input_buffer::InputBuffer;
+pub use area_buffer::AreaBuffer;
 pub use layout::{
     compute_layout,
     find_widget,
@@ -26,11 +27,13 @@ pub use widget::{
     Radio,
     TextInput,
     Widget,
+    TextArea,
 };
 
 mod buffer;
 mod cmd;
 mod input_buffer;
+mod area_buffer;
 mod layout;
 #[allow(unused)]
 mod symbol;

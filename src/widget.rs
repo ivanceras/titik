@@ -38,6 +38,7 @@ use stretch::{
     },
 };
 pub use text_input::TextInput;
+pub use text_area::TextArea;
 
 mod button;
 mod checkbox;
@@ -45,6 +46,7 @@ mod flex_box;
 mod image_control;
 mod radio;
 mod text_input;
+mod text_area;
 
 pub trait Widget<MSG>
 where

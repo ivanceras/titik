@@ -10,7 +10,7 @@ use crate::{
         thick_line,
     },
     Cmd,
-    InputBuffer,
+    AreaBuffer,
     LayoutTree,
     Widget,
 };
@@ -34,36 +34,36 @@ use stretch::{
 };
 
 #[derive(Default, Debug, PartialEq)]
-pub struct TextInput {
-    pub input_buffer: InputBuffer,
+pub struct TextArea {
+    pub area_buffer: AreaBuffer,
     pub is_rounded: bool,
     focused: bool,
     pub width: Option<f32>,
     pub height: Option<f32>,
 }
 
-impl TextInput {
+impl TextArea {
     pub fn new<S>(value: S) -> Self
     where
         S: ToString,
     {
-        TextInput {
-            input_buffer: InputBuffer::new_with_value(value),
+        TextArea {
+            area_buffer: AreaBuffer::from(value.to_string()),
             is_rounded: false,
             ..Default::default()
         }
     }
 
     pub fn process_key(&mut self, key_event: KeyEvent) {
-        self.input_buffer.process_key_event(key_event);
+        self.area_buffer.process_key_event(key_event);
     }
 
     pub fn set_value<S: ToString>(&mut self, value: S) {
-        self.input_buffer = InputBuffer::new_with_value(value);
+        self.area_buffer = AreaBuffer::from(value.to_string());
     }
 
-    pub fn get_value(&self) -> &str {
-        self.input_buffer.get_content()
+    pub fn get_value(&self) -> String {
+        self.area_buffer.to_string()
     }
 
     pub fn set_rounded(&mut self, rounded: bool) {
@@ -81,8 +81,7 @@ impl TextInput {
                 vec![]
             }
             Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
-                let mut cursor_loc = x as i32 - layout.location.x.round() as i32 - 1;
-                self.input_buffer.set_cursor_loc_corrected(cursor_loc as usize);
+                //self.area_buffer.set_cursor_loc(x as usize - layout.location.x.round() as usize - 3);
                 vec![]
             }
             _ => vec![],
@@ -90,7 +89,7 @@ impl TextInput {
     }
 }
 
-impl<MSG> Widget<MSG> for TextInput {
+impl<MSG> Widget<MSG> for TextArea {
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -174,9 +173,9 @@ impl<MSG> Widget<MSG> for TextInput {
         buf.set_symbol(loc_x, loc_y + height - 1, bottom_left);
         buf.set_symbol(loc_x + width - 1, loc_y, top_right);
         buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
-        let cursor_loc_x = loc_x + self.input_buffer.get_cursor_location();
+        let (cursor_loc_x,cursor_loc_y) = self.area_buffer.get_cursor_location();
         if self.focused {
-            vec![Cmd::ShowCursor, Cmd::MoveTo(cursor_loc_x + 1, text_loc_y)]
+            vec![Cmd::ShowCursor, Cmd::MoveTo(loc_x + cursor_loc_x, loc_y + cursor_loc_y)]
         } else {
             vec![]
         }
