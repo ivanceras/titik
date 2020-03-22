@@ -64,11 +64,36 @@ impl AreaBuffer {
             KeyCode::Up => {
                 if self.cursor_loc_y > 0 {
                     self.cursor_loc_y -= 1;
+                    if let Some(line) = self.content.get(self.cursor_loc_y) {
+                        if self.cursor_loc_x > line.len() {
+                            self.cursor_loc_x = line.len();
+                        }
+                    }
                 }
             }
             KeyCode::Down => {
                 if self.cursor_loc_y < self.content.len()-1 {
                     self.cursor_loc_y += 1;
+                    if let Some(line) = self.content.get(self.cursor_loc_y) {
+                        if self.cursor_loc_x > line.len() {
+                            self.cursor_loc_x = line.len();
+                        }
+                    }
+                }
+            }
+            KeyCode::Backspace => {
+                if let Some(line) = self.content.get_mut(self.cursor_loc_y) {
+                    if self.cursor_loc_x > 0 && line.len() > 0 {
+                        self.cursor_loc_x -= 1;
+                        line.remove(self.cursor_loc_x);
+                    }
+                }
+            }
+            KeyCode::Delete => {
+                if let Some(line) = self.content.get_mut(self.cursor_loc_y){
+                    if self.cursor_loc_x < line.len(){
+                        line.remove(self.cursor_loc_x);
+                    }
                 }
             }
             _ => (),
