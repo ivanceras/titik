@@ -108,11 +108,8 @@ where
 
     let mut root_node = FlexBox::new();
     let mut cb1 = Checkbox::new("Checkbox1");
-    cb1.set_checked(true);
     let mut cb2 = Checkbox::new("Checkbox2");
-    cb2.set_checked(false);
     let mut rb1 = Radio::new("Radio1");
-    rb1.set_checked(true);
     let mut input1 = TextInput::new("Hello world!");
 
     let mut input2 =
@@ -210,8 +207,8 @@ where
                 _ => (),
             }
             if let Some((x, y)) = extract_location(&event) {
-                let hits = layout_tree.hit(x as f32, y as f32);
-                for hit in hits {
+                let mut hits = layout_tree.hit(x as f32, y as f32);
+                let hit = hits.pop().expect("process only 1 for now");
                     let mut hit_widget: Option<&mut dyn Widget<()>> =
                         find_widget_mut(&mut root_node, hit);
 
@@ -221,7 +218,6 @@ where
                     if let Some(hit_widget) = &mut hit_widget {
                         hit_widget.process_event(event, &focused_layout.layout);
                     }
-                }
             }
         }
     }

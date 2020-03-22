@@ -27,11 +27,11 @@ use std::{
 };
 use stretch::{
     geometry::Size,
+    result::Layout,
     style::{
         Dimension,
         Style,
     },
-    result::Layout,
 };
 
 #[derive(PartialEq, Clone)]
@@ -131,7 +131,11 @@ where
             buf.set_symbol(loc_x + width - 1, loc_y + j, line::VERTICAL);
         }
         for (t, ch) in self.label.chars().enumerate() {
-            buf.set_symbol(loc_x + 1 + t, loc_y + 1, ch);
+            let mut cell = Cell::new(ch);
+            if self.focused {
+                cell.bold();
+            }
+            buf.set_cell(loc_x + 1 + t, loc_y + 1, cell);
         }
 
         let top_left = if self.is_rounded {

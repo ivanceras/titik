@@ -57,6 +57,10 @@ impl Cell {
         }
     }
 
+    pub fn bold(&mut self) {
+        self.attributes.set(Attribute::Bold);
+    }
+
     pub fn is_blank(&self) -> bool {
         self.symbol == " "
     }
@@ -107,7 +111,7 @@ impl Buffer {
                 *cell = new_cell;
                 if unicode_width > 1 {
                     for i in 1..unicode_width {
-                        self.set_symbol(x, y + i, '\0');
+                        self.set_symbol(x + 1, y, '\0');
                     }
                 }
             }
