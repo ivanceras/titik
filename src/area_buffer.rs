@@ -7,7 +7,7 @@ use unicode_width::UnicodeWidthChar;
 /// Area buffer is a 2 dimensional text buffer
 #[derive(Default, Debug, PartialEq, Clone)]
 pub struct AreaBuffer {
-    content: Vec<Vec<char>>,
+    pub(crate) content: Vec<Vec<char>>,
     cursor_loc_x: usize,
     cursor_loc_y: usize,
 }
@@ -22,10 +22,15 @@ impl AreaBuffer {
     }
 
     fn add_char(&mut self, c: char) {
-        if let Some(line) = self.content.get_mut(self.cursor_loc_y) {
+        let line = self.content.get_mut(self.cursor_loc_y).expect("must have a line");
             line.insert(self.cursor_loc_x, c);
             self.cursor_loc_x += 1;
-        }
+    }
+
+    pub fn add_line<S:ToString>(&mut self, s: S){
+        let line = s.to_string().chars().collect();
+        self.content.push(line);
+        self.cursor_loc_y += 1;
     }
 
     pub fn process_key_event(
@@ -45,8 +50,31 @@ impl AreaBuffer {
         }
     }
 
+
+    pub fn set_cursor_loc_corrected(&mut self, mut x: i32, mut y: i32) {
+        if y < 0 {
+            y = 0;
+        }
+        let rows = self.content.len() as i32;
+        if y >= rows  {
+            y = rows - 1;
+        }
+        if x < 0 {
+            x = 0;
+        }
+        let cursor_y = y as usize;
+        if let Some(line) = self.content.get(cursor_y){
+            if x > line.len() as i32{
+                x = line.len() as i32;
+            }
+        }
+        let cursor_x = x as usize;
+        self.cursor_loc_x = cursor_x;
+        self.cursor_loc_y = cursor_y;
+    }
+
     pub fn get_cursor_location(&self) -> (usize, usize) {
-        (self.cursor_loc_x , self.cursor_loc_y)
+        (self.cursor_loc_x , self.cursor_loc_y )
     }
 }
 

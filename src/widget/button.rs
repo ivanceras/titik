@@ -31,6 +31,7 @@ use stretch::{
         Dimension,
         Style,
     },
+    result::Layout,
 };
 
 #[derive(PartialEq, Clone)]
@@ -177,7 +178,7 @@ where
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(..)) => {
                 self.on_click.iter().map(|cb| cb.emit(event)).collect()

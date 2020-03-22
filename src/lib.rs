@@ -13,6 +13,7 @@ pub use layout::{
     compute_layout,
     find_widget,
     find_widget_mut,
+    find_layout,
     set_focused_node,
     widget_hit_at,
     widget_node_idx_at,

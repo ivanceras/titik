@@ -48,6 +48,7 @@ use stretch::{
 };
 use titik::{
     compute_layout,
+    find_layout,
     find_widget,
     find_widget_mut,
     set_focused_node,
@@ -62,6 +63,7 @@ use titik::{
     InputBuffer,
     LayoutTree,
     Radio,
+    TextArea,
     TextInput,
     Widget,
 };
@@ -105,7 +107,7 @@ where
     let mut focused_widget_idx = None;
 
     let mut root_node = FlexBox::new();
-    let mut cb1 = Checkbox::new(format!("{:?}", focused_widget_idx));
+    let mut cb1 = Checkbox::new("Checkbox1");
     cb1.set_checked(true);
     let mut cb2 = Checkbox::new("Checkbox2");
     cb2.set_checked(false);
@@ -115,6 +117,9 @@ where
 
     let mut input2 =
         TextInput::new("The quick brown fox jumps over the lazy dog...");
+
+    let mut text_area1 =
+        TextArea::new("This is a text area \nWith a line\nand another line");
 
     let rb2 = Radio::new("Radio2");
     let mut btn2: Button<()> = Button::new("Button2");
@@ -135,6 +140,7 @@ where
     root_node.add_child(Box::new(rb2));
     root_node.add_child(Box::new(input1));
     root_node.add_child(Box::new(input2));
+    root_node.add_child(Box::new(text_area1));
 
     let (width, height) = buffer_size().unwrap();
 
@@ -181,13 +187,14 @@ where
                         if let Some(idx) = focused_widget_idx.as_ref() {
                             let active_widget: Option<&mut dyn Widget<()>> =
                                 find_widget_mut(&mut root_node, *idx);
+                            let focused_layout =
+                                find_layout(&layout_tree, *idx)
+                                    .expect("must have a layout tree");
                             if let Some(focused_widget) = active_widget {
-                                if let Some(txt_input) = focused_widget
-                                    .as_any_mut()
-                                    .downcast_mut::<TextInput>()
-                                {
-                                    txt_input.process_key(key_event);
-                                }
+                                focused_widget.process_event(
+                                    event,
+                                    &focused_layout.layout,
+                                );
                             }
                         }
                     }
@@ -197,20 +204,6 @@ where
                         widget_node_idx_at(&layout_tree, x as f32, y as f32);
 
                     if let Some(idx) = focused_widget_idx.as_ref() {
-                        let mut active_widget: Option<&mut dyn Widget<()>> =
-                            find_widget_mut(&mut root_node, *idx);
-
-                        if let Some(active_widget) = &mut active_widget {
-                            if let Some(txt_input) = active_widget
-                                .as_any_mut()
-                                .downcast_mut::<TextInput>(
-                            ) {
-                                let msg = txt_input.process_event::<()>(
-                                    event,
-                                    &layout_tree.layout,
-                                );
-                            }
-                        }
                         set_focused_node(&mut root_node, *idx);
                     }
                 }
@@ -218,7 +211,17 @@ where
             }
             if let Some((x, y)) = extract_location(&event) {
                 let hits = layout_tree.hit(x as f32, y as f32);
-                //println!("hit at: {:?}", hits);
+                for hit in hits {
+                    let mut hit_widget: Option<&mut dyn Widget<()>> =
+                        find_widget_mut(&mut root_node, hit);
+
+                    let focused_layout = find_layout(&layout_tree, hit)
+                        .expect("must have a layout tree");
+
+                    if let Some(hit_widget) = &mut hit_widget {
+                        hit_widget.process_event(event, &focused_layout.layout);
+                    }
+                }
             }
         }
     }

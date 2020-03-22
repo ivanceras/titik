@@ -9,8 +9,8 @@ use crate::{
         rounded,
         thick_line,
     },
-    Cmd,
     AreaBuffer,
+    Cmd,
     LayoutTree,
     Widget,
 };
@@ -62,6 +62,10 @@ impl TextArea {
         self.area_buffer = AreaBuffer::from(value.to_string());
     }
 
+    pub fn add_line<S: ToString>(&mut self, s: S) {
+        self.area_buffer.add_line(s);
+    }
+
     pub fn get_value(&self) -> String {
         self.area_buffer.to_string()
     }
@@ -70,23 +74,6 @@ impl TextArea {
         self.is_rounded = rounded;
     }
 
-    pub fn process_event<MSG>(
-        &mut self,
-        event: Event,
-        layout: &Layout,
-    ) -> Vec<MSG> {
-        match event {
-            Event::Key(ke) => {
-                self.process_key(ke);
-                vec![]
-            }
-            Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
-                //self.area_buffer.set_cursor_loc(x as usize - layout.location.x.round() as usize - 3);
-                vec![]
-            }
-            _ => vec![],
-        }
-    }
 }
 
 impl<MSG> Widget<MSG> for TextArea {
@@ -103,7 +90,9 @@ impl<MSG> Widget<MSG> for TextArea {
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Points(3.0)
+                    Dimension::Points(
+                        2.0 + self.area_buffer.content.len() as f32,
+                    )
                 },
             },
             ..Default::default()
@@ -163,9 +152,11 @@ impl<MSG> Widget<MSG> for TextArea {
             buf.set_symbol(loc_x + width - 1, loc_y + j, vertical);
         }
         let text_loc_y = loc_y + 1;
-        for (t, ch) in self.get_value().chars().enumerate() {
-            if loc_x + t < (width - 2) {
-                buf.set_symbol(loc_x + 1 + t, text_loc_y, ch);
+        for (j, line) in self.area_buffer.content.iter().enumerate() {
+            for (i, ch) in line.iter().enumerate() {
+                if loc_x + i < (width - 2) {
+                    buf.set_symbol(loc_x + 1 + i, text_loc_y + j, ch);
+                }
             }
         }
 
@@ -173,9 +164,13 @@ impl<MSG> Widget<MSG> for TextArea {
         buf.set_symbol(loc_x, loc_y + height - 1, bottom_left);
         buf.set_symbol(loc_x + width - 1, loc_y, top_right);
         buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
-        let (cursor_loc_x,cursor_loc_y) = self.area_buffer.get_cursor_location();
+        let (cursor_loc_x, cursor_loc_y) =
+            self.area_buffer.get_cursor_location();
         if self.focused {
-            vec![Cmd::ShowCursor, Cmd::MoveTo(loc_x + cursor_loc_x, loc_y + cursor_loc_y)]
+            vec![
+                Cmd::ShowCursor,
+                Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + cursor_loc_y + 1),
+            ]
         } else {
             vec![]
         }
@@ -196,5 +191,29 @@ impl<MSG> Widget<MSG> for TextArea {
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
         self.width = width;
         self.height = height;
+    }
+
+    fn process_event(
+        &mut self,
+        event: Event,
+        layout: &Layout,
+    ) -> Vec<MSG> {
+        match event {
+            Event::Key(ke) => {
+                self.process_key(ke);
+                vec![]
+            }
+            Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
+                let cursor_loc_x =
+                    x as i32 - layout.location.x.round() as i32;
+                let mut cursor_loc_y =
+                    y as i32 - layout.location.y.round() as i32;
+                self.area_buffer
+                    .set_cursor_loc_corrected(cursor_loc_x, cursor_loc_y - 1);
+                //self.add_line(format!("cursor: {},{}", cursor_loc_x, cursor_loc_y));
+                vec![]
+            }
+            _ => vec![],
+        }
     }
 }

@@ -70,24 +70,6 @@ impl TextInput {
         self.is_rounded = rounded;
     }
 
-    pub fn process_event<MSG>(
-        &mut self,
-        event: Event,
-        layout: &Layout,
-    ) -> Vec<MSG> {
-        match event {
-            Event::Key(ke) => {
-                self.process_key(ke);
-                vec![]
-            }
-            Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
-                let mut cursor_loc = x as i32 - layout.location.x.round() as i32 - 1;
-                self.input_buffer.set_cursor_loc_corrected(cursor_loc as usize);
-                vec![]
-            }
-            _ => vec![],
-        }
-    }
 }
 
 impl<MSG> Widget<MSG> for TextInput {
@@ -163,10 +145,9 @@ impl<MSG> Widget<MSG> for TextInput {
             buf.set_symbol(loc_x, loc_y + j, vertical);
             buf.set_symbol(loc_x + width - 1, loc_y + j, vertical);
         }
-        let text_loc_y = loc_y + 1;
         for (t, ch) in self.get_value().chars().enumerate() {
             if loc_x + t < (width - 2) {
-                buf.set_symbol(loc_x + 1 + t, text_loc_y, ch);
+                buf.set_symbol(loc_x + 1 + t, loc_y + 1, ch);
             }
         }
 
@@ -174,9 +155,9 @@ impl<MSG> Widget<MSG> for TextInput {
         buf.set_symbol(loc_x, loc_y + height - 1, bottom_left);
         buf.set_symbol(loc_x + width - 1, loc_y, top_right);
         buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
-        let cursor_loc_x = loc_x + self.input_buffer.get_cursor_location();
+        let cursor_loc_x = self.input_buffer.get_cursor_location();
         if self.focused {
-            vec![Cmd::ShowCursor, Cmd::MoveTo(cursor_loc_x + 1, text_loc_y)]
+            vec![Cmd::ShowCursor, Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + 1)]
         } else {
             vec![]
         }
@@ -197,5 +178,24 @@ impl<MSG> Widget<MSG> for TextInput {
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
         self.width = width;
         self.height = height;
+    }
+
+    fn process_event(
+        &mut self,
+        event: Event,
+        layout: &Layout,
+    ) -> Vec<MSG> {
+        match event {
+            Event::Key(ke) => {
+                self.process_key(ke);
+                vec![]
+            }
+            Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
+                let mut cursor_loc = x as i32 - layout.location.x.round() as i32;
+                self.input_buffer.set_cursor_loc_corrected(cursor_loc as usize);
+                vec![]
+            }
+            _ => vec![],
+        }
     }
 }
