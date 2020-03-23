@@ -101,7 +101,7 @@ impl AreaBuffer {
     }
 
 
-    pub fn set_cursor_loc_corrected(&mut self, cursor_x: usize, cursor_y: usize) {
+    pub fn set_cursor_loc(&mut self, cursor_x: usize, cursor_y: usize) {
         self.cursor_loc_x = cursor_x;
         self.cursor_loc_y = cursor_y;
     }

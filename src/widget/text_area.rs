@@ -163,18 +163,28 @@ where
             buf.set_symbol(loc_x, loc_y + j, vertical);
             buf.set_symbol(loc_x + width - 1, loc_y + j, vertical);
         }
+
+        // scroller
+        // TODO: calculate max scroll
+        let scroller_height = height * height/ self.area_buffer.content.len();
+        let scroller_loc = self.scroll/height; 
+        for j in 0..scroller_height{
+            buf.set_symbol(loc_x + width - 1, loc_y + scroller_loc + j + 1, '▇');
+        }
+
+
+        // draw the text content
         let text_loc_y = loc_y + 1;
         for (j, line) in self
             .area_buffer
             .content
             .iter()
-            .skip(self.scroll)
             .enumerate()
         {
-            if j < self.area_buffer.content.len() - 2 {
+            if j >= self.scroll && j < height - 2 + self.scroll {
                 for (i, ch) in line.iter().enumerate() {
                     if loc_x + i < (width - 2) {
-                        buf.set_symbol(loc_x + 1 + i, text_loc_y + j, ch);
+                        buf.set_symbol(loc_x + 1 + i, text_loc_y - self.scroll + j, ch);
                     }
                 }
             }
@@ -245,7 +255,7 @@ where
                 let cursor_x = x as usize;
 
                 self.area_buffer
-                    .set_cursor_loc_corrected(cursor_x, cursor_y);
+                    .set_cursor_loc(cursor_x, cursor_y);
                 vec![]
             }
             Event::Mouse(MouseEvent::ScrollUp(x, y, modifier)) => {

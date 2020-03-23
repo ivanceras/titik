@@ -117,13 +117,28 @@ where
 
     let mut text_area1: TextArea<()> =
         TextArea::new("This is a text area\
-            \nWith a line\
-            \nand another line\
-            \nWith a line\
-            \nand another line\
+            \n1. With a line\
+            \n2. and another line\
+            \n3. With a line\
+            \n4. and another line\
+            \n5. With a line\
+            \n6. With a line\
+            \n7. and another line\
+            \n8. With a line\
+            \n9. and another line\
+            \n10. and another line\
+            \n11. With a line\
+            \n12. and another line\
+            \n13. With a line\
+            \n14. and another line\
+            \n15. With a line\
+            \n16. With a line\
+            \n17. and another line\
+            \n18. With a line\
+            \n19. and another line\
             \n");
-    text_area1.set_size(None, Some(5.0));
-    text_area1.scroll = 3;
+    text_area1.set_size(None, Some(7.0));
+    text_area1.scroll = 0;
 
     let rb2 = Radio::new("Radio2");
     let mut btn2: Button<()> = Button::new("Button2");
