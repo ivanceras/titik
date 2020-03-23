@@ -186,7 +186,10 @@ where
         buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
         let (cursor_loc_x, cursor_loc_y) =
             self.area_buffer.get_cursor_location();
-        if self.focused {
+
+        let abs_cursor_y = loc_y + cursor_loc_y + 1 - self.scroll ;
+        let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < loc_y + height - 1;
+        if self.focused && is_cursor_visible {
             vec![
                 Cmd::ShowCursor,
                 Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + cursor_loc_y + 1 - self.scroll),
@@ -221,7 +224,7 @@ where
             }
             Event::Mouse(MouseEvent::Down(_btn, mut x, mut y, modifier)) => {
                 let mut x = x as i32 - layout.location.x.round() as i32;
-                let mut y = y as i32 - layout.location.y.round() as i32;
+                let mut y = y as i32 - layout.location.y.round() as i32 - 1;
 
                 if y < 0 {
                     y = 0;
@@ -242,7 +245,7 @@ where
                 let cursor_x = x as usize;
 
                 self.area_buffer
-                    .set_cursor_loc_corrected(cursor_x, cursor_y - 1);
+                    .set_cursor_loc_corrected(cursor_x, cursor_y);
                 vec![]
             }
             Event::Mouse(MouseEvent::ScrollUp(x, y, modifier)) => {
