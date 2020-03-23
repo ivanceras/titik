@@ -23,7 +23,11 @@ use crossterm::{
     },
     Command,
 };
-use std::any::Any;
+use std::{
+    any::Any,
+    fmt,
+    marker::PhantomData,
+};
 use stretch::{
     geometry::Size,
     result::Layout,
@@ -33,16 +37,18 @@ use stretch::{
     },
 };
 
-#[derive(Default, Debug, PartialEq)]
-pub struct TextArea {
+#[derive(Debug, PartialEq)]
+pub struct TextArea<MSG> {
     pub area_buffer: AreaBuffer,
     pub is_rounded: bool,
     focused: bool,
     pub width: Option<f32>,
     pub height: Option<f32>,
+    pub scroll: usize,
+    _phantom_msg: PhantomData<MSG>,
 }
 
-impl TextArea {
+impl<MSG> TextArea<MSG> {
     pub fn new<S>(value: S) -> Self
     where
         S: ToString,
@@ -50,7 +56,11 @@ impl TextArea {
         TextArea {
             area_buffer: AreaBuffer::from(value.to_string()),
             is_rounded: false,
-            ..Default::default()
+            width: None,
+            height: None,
+            focused: false,
+            scroll: 0,
+            _phantom_msg: PhantomData,
         }
     }
 
@@ -73,10 +83,12 @@ impl TextArea {
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }
-
 }
 
-impl<MSG> Widget<MSG> for TextArea {
+impl<MSG> Widget<MSG> for TextArea<MSG>
+where
+    MSG: fmt::Debug + 'static,
+{
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -152,10 +164,18 @@ impl<MSG> Widget<MSG> for TextArea {
             buf.set_symbol(loc_x + width - 1, loc_y + j, vertical);
         }
         let text_loc_y = loc_y + 1;
-        for (j, line) in self.area_buffer.content.iter().enumerate() {
-            for (i, ch) in line.iter().enumerate() {
-                if loc_x + i < (width - 2) {
-                    buf.set_symbol(loc_x + 1 + i, text_loc_y + j, ch);
+        for (j, line) in self
+            .area_buffer
+            .content
+            .iter()
+            .skip(self.scroll)
+            .enumerate()
+        {
+            if j < self.area_buffer.content.len() - 2 {
+                for (i, ch) in line.iter().enumerate() {
+                    if loc_x + i < (width - 2) {
+                        buf.set_symbol(loc_x + 1 + i, text_loc_y + j, ch);
+                    }
                 }
             }
         }
@@ -169,7 +189,7 @@ impl<MSG> Widget<MSG> for TextArea {
         if self.focused {
             vec![
                 Cmd::ShowCursor,
-                Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + cursor_loc_y + 1),
+                Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + cursor_loc_y + 1 - self.scroll),
             ]
         } else {
             vec![]
@@ -193,24 +213,48 @@ impl<MSG> Widget<MSG> for TextArea {
         self.height = height;
     }
 
-    fn process_event(
-        &mut self,
-        event: Event,
-        layout: &Layout,
-    ) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Key(ke) => {
                 self.process_key(ke);
                 vec![]
             }
-            Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
-                let cursor_loc_x =
-                    x as i32 - layout.location.x.round() as i32;
-                let mut cursor_loc_y =
-                    y as i32 - layout.location.y.round() as i32;
+            Event::Mouse(MouseEvent::Down(_btn, mut x, mut y, modifier)) => {
+                let mut x = x as i32 - layout.location.x.round() as i32;
+                let mut y = y as i32 - layout.location.y.round() as i32;
+
+                if y < 0 {
+                    y = 0;
+                }
+                let rows = self.area_buffer.content.len() as i32;
+                if y >= rows {
+                    y = rows - 1;
+                }
+                if x < 0 {
+                    x = 0;
+                }
+                let cursor_y = y as usize + self.scroll;
+                if let Some(line) = self.area_buffer.content.get(cursor_y) {
+                    if x > line.len() as i32 {
+                        x = line.len() as i32;
+                    }
+                }
+                let cursor_x = x as usize;
+
                 self.area_buffer
-                    .set_cursor_loc_corrected(cursor_loc_x, cursor_loc_y - 1);
-                //self.add_line(format!("cursor: {},{}", cursor_loc_x, cursor_loc_y));
+                    .set_cursor_loc_corrected(cursor_x, cursor_y - 1);
+                vec![]
+            }
+            Event::Mouse(MouseEvent::ScrollUp(x, y, modifier)) => {
+                if self.scroll > 0 {
+                    self.scroll -= 1;
+                }
+                vec![]
+            }
+            Event::Mouse(MouseEvent::ScrollDown(x, y, modifier)) => {
+                if self.scroll < self.area_buffer.content.len() {
+                    self.scroll += 1;
+                }
                 vec![]
             }
             _ => vec![],

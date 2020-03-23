@@ -115,8 +115,15 @@ where
     let mut input2 =
         TextInput::new("The quick brown fox jumps over the lazy dog...");
 
-    let mut text_area1 =
-        TextArea::new("This is a text area \nWith a line\nand another line");
+    let mut text_area1: TextArea<()> =
+        TextArea::new("This is a text area\
+            \nWith a line\
+            \nand another line\
+            \nWith a line\
+            \nand another line\
+            \n");
+    text_area1.set_size(None, Some(5.0));
+    text_area1.scroll = 3;
 
     let rb2 = Radio::new("Radio2");
     let mut btn2: Button<()> = Button::new("Button2");

@@ -101,24 +101,7 @@ impl AreaBuffer {
     }
 
 
-    pub fn set_cursor_loc_corrected(&mut self, mut x: i32, mut y: i32) {
-        if y < 0 {
-            y = 0;
-        }
-        let rows = self.content.len() as i32;
-        if y >= rows  {
-            y = rows - 1;
-        }
-        if x < 0 {
-            x = 0;
-        }
-        let cursor_y = y as usize;
-        if let Some(line) = self.content.get(cursor_y){
-            if x > line.len() as i32{
-                x = line.len() as i32;
-            }
-        }
-        let cursor_x = x as usize;
+    pub fn set_cursor_loc_corrected(&mut self, cursor_x: usize, cursor_y: usize) {
         self.cursor_loc_x = cursor_x;
         self.cursor_loc_y = cursor_y;
     }
