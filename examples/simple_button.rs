@@ -140,7 +140,6 @@ where
             \n",
     );
     text_area1.set_size(None, Some(7.0));
-    text_area1.scroll = 0;
 
     let rb2 = Radio::new("Radio2");
     let mut btn2: Button<()> = Button::new("Button2");
@@ -155,7 +154,11 @@ where
     let btn1: Button<()> = Button::new("Button 1");
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
-    root_node.add_child(Box::new(img));
+    let mut row = FlexBox::new();
+    row.horizontal();
+    row.add_child(Box::new(img));
+    row.add_child(Box::new(svg));
+    root_node.add_child(Box::new(row));
     root_node.add_child(Box::new(cb2));
     root_node.add_child(Box::new(cb1));
 
@@ -164,7 +167,6 @@ where
     root_node.add_child(Box::new(input1));
     root_node.add_child(Box::new(input2));
     root_node.add_child(Box::new(text_area1));
-    root_node.add_child(Box::new(svg));
 
     let (width, height) = buffer_size().unwrap();
 
