@@ -17,8 +17,8 @@ use image::{
     self,
     DynamicImage,
     GenericImageView,
-    RgbaImage,
     ImageBuffer,
+    RgbaImage,
 };
 use std::{
     any::Any,
@@ -46,19 +46,26 @@ pub struct SvgImage<MSG> {
 
 impl<MSG> SvgImage<MSG> {
     pub fn new(svg: String) -> Self {
-        let rtree = resvg::usvg::Tree::from_str(&svg, &resvg::usvg::Options::default()).expect("must be parse into tree");
+        let rtree =
+            resvg::usvg::Tree::from_str(&svg, &resvg::usvg::Options::default())
+                .expect("must be parse into tree");
         let svg_size = rtree.svg_node().size;
         //TODO: get the size when width and height is not defined
-        let (width, height) = (svg_size.width() as u32, svg_size.height() as u32);
+        let (width, height) =
+            (svg_size.width() as u32, svg_size.height() as u32);
         let backend = resvg::default_backend();
-        let mut img = backend.render_to_image(&rtree, &resvg::Options::default()).expect("must render to image");
+        let mut img = backend
+            .render_to_image(&rtree, &resvg::Options::default())
+            .expect("must render to image");
         let rgba_vec = img.make_rgba_vec();
-        let img_buffer: RgbaImage = ImageBuffer::from_raw(width, height, rgba_vec).expect("must construct imagebuffer");
+        let img_buffer: RgbaImage =
+            ImageBuffer::from_raw(width, height, rgba_vec)
+                .expect("must construct imagebuffer");
 
         let mut image = SvgImage {
             image: DynamicImage::ImageRgba8(img_buffer),
-            width: Some(width as f32/ 10.0),
-            height: Some(height as f32/ 10.0 / 2.0),
+            width: Some(width as f32 / 10.0),
+            height: Some(height as f32 / 10.0 / 2.0),
             cells: vec![],
             _phantom_msg: PhantomData,
         };

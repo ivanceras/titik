@@ -69,7 +69,6 @@ impl TextInput {
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }
-
 }
 
 impl<MSG> Widget<MSG> for TextInput {
@@ -157,7 +156,10 @@ impl<MSG> Widget<MSG> for TextInput {
         buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
         let cursor_loc_x = self.input_buffer.get_cursor_location();
         if self.focused {
-            vec![Cmd::ShowCursor, Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + 1)]
+            vec![
+                Cmd::ShowCursor,
+                Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + 1),
+            ]
         } else {
             vec![]
         }
@@ -180,19 +182,17 @@ impl<MSG> Widget<MSG> for TextInput {
         self.height = height;
     }
 
-    fn process_event(
-        &mut self,
-        event: Event,
-        layout: &Layout,
-    ) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Key(ke) => {
                 self.process_key(ke);
                 vec![]
             }
             Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
-                let mut cursor_loc = x as i32 - layout.location.x.round() as i32;
-                self.input_buffer.set_cursor_loc_corrected(cursor_loc as usize);
+                let mut cursor_loc =
+                    x as i32 - layout.location.x.round() as i32;
+                self.input_buffer
+                    .set_cursor_loc_corrected(cursor_loc as usize);
                 vec![]
             }
             _ => vec![],

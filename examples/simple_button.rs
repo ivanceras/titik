@@ -115,8 +115,8 @@ where
     let mut input2 =
         TextInput::new("The quick brown fox jumps over the lazy dog...");
 
-    let mut text_area1: TextArea<()> =
-        TextArea::new("This is a text area\
+    let mut text_area1: TextArea<()> = TextArea::new(
+        "This is a text area\
             \n1. With a line\
             \n2. and another line\
             \n3. With a line\
@@ -136,7 +136,8 @@ where
             \n17. and another line\
             \n18. With a line\
             \n19. and another line\
-            \n");
+            \n",
+    );
     text_area1.set_size(None, Some(7.0));
     text_area1.scroll = 0;
 
@@ -231,15 +232,15 @@ where
             if let Some((x, y)) = extract_location(&event) {
                 let mut hits = layout_tree.hit(x as f32, y as f32);
                 let hit = hits.pop().expect("process only 1 for now");
-                    let mut hit_widget: Option<&mut dyn Widget<()>> =
-                        find_widget_mut(&mut root_node, hit);
+                let mut hit_widget: Option<&mut dyn Widget<()>> =
+                    find_widget_mut(&mut root_node, hit);
 
-                    let focused_layout = find_layout(&layout_tree, hit)
-                        .expect("must have a layout tree");
+                let focused_layout = find_layout(&layout_tree, hit)
+                    .expect("must have a layout tree");
 
-                    if let Some(hit_widget) = &mut hit_widget {
-                        hit_widget.process_event(event, &focused_layout.layout);
-                    }
+                if let Some(hit_widget) = &mut hit_widget {
+                    hit_widget.process_event(event, &focused_layout.layout);
+                }
             }
         }
     }

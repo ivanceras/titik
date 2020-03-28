@@ -51,9 +51,7 @@ impl LayoutTree {
     pub fn hit(&self, x: f32, y: f32) -> Vec<usize> {
         self.at_location(x, y, &mut 0)
     }
-
 }
-
 
 //TODO: keep track of the focused element,
 // area and position of the layout also determines
@@ -132,7 +130,10 @@ fn find_node_mut<'a, MSG>(
     }
 }
 
-pub fn find_layout<'a>(node: &'a LayoutTree, node_idx: usize) -> Option<&'a LayoutTree> {
+pub fn find_layout<'a>(
+    node: &'a LayoutTree,
+    node_idx: usize,
+) -> Option<&'a LayoutTree> {
     find_layout_tree(node, node_idx, &mut 0)
 }
 
@@ -148,7 +149,7 @@ fn find_layout_tree<'a>(
             *cur_index += 1;
             find_layout_tree(child, node_idx, cur_index)
         })
-    } 
+    }
 }
 
 pub fn set_focused_node<'a, MSG>(

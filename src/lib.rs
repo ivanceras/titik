@@ -1,6 +1,7 @@
 //! Titik is a crossplatform TUI widget library.
 //! It uses crossterm as the underlying backend.
 //!
+pub use area_buffer::AreaBuffer;
 pub use buffer::{
     Buffer,
     Cell,
@@ -8,12 +9,11 @@ pub use buffer::{
 pub use cmd::Cmd;
 pub use crossterm;
 pub use input_buffer::InputBuffer;
-pub use area_buffer::AreaBuffer;
 pub use layout::{
     compute_layout,
+    find_layout,
     find_widget,
     find_widget_mut,
-    find_layout,
     set_focused_node,
     widget_hit_at,
     widget_node_idx_at,
@@ -25,17 +25,17 @@ pub use widget::{
     Checkbox,
     FlexBox,
     Image,
-    SvgImage,
     Radio,
+    SvgImage,
+    TextArea,
     TextInput,
     Widget,
-    TextArea,
 };
 
+mod area_buffer;
 mod buffer;
 mod cmd;
 mod input_buffer;
-mod area_buffer;
 mod layout;
 #[allow(unused)]
 mod symbol;

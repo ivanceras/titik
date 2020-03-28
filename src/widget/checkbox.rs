@@ -14,9 +14,11 @@ use crate::{
     Widget,
 };
 use crossterm::{
-    event::Event,
+    event::{
+        Event,
+        MouseEvent,
+    },
     Command,
-    event::MouseEvent,
 };
 use std::{
     any::Any,
@@ -24,11 +26,11 @@ use std::{
 };
 use stretch::{
     geometry::Size,
+    result::Layout,
     style::{
         Dimension,
         Style,
     },
-    result::Layout,
 };
 
 #[derive(Default, Debug, PartialEq)]
@@ -96,11 +98,7 @@ impl<MSG> Widget<MSG> for Checkbox {
 
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {}
 
-    fn process_event(
-        &mut self,
-        event: Event,
-        layout: &Layout,
-    ) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
                 self.is_checked = !self.is_checked;

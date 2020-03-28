@@ -22,12 +22,15 @@ impl AreaBuffer {
     }
 
     fn add_char(&mut self, c: char) {
-        let line = self.content.get_mut(self.cursor_loc_y).expect("must have a line");
-            line.insert(self.cursor_loc_x, c);
-            self.cursor_loc_x += 1;
+        let line = self
+            .content
+            .get_mut(self.cursor_loc_y)
+            .expect("must have a line");
+        line.insert(self.cursor_loc_x, c);
+        self.cursor_loc_x += 1;
     }
 
-    pub fn add_line<S:ToString>(&mut self, s: S){
+    pub fn add_line<S: ToString>(&mut self, s: S) {
         let line = s.to_string().chars().collect();
         self.content.push(line);
         self.cursor_loc_y += 1;
@@ -42,7 +45,8 @@ impl AreaBuffer {
                 self.add_char(c);
             }
             KeyCode::Enter => {
-                if let Some(mut line) = self.content.get_mut(self.cursor_loc_y){
+                if let Some(mut line) = self.content.get_mut(self.cursor_loc_y)
+                {
                     let new_line = line.split_off(self.cursor_loc_x);
                     self.cursor_loc_y += 1;
                     self.cursor_loc_x = 0;
@@ -72,7 +76,7 @@ impl AreaBuffer {
                 }
             }
             KeyCode::Down => {
-                if self.cursor_loc_y < self.content.len()-1 {
+                if self.cursor_loc_y < self.content.len() - 1 {
                     self.cursor_loc_y += 1;
                     if let Some(line) = self.content.get(self.cursor_loc_y) {
                         if self.cursor_loc_x > line.len() {
@@ -90,8 +94,8 @@ impl AreaBuffer {
                 }
             }
             KeyCode::Delete => {
-                if let Some(line) = self.content.get_mut(self.cursor_loc_y){
-                    if self.cursor_loc_x < line.len(){
+                if let Some(line) = self.content.get_mut(self.cursor_loc_y) {
+                    if self.cursor_loc_x < line.len() {
                         line.remove(self.cursor_loc_x);
                     }
                 }
@@ -100,14 +104,13 @@ impl AreaBuffer {
         }
     }
 
-
     pub fn set_cursor_loc(&mut self, cursor_x: usize, cursor_y: usize) {
         self.cursor_loc_x = cursor_x;
         self.cursor_loc_y = cursor_y;
     }
 
     pub fn get_cursor_location(&self) -> (usize, usize) {
-        (self.cursor_loc_x , self.cursor_loc_y )
+        (self.cursor_loc_x, self.cursor_loc_y)
     }
 }
 
@@ -135,7 +138,7 @@ impl From<String> for AreaBuffer {
 
         AreaBuffer {
             content,
-            cursor_loc_x: cursor_loc_x,
+            cursor_loc_x,
             cursor_loc_y: cursor_loc_y - 1,
         }
     }

@@ -166,25 +166,27 @@ where
 
         // scroller
         // TODO: calculate max scroll
-        let scroller_height = height * height/ self.area_buffer.content.len();
-        let scroller_loc = self.scroll/height; 
-        for j in 0..scroller_height{
-            buf.set_symbol(loc_x + width - 1, loc_y + scroller_loc + j + 1, '▇');
+        let scroller_height = height * height / self.area_buffer.content.len();
+        let scroller_loc = self.scroll / height;
+        for j in 0..scroller_height {
+            buf.set_symbol(
+                loc_x + width - 1,
+                loc_y + scroller_loc + j + 1,
+                '▇',
+            );
         }
-
 
         // draw the text content
         let text_loc_y = loc_y + 1;
-        for (j, line) in self
-            .area_buffer
-            .content
-            .iter()
-            .enumerate()
-        {
+        for (j, line) in self.area_buffer.content.iter().enumerate() {
             if j >= self.scroll && j < height - 2 + self.scroll {
                 for (i, ch) in line.iter().enumerate() {
                     if loc_x + i < (width - 2) {
-                        buf.set_symbol(loc_x + 1 + i, text_loc_y - self.scroll + j, ch);
+                        buf.set_symbol(
+                            loc_x + 1 + i,
+                            text_loc_y - self.scroll + j,
+                            ch,
+                        );
                     }
                 }
             }
@@ -197,12 +199,16 @@ where
         let (cursor_loc_x, cursor_loc_y) =
             self.area_buffer.get_cursor_location();
 
-        let abs_cursor_y = loc_y + cursor_loc_y + 1 - self.scroll ;
-        let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < loc_y + height - 1;
+        let abs_cursor_y = loc_y + cursor_loc_y + 1 - self.scroll;
+        let is_cursor_visible =
+            abs_cursor_y > loc_y && abs_cursor_y < loc_y + height - 1;
         if self.focused && is_cursor_visible {
             vec![
                 Cmd::ShowCursor,
-                Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + cursor_loc_y + 1 - self.scroll),
+                Cmd::MoveTo(
+                    loc_x + cursor_loc_x + 1,
+                    loc_y + cursor_loc_y + 1 - self.scroll,
+                ),
             ]
         } else {
             vec![]
@@ -254,8 +260,7 @@ where
                 }
                 let cursor_x = x as usize;
 
-                self.area_buffer
-                    .set_cursor_loc(cursor_x, cursor_y);
+                self.area_buffer.set_cursor_loc(cursor_x, cursor_y);
                 vec![]
             }
             Event::Mouse(MouseEvent::ScrollUp(x, y, modifier)) => {
