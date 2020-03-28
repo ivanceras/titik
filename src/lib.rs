@@ -25,6 +25,7 @@ pub use widget::{
     Checkbox,
     FlexBox,
     Image,
+    SvgImage,
     Radio,
     TextInput,
     Widget,

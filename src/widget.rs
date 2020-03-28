@@ -19,6 +19,7 @@ use crossterm::{
 };
 pub use flex_box::FlexBox;
 pub use image_control::Image;
+pub use svg_image::SvgImage;
 pub use radio::Radio;
 use std::{
     any::Any,
@@ -44,6 +45,7 @@ mod button;
 mod checkbox;
 mod flex_box;
 mod image_control;
+mod svg_image;
 mod radio;
 mod text_input;
 mod text_area;
