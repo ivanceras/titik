@@ -66,6 +66,7 @@ use titik::{
     TextArea,
     TextInput,
     Widget,
+    SvgImage,
 };
 
 fn init<W: Write>(w: &mut W) -> Result<()> {
@@ -147,6 +148,8 @@ where
     let mut img: Image<()> =
         Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(60.0), Some(20.0));
+
+    let svg: SvgImage<()> = SvgImage::new(include_str!("../tiger.svg").to_string());
     root_node.vertical();
 
     let btn1: Button<()> = Button::new("Button 1");
@@ -161,6 +164,7 @@ where
     root_node.add_child(Box::new(input1));
     root_node.add_child(Box::new(input2));
     root_node.add_child(Box::new(text_area1));
+    root_node.add_child(Box::new(svg));
 
     let (width, height) = buffer_size().unwrap();
 
