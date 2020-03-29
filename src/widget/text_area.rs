@@ -85,7 +85,12 @@ impl<MSG> TextArea<MSG> {
     }
 
     fn inner_height(&self, layout: &Layout) -> usize {
-        layout.size.height.round() as usize - 2
+        let ih = layout.size.height.round() - 2.0;
+        if ih > 0.0 {
+            ih as usize
+        }else{
+            0
+        }
     }
 }
 
@@ -172,24 +177,26 @@ where
         }
 
         let scroller_height = height * height / self.area_buffer.content.len();
+        if inner_height > 0 {
         let scroller_loc = self.scroll_top / inner_height;
-        for j in 0..scroller_height {
-            buf.set_symbol(
-                right,
-                loc_y + scroller_loc + j + 1,
-                '▇',
-            );
+            for j in 0..scroller_height {
+                buf.set_symbol(
+                    right,
+                    loc_y + scroller_loc + j + 1,
+                    '▇',
+                );
+            }
         }
 
         // draw the text content
-        let text_loc_y = loc_y + 1;
+        let text_loc_y = loc_y + 1 - self.scroll_top;
         for (j, line) in self.area_buffer.content.iter().enumerate() {
             if j >= self.scroll_top && j < inner_height + self.scroll_top {
                 for (i, ch) in line.iter().enumerate() {
                     if loc_x + i < (width - 2) {
                         buf.set_symbol(
                             loc_x + 1 + i,
-                            text_loc_y - self.scroll_top + j,
+                            text_loc_y + j,
                             ch,
                         );
                     }

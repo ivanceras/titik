@@ -27,6 +27,7 @@ pub use crossterm::{
 };
 use std::{
     cell::RefCell,
+    fmt,
     io::{
         self,
         Write,
@@ -47,7 +48,10 @@ use stretch::{
     },
 };
 use titik::{
+    renderer,
+    renderer::Renderer,
     compute_layout,
+    command,
     find_layout,
     find_widget,
     find_widget_mut,
@@ -63,50 +67,18 @@ use titik::{
     InputBuffer,
     LayoutTree,
     Radio,
+    SvgImage,
     TextArea,
     TextInput,
     Widget,
-    SvgImage,
 };
 
-fn init<W: Write>(w: &mut W) -> Result<()> {
-    execute!(w, terminal::EnterAlternateScreen)?;
-    execute!(w, EnableMouseCapture)?;
-    terminal::enable_raw_mode()?;
-    Ok(())
-}
 
-fn finalize<W: Write>(w: &mut W) -> Result<()> {
-    execute!(
-        w,
-        style::ResetColor,
-        cursor::Show,
-        terminal::LeaveAlternateScreen
-    )?;
-    terminal::disable_raw_mode()?;
-    w.flush()?;
-    Ok(())
-}
 
-fn clear<W: Write>(w: &mut W) -> crossterm::Result<()> {
-    queue!(
-        w,
-        style::ResetColor,
-        terminal::Clear(ClearType::All),
-        cursor::Show,
-        cursor::MoveTo(1, 1)
-    )?;
-    Ok(())
-}
-
-fn run<W>(w: &mut W) -> Result<()>
+fn build_ui<MSG>() -> Box<dyn Widget<MSG>>
 where
-    W: Write,
+    MSG: fmt::Debug + 'static,
 {
-    init(w)?;
-
-    let mut focused_widget_idx = None;
-
     let mut root_node = FlexBox::new();
     let mut cb1 = Checkbox::new("Checkbox1");
     let mut cb2 = Checkbox::new("Checkbox2");
@@ -116,7 +88,7 @@ where
     let mut input2 =
         TextInput::new("The quick brown fox jumps over the lazy dog...");
 
-    let mut text_area1: TextArea<()> = TextArea::new(
+    let mut text_area1: TextArea<MSG> = TextArea::new(
         "This is a text area\
             \n1. With a line\
             \n2. and another line\
@@ -142,16 +114,17 @@ where
     text_area1.set_size(None, Some(7.0));
 
     let rb2 = Radio::new("Radio2");
-    let mut btn2: Button<()> = Button::new("Button2");
+    let mut btn2: Button<MSG> = Button::new("Button2");
     btn2.set_rounded(true);
-    let mut img: Image<()> =
+    let mut img: Image<MSG> =
         Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(60.0), Some(20.0));
 
-    let svg: SvgImage<()> = SvgImage::new(include_str!("../tiger.svg").to_string());
+    let svg: SvgImage<MSG> =
+        SvgImage::new(include_str!("../tiger.svg").to_string());
     root_node.vertical();
 
-    let btn1: Button<()> = Button::new("Button 1");
+    let btn1: Button<MSG> = Button::new("Button 1");
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
     let mut row = FlexBox::new();
@@ -167,110 +140,12 @@ where
     root_node.add_child(Box::new(input1));
     root_node.add_child(Box::new(input2));
     root_node.add_child(Box::new(text_area1));
-
-    let (width, height) = buffer_size().unwrap();
-
-    loop {
-        let (width, height) = buffer_size().unwrap();
-        root_node.set_size(Some((width) as f32), Some(height as f32));
-        let layout_tree = compute_layout(
-            &mut root_node,
-            Size {
-                width: Number::Defined(width as f32),
-                height: Number::Defined(height as f32),
-            },
-        );
-
-        let mut buf = Buffer::new(width as usize, height as usize);
-        buf.reset();
-        let cmds = root_node.draw(&mut buf, &layout_tree);
-        buf.render(w);
-        cmds.iter()
-            .for_each(|cmd| cmd.execute(w).expect("must execute"));
-        w.flush();
-
-        if let Ok(event) = event::read() {
-            match event {
-                Event::Key(key_event) => {
-                    // To quite, press any of the following:
-                    //  - CTRL-c
-                    //  - CTRL-q
-                    //  - CTRL-d
-                    //  - CTRL-z
-                    if key_event.modifiers.contains(KeyModifiers::CONTROL) {
-                        match key_event.code {
-                            KeyCode::Char(c) => {
-                                match c {
-                                    'c' | 'q' | 'd' | 'z' => {
-                                        break;
-                                    }
-                                    _ => (),
-                                }
-                            }
-                            _ => (),
-                        }
-                    } else {
-                        if let Some(idx) = focused_widget_idx.as_ref() {
-                            let active_widget: Option<&mut dyn Widget<()>> =
-                                find_widget_mut(&mut root_node, *idx);
-                            let focused_layout =
-                                find_layout(&layout_tree, *idx)
-                                    .expect("must have a layout tree");
-                            if let Some(focused_widget) = active_widget {
-                                focused_widget.process_event(
-                                    event,
-                                    &focused_layout.layout,
-                                );
-                            }
-                        }
-                    }
-                }
-                Event::Mouse(MouseEvent::Down(btn, x, y, _modifier)) => {
-                    focused_widget_idx =
-                        widget_node_idx_at(&layout_tree, x as f32, y as f32);
-
-                    if let Some(idx) = focused_widget_idx.as_ref() {
-                        set_focused_node(&mut root_node, *idx);
-                    }
-                }
-                _ => (),
-            }
-            if let Some((x, y)) = extract_location(&event) {
-                let mut hits = layout_tree.hit(x as f32, y as f32);
-                let hit = hits.pop().expect("process only 1 for now");
-                let mut hit_widget: Option<&mut dyn Widget<()>> =
-                    find_widget_mut(&mut root_node, hit);
-
-                let focused_layout = find_layout(&layout_tree, hit)
-                    .expect("must have a layout tree");
-
-                if let Some(hit_widget) = &mut hit_widget {
-                    hit_widget.process_event(event, &focused_layout.layout);
-                }
-            }
-        }
-    }
-    finalize(w)?;
-    Ok(())
-}
-
-fn extract_location(event: &Event) -> Option<(u16, u16)> {
-    match event {
-        Event::Key(_) => None,
-        Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => Some((*x, *y)),
-        Event::Mouse(MouseEvent::Up(_btn, x, y, _modifier)) => Some((*x, *y)),
-        Event::Mouse(MouseEvent::Drag(_btn, x, y, _modifier)) => Some((*x, *y)),
-        Event::Mouse(MouseEvent::ScrollDown(x, y, _modifier)) => Some((*x, *y)),
-        Event::Mouse(MouseEvent::ScrollUp(x, y, _modifier)) => Some((*x, *y)),
-        Event::Resize(_, _) => None,
-    }
-}
-
-pub fn buffer_size() -> Result<(u16, u16)> {
-    terminal::size()
+    Box::new(root_node)
 }
 
 fn main() -> Result<()> {
-    let mut stderr = io::stdout();
-    run(&mut stderr)
+    let mut stdout = io::stdout();
+    let mut root_node: Box<dyn Widget<()>> = build_ui();
+    let mut renderer = Renderer::new(&mut stdout, root_node);
+    renderer.run()
 }

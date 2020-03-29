@@ -40,44 +40,5 @@ mod layout;
 #[allow(unused)]
 mod symbol;
 mod widget;
-
-pub mod command {
-    use crossterm::{
-        cursor,
-        event::EnableMouseCapture,
-        style,
-        terminal,
-        terminal::ClearType,
-    };
-    use std::io::Write;
-
-    pub fn move_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
-        crossterm::execute!(w, cursor::Hide, cursor::MoveTo(1, 1))
-    }
-
-    pub fn reset_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
-        crossterm::queue!(
-            w,
-            style::ResetColor,
-            terminal::Clear(ClearType::All),
-            cursor::Hide,
-            cursor::MoveTo(1, 1)
-        )
-    }
-
-    pub fn init<W: Write>(w: &mut W) -> crossterm::Result<()> {
-        crossterm::execute!(w, terminal::EnterAlternateScreen)?;
-        crossterm::execute!(w, EnableMouseCapture)?;
-        terminal::enable_raw_mode()
-    }
-
-    pub fn finalize<W: Write>(w: &mut W) -> crossterm::Result<()> {
-        crossterm::execute!(
-            w,
-            style::ResetColor,
-            cursor::Show,
-            terminal::LeaveAlternateScreen
-        )?;
-        terminal::disable_raw_mode()
-    }
-}
+pub mod command;
+pub mod renderer;
