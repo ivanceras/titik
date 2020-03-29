@@ -34,6 +34,7 @@ pub use widget::{
     Widget,
 };
 pub use renderer::Renderer;
+pub use renderer::Dispatch;
 
 mod area_buffer;
 mod buffer;

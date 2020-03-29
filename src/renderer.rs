@@ -9,7 +9,6 @@ use crate::{
     LayoutTree,
     Widget,
 };
-
 pub use crossterm::{
     cursor,
     event::{
@@ -48,19 +47,24 @@ use stretch::{
     number::Number,
 };
 
-pub struct Renderer<W, MSG> {
+pub trait Dispatch<MSG> {
+    fn dispatch(&self, msg: MSG);
+}
+
+pub struct Renderer<'a, W, MSG>{
     terminal_size: (u16, u16),
     layout_tree: LayoutTree,
     root_node: Box<dyn Widget<MSG>>,
     focused_widget_idx: Option<usize>,
     write: W,
+    program: Option<&'a dyn Dispatch<MSG>>,
 }
 
-impl<W, MSG> Renderer<W, MSG>
+impl<'a, W, MSG> Renderer<'a, W, MSG>
 where
     W: Write,
 {
-    pub fn new(write: W, mut root_node: Box<dyn Widget<MSG>>) -> Self {
+    pub fn new(write: W, program: Option<&'a dyn Dispatch<MSG>>,mut root_node: Box<dyn Widget<MSG>>) -> Self {
         let (width, height) =
             terminal::size().expect("must get the terminal size");
         root_node.set_size(Some((width) as f32), Some(height as f32));
@@ -78,6 +82,7 @@ where
             focused_widget_idx: None,
             layout_tree,
             write,
+            program,
         }
     }
 
@@ -180,7 +185,12 @@ where
                         .expect("must have a layout tree");
 
                     if let Some(hit_widget) = &mut hit_widget {
-                        hit_widget.process_event(event, &focused_layout.layout);
+                        let msgs = hit_widget.process_event(event, &focused_layout.layout);
+                        if let Some(program) = self.program{
+                            for msg in msgs{
+                                program.dispatch(msg);
+                            }
+                        }
                     }
                 }
             }

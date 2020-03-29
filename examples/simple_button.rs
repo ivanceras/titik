@@ -132,7 +132,7 @@ where
 fn main() -> Result<()> {
     let mut stdout = io::stdout();
     let mut root_node: Box<dyn Widget<()>> = build_ui();
-    let mut renderer = Renderer::new(&mut stdout, root_node);
+    let mut renderer = Renderer::new(&mut stdout, None, root_node);
     renderer.run()
 }
 
