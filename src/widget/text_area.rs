@@ -280,7 +280,7 @@ where
                 self.process_key(ke);
                 vec![]
             }
-            Event::Mouse(MouseEvent::Down(_btn, mut x, mut y, modifier)) => {
+            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
                 let mut x = x as i32 - layout.location.x.round() as i32;
                 let mut y = y as i32 - layout.location.y.round() as i32 - 1;
 
@@ -305,13 +305,13 @@ where
                 self.area_buffer.set_cursor_loc(cursor_x, cursor_y);
                 vec![]
             }
-            Event::Mouse(MouseEvent::ScrollUp(x, y, modifier)) => {
+            Event::Mouse(MouseEvent::ScrollUp(_x, _y, _modifier)) => {
                 if self.scroll_top > 0 {
                     self.scroll_top -= 1;
                 }
                 vec![]
             }
-            Event::Mouse(MouseEvent::ScrollDown(x, y, modifier)) => {
+            Event::Mouse(MouseEvent::ScrollDown(_x, _y, _modifier)) => {
                 // if the last content is aligned with the bottom
                 let rows = self.area_buffer.content.len();
                 let inner_height = self.inner_height(&layout);

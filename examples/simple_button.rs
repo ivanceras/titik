@@ -1,4 +1,4 @@
-use crossterm::event::EnableMouseCapture;
+
 pub use crossterm::{
     cursor,
     event::{
@@ -34,19 +34,7 @@ use std::{
     },
     rc::Rc,
 };
-use stretch::{
-    geometry::{
-        Rect,
-        Size,
-    },
-    number::Number,
-    style::{
-        Dimension,
-        FlexDirection,
-        Style,
-        *,
-    },
-};
+
 use titik::{
     renderer,
     renderer::Renderer,
@@ -80,12 +68,12 @@ where
     MSG: fmt::Debug + 'static,
 {
     let mut root_node = FlexBox::new();
-    let mut cb1 = Checkbox::new("Checkbox1");
-    let mut cb2 = Checkbox::new("Checkbox2");
-    let mut rb1 = Radio::new("Radio1");
-    let mut input1 = TextInput::new("Hello world!");
+    let cb1 = Checkbox::new("Checkbox1");
+    let cb2 = Checkbox::new("Checkbox2");
+    let rb1 = Radio::new("Radio1");
+    let input1 = TextInput::new("Hello world!");
 
-    let mut input2 =
+    let input2 =
         TextInput::new("The quick brown fox jumps over the lazy dog...");
 
     let mut text_area1: TextArea<MSG> = TextArea::new(
@@ -145,7 +133,7 @@ where
 
 fn main() -> Result<()> {
     let mut stdout = io::stdout();
-    let mut root_node: Box<dyn Widget<()>> = build_ui();
+    let root_node: Box<dyn Widget<()>> = build_ui();
     let mut renderer = Renderer::new(&mut stdout, root_node);
     renderer.run()
 }

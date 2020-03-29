@@ -4,7 +4,6 @@ use crate::{
         Cell,
     },
     symbol::{
-        bar,
         line,
         rounded,
     },
@@ -17,7 +16,6 @@ use crossterm::{
         Event,
         MouseEvent,
     },
-    Command,
 };
 use sauron_vdom::Callback;
 use std::{
@@ -186,7 +184,7 @@ where
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(..)) => {
                 self.on_click.iter().map(|cb| cb.emit(event)).collect()

@@ -5,7 +5,6 @@ use crossterm::{
         Attribute,
         Attributes,
         Color,
-        ContentStyle,
         Print,
         ResetColor,
         SetAttributes,
@@ -110,7 +109,7 @@ impl Buffer {
                 let unicode_width = new_cell.unicode_width();
                 *cell = new_cell;
                 if unicode_width > 1 {
-                    for i in 1..unicode_width {
+                    for _i in 1..unicode_width {
                         self.set_symbol(x + 1, y, '\0');
                     }
                 }

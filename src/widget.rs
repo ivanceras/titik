@@ -15,7 +15,6 @@ pub use button::Button;
 pub use checkbox::Checkbox;
 use crossterm::{
     event::Event,
-    Command,
 };
 pub use flex_box::FlexBox;
 pub use image_control::Image;
@@ -33,7 +32,6 @@ use stretch::{
     number::Number,
     result::Layout,
     style::{
-        Dimension,
         Style,
     },
 };
@@ -67,7 +65,7 @@ where
         None
     }
 
-    fn child_mut(&mut self, index: usize) -> Option<&mut Box<dyn Widget<MSG>>> {
+    fn child_mut(&mut self, _index: usize) -> Option<&mut Box<dyn Widget<MSG>>> {
         None
     }
 
@@ -85,7 +83,7 @@ where
         stretch.new_node(self.style(), children_styles).ok()
     }
 
-    fn set_focused(&mut self, focused: bool) {}
+    fn set_focused(&mut self, _focused: bool) {}
 
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
@@ -98,7 +96,7 @@ where
     {
         self.as_any_mut().downcast_mut::<Self>()
     }
-    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
+    fn process_event(&mut self, _event: Event, _layout: &Layout) -> Vec<MSG> {
         vec![]
     }
 }

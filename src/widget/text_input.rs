@@ -188,8 +188,8 @@ impl<MSG> Widget<MSG> for TextInput {
                 self.process_key(ke);
                 vec![]
             }
-            Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
-                let mut cursor_loc =
+            Event::Mouse(MouseEvent::Down(_btn, x, _y, _modifier)) => {
+                let cursor_loc =
                     x as i32 - layout.location.x.round() as i32;
                 self.input_buffer
                     .set_cursor_loc_corrected(cursor_loc as usize);

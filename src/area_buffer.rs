@@ -38,14 +38,14 @@ impl AreaBuffer {
 
     pub fn process_key_event(
         &mut self,
-        KeyEvent { code, modifiers }: KeyEvent,
+        KeyEvent { code, modifiers: _ }: KeyEvent,
     ) {
         match code {
             KeyCode::Char(c) => {
                 self.add_char(c);
             }
             KeyCode::Enter => {
-                if let Some(mut line) = self.content.get_mut(self.cursor_loc_y)
+                if let Some(line) = self.content.get_mut(self.cursor_loc_y)
                 {
                     let new_line = line.split_off(self.cursor_loc_x);
                     self.cursor_loc_y += 1;
@@ -126,7 +126,7 @@ impl From<String> for AreaBuffer {
                 row.push(ch);
                 cursor_loc_x += 1;
                 if let Some(width) = ch.width() {
-                    for i in 1..width {
+                    for _i in 1..width {
                         row.push('\0');
                         cursor_loc_x += 1;
                     }

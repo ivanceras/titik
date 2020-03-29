@@ -12,10 +12,7 @@ use crate::{
     LayoutTree,
     Widget,
 };
-use crossterm::{
-    event::Event,
-    Command,
-};
+
 use std::{
     any::Any,
     fmt,
@@ -151,8 +148,8 @@ mod test {
         println!("btn1: {:?}", btn1);
         fb.add_child(Box::new(btn1));
 
-        let mut btn1_mut = fb.child_mut(0).expect("must have a child 0");
-        let mut btn1_cast = btn1_mut
+        let btn1_mut = fb.child_mut(0).expect("must have a child 0");
+        let btn1_cast = btn1_mut
             .as_any_mut()
             .downcast_mut::<Button<()>>()
             .expect("must be a button");
@@ -169,8 +166,8 @@ mod test {
         println!("btn1: {:?}", btn1);
         fb.add_child(Box::new(btn1));
 
-        let mut children = fb.children_mut().expect("must have children");
-        let mut btn0 = children[0]
+        let children = fb.children_mut().expect("must have children");
+        let btn0 = children[0]
             .as_any_mut()
             .downcast_mut::<Button<()>>()
             .expect("must be a button");

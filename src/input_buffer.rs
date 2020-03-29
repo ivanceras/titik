@@ -120,7 +120,7 @@ impl InputBuffer {
     // - Char(char)
     pub fn process_key_event(
         &mut self,
-        KeyEvent { code, modifiers }: KeyEvent,
+        KeyEvent { code, modifiers: _ }: KeyEvent,
     ) {
         match code {
             KeyCode::Char(c) => {

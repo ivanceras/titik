@@ -21,7 +21,7 @@ use crate::{
     TextInput,
     Widget,
 };
-use crossterm::event::EnableMouseCapture;
+
 pub use crossterm::{
     cursor,
     event::{
@@ -181,7 +181,7 @@ where
                         }
                     }
                     // mouse clicks sets the focused the widget underneath
-                    Event::Mouse(MouseEvent::Down(btn, x, y, _modifier)) => {
+                    Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
                         self.focused_widget_idx = widget_node_idx_at(
                             &self.layout_tree,
                             x as f32,

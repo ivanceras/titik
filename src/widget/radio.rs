@@ -18,7 +18,6 @@ use crossterm::{
         Event,
         MouseEvent,
     },
-    Command,
 };
 use std::any::Any;
 use stretch::{
@@ -29,7 +28,7 @@ use stretch::{
         Style,
     },
 };
-use unicode_width::UnicodeWidthStr;
+
 
 #[derive(Default, Debug, PartialEq)]
 pub struct Radio {
@@ -94,11 +93,11 @@ impl<MSG> Widget<MSG> for Radio {
         self
     }
 
-    fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {}
+    fn set_size(&mut self, _width: Option<f32>, _height: Option<f32>) {}
 
-    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
         match event {
-            Event::Mouse(MouseEvent::Down(_btn, x, y, modifier)) => {
+            Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
                 self.is_checked = !self.is_checked;
                 vec![]
             }
