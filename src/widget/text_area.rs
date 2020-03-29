@@ -84,10 +84,35 @@ impl<MSG> TextArea<MSG> {
         self.is_rounded = rounded;
     }
 
+    fn border_top(&self) -> f32 {
+        1.0
+    }
+
+    fn border_bottom(&self) -> f32 {
+        1.0
+    }
+
+    fn border_left(&self) -> f32 {
+        1.0
+    }
+    fn border_right(&self) -> f32 {
+        1.0
+    }
+
+
     fn inner_height(&self, layout: &Layout) -> usize {
-        let ih = layout.size.height.round() - 2.0;
+        let ih = layout.size.height.round() - self.border_top() - self.border_bottom();
         if ih > 0.0 {
             ih as usize
+        }else{
+            0
+        }
+    }
+
+    fn inner_width(&self, layout: &Layout) -> usize {
+        let iw = layout.size.width.round() - self.border_left() - self.border_right();
+        if iw > 0.0 {
+            iw as usize
         }else{
             0
         }
@@ -128,23 +153,23 @@ where
         let height = layout.size.height.round() as usize;
         let inner_height = self.inner_height(&layout_tree.layout);
 
-        let mut top_left = if self.is_rounded {
+        let mut top_left_symbol = if self.is_rounded {
             rounded::TOP_LEFT
         } else {
             line::TOP_LEFT
         };
 
-        let mut top_right = if self.is_rounded {
+        let mut top_right_symbol = if self.is_rounded {
             rounded::TOP_RIGHT
         } else {
             line::TOP_RIGHT
         };
-        let mut bottom_left = if self.is_rounded {
+        let mut bottom_left_symbol = if self.is_rounded {
             rounded::BOTTOM_LEFT
         } else {
             line::BOTTOM_LEFT
         };
-        let mut bottom_right = if self.is_rounded {
+        let mut bottom_right_symbol = if self.is_rounded {
             rounded::BOTTOM_RIGHT
         } else {
             line::BOTTOM_RIGHT
@@ -156,10 +181,10 @@ where
         // Note: the rounded border is override with square thick line since there is no thick
         // rounded corner
         if self.focused {
-            top_left = thick_line::TOP_LEFT;
-            top_right = thick_line::TOP_RIGHT;
-            bottom_left = thick_line::BOTTOM_LEFT;
-            bottom_right = thick_line::BOTTOM_RIGHT;
+            top_left_symbol = thick_line::TOP_LEFT;
+            top_right_symbol = thick_line::TOP_RIGHT;
+            bottom_left_symbol = thick_line::BOTTOM_LEFT;
+            bottom_right_symbol = thick_line::BOTTOM_RIGHT;
             horizontal_symbol = thick_line::HORIZONTAL;
             vertical_symbol = thick_line::VERTICAL;
         }
@@ -188,12 +213,14 @@ where
             }
         }
 
+        let inner_width = self.inner_width(&layout_tree.layout);
+
         // draw the text content
         let text_loc_y = loc_y + 1 - self.scroll_top;
         for (j, line) in self.area_buffer.content.iter().enumerate() {
             if j >= self.scroll_top && j < inner_height + self.scroll_top {
                 for (i, ch) in line.iter().enumerate() {
-                    if loc_x + i < (width - 2) {
+                    if loc_x + i < inner_width {
                         buf.set_symbol(
                             loc_x + 1 + i,
                             text_loc_y + j,
@@ -204,22 +231,25 @@ where
             }
         }
 
-        buf.set_symbol(loc_x, loc_y, top_left);
-        buf.set_symbol(loc_x, bottom, bottom_left);
-        buf.set_symbol(right, loc_y, top_right);
-        buf.set_symbol(right, bottom, bottom_right);
+        buf.set_symbol(loc_x, loc_y, top_left_symbol);
+        buf.set_symbol(loc_x, bottom, bottom_left_symbol);
+        buf.set_symbol(right, loc_y, top_right_symbol);
+        buf.set_symbol(right, bottom, bottom_right_symbol);
         let (cursor_loc_x, cursor_loc_y) =
             self.area_buffer.get_cursor_location();
 
+        let abs_cursor_x = loc_x + cursor_loc_x + 1;
         let abs_cursor_y = loc_y + cursor_loc_y + 1 - self.scroll_top;
+
         let is_cursor_visible =
-            abs_cursor_y > loc_y && abs_cursor_y < loc_y + height - 1;
+            abs_cursor_y > loc_y && abs_cursor_y < bottom;
+
         if self.focused && is_cursor_visible {
             vec![
                 Cmd::ShowCursor,
                 Cmd::MoveTo(
-                    loc_x + cursor_loc_x + 1,
-                    loc_y + cursor_loc_y + 1 - self.scroll_top,
+                    abs_cursor_x,
+                    abs_cursor_y,
                 ),
             ]
         } else {

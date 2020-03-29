@@ -122,13 +122,17 @@ where
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
+
+        let bottom = loc_y + height - 1;
+        let right = loc_x + width - 1;
+
         for i in 0..width {
             buf.set_symbol(loc_x + i, loc_y, line::HORIZONTAL);
-            buf.set_symbol(loc_x + i, loc_y + height - 1, line::HORIZONTAL);
+            buf.set_symbol(loc_x + i, bottom, line::HORIZONTAL);
         }
         for j in 0..height {
             buf.set_symbol(loc_x, loc_y + j, line::VERTICAL);
-            buf.set_symbol(loc_x + width - 1, loc_y + j, line::VERTICAL);
+            buf.set_symbol(right, loc_y + j, line::VERTICAL);
         }
         for (t, ch) in self.label.chars().enumerate() {
             let mut cell = Cell::new(ch);
@@ -138,30 +142,30 @@ where
             buf.set_cell(loc_x + 1 + t, loc_y + 1, cell);
         }
 
-        let top_left = if self.is_rounded {
+        let top_left_symbol = if self.is_rounded {
             rounded::TOP_LEFT
         } else {
             line::TOP_LEFT
         };
-        let top_right = if self.is_rounded {
+        let top_right_symbol = if self.is_rounded {
             rounded::TOP_RIGHT
         } else {
             line::TOP_RIGHT
         };
-        let bottom_left = if self.is_rounded {
+        let bottom_left_symbol = if self.is_rounded {
             rounded::BOTTOM_LEFT
         } else {
             line::BOTTOM_LEFT
         };
-        let bottom_right = if self.is_rounded {
+        let bottom_right_symbol = if self.is_rounded {
             rounded::BOTTOM_RIGHT
         } else {
             line::BOTTOM_RIGHT
         };
-        buf.set_symbol(loc_x, loc_y, top_left);
-        buf.set_symbol(loc_x, loc_y + height - 1, bottom_left);
-        buf.set_symbol(loc_x + width - 1, loc_y, top_right);
-        buf.set_symbol(loc_x + width - 1, loc_y + height - 1, bottom_right);
+        buf.set_symbol(loc_x, loc_y, top_left_symbol);
+        buf.set_symbol(loc_x, bottom, bottom_left_symbol);
+        buf.set_symbol(right, loc_y, top_right_symbol);
+        buf.set_symbol(right, bottom, bottom_right_symbol);
         vec![]
     }
 
