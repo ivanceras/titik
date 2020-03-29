@@ -1,12 +1,6 @@
 use crate::{
     buffer::{
         Buffer,
-        Cell,
-    },
-    symbol::{
-        bar,
-        line,
-        rounded,
     },
     Cmd,
     LayoutTree,

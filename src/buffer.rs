@@ -133,13 +133,13 @@ impl Buffer {
     }
 
     pub fn render<W: Write>(&self, w: &mut W) -> crossterm::Result<()> {
-        crossterm::queue!(w, cursor::Hide);
+        crossterm::queue!(w, cursor::Hide)?;
         for (j, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
-                crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16));
+                crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16))?;
                 // fillter is \0 null character, filler is not printable
                 if !cell.is_filler() {
-                    crossterm::queue!(w, Print(cell));
+                    crossterm::queue!(w, Print(cell))?;
                 }
             }
         }

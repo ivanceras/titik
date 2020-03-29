@@ -1,10 +1,8 @@
 use crate::{
     buffer::{
         Buffer,
-        Cell,
     },
     symbol::{
-        bar,
         line,
         rounded,
         thick_line,
@@ -15,13 +13,11 @@ use crate::{
     Widget,
 };
 use crossterm::{
-    cursor,
     event::{
         Event,
         KeyEvent,
         MouseEvent,
     },
-    Command,
 };
 use std::any::Any;
 use stretch::{
@@ -192,7 +188,7 @@ impl<MSG> Widget<MSG> for TextInput {
                 let cursor_loc =
                     x as i32 - layout.location.x.round() as i32;
                 self.input_buffer
-                    .set_cursor_loc_corrected(cursor_loc as usize);
+                    .set_cursor_loc(cursor_loc as usize);
                 vec![]
             }
             _ => vec![],

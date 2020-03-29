@@ -1,10 +1,8 @@
 use crate::{
     buffer::{
         Buffer,
-        Cell,
     },
     symbol::{
-        bar,
         line,
         rounded,
         thick_line,
@@ -15,13 +13,11 @@ use crate::{
     Widget,
 };
 use crossterm::{
-    cursor,
     event::{
         Event,
         KeyEvent,
         MouseEvent,
     },
-    Command,
 };
 use std::{
     any::Any,

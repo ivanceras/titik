@@ -9,9 +9,7 @@ use crate::{
     Widget,
 };
 use crossterm::{
-    event::Event,
     style::Color,
-    Command,
 };
 use image::{
     self,

@@ -1,12 +1,6 @@
 use crate::{
     buffer::{
         Buffer,
-        Cell,
-    },
-    symbol::{
-        bar,
-        line,
-        rounded,
     },
     Cmd,
     LayoutTree,
@@ -24,12 +18,10 @@ use std::{
     fmt,
 };
 use stretch::{
-    geometry::Size,
     node::{
         Node,
         Stretch,
     },
-    number::Number,
     result::Layout,
     style::{
         Style,

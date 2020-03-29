@@ -2,23 +2,11 @@ use crate::{
     command,
     compute_layout,
     find_layout,
-    find_widget,
     find_widget_mut,
     set_focused_node,
-    widget_hit_at,
     widget_node_idx_at,
     Buffer,
-    Button,
-    Checkbox,
-    Cmd,
-    FlexBox,
-    Image,
-    InputBuffer,
     LayoutTree,
-    Radio,
-    SvgImage,
-    TextArea,
-    TextInput,
     Widget,
 };
 
@@ -49,26 +37,15 @@ pub use crossterm::{
     Result,
 };
 use std::{
-    cell::RefCell,
-    fmt,
     io::{
-        self,
         Write,
     },
-    rc::Rc,
 };
 use stretch::{
     geometry::{
-        Rect,
         Size,
     },
     number::Number,
-    style::{
-        Dimension,
-        FlexDirection,
-        Style,
-        *,
-    },
 };
 
 pub struct Renderer<W, MSG> {
@@ -132,11 +109,11 @@ where
             let mut buf = Buffer::new(width as usize, height as usize);
             buf.reset();
             let cmds = self.root_node.draw(&mut buf, &self.layout_tree);
-            buf.render(&mut self.write);
+            buf.render(&mut self.write)?;
             cmds.iter().for_each(|cmd| {
                 cmd.execute(&mut self.write).expect("must execute")
             });
-            self.write.flush();
+            self.write.flush()?;
 
             if let Ok(event) = event::read() {
                 match event {
