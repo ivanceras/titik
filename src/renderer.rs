@@ -81,9 +81,7 @@ where
         }
     }
 
-    fn recompute_layout(&mut self) {
-            let (width, height) =
-                terminal::size().expect("must get the terminal size");
+    fn recompute_layout(&mut self, width: u16, height: u16) {
         self.root_node
             .set_size(Some((width) as f32), Some(height as f32));
         self.layout_tree = compute_layout(
@@ -99,13 +97,7 @@ where
     pub fn run(&mut self) -> Result<()> {
         command::init(&mut self.write)?;
         loop {
-            let (width, height) =
-                terminal::size().expect("must get the terminal size");
-            // recompute layout if the terminal size is changed
-            if self.terminal_size != (width, height) {
-                self.recompute_layout();
-            }
-
+            let (width, height) = self.terminal_size;
             let mut buf = Buffer::new(width as usize, height as usize);
             buf.reset();
             let cmds = self.root_node.draw(&mut buf, &self.layout_tree);
@@ -169,8 +161,8 @@ where
                             set_focused_node(self.root_node.as_mut(), *idx);
                         }
                     }
-                    Event::Resize(_, _) => {
-                        self.recompute_layout();
+                    Event::Resize(w, h) => {
+                        self.recompute_layout(w,h);
                     }
                     _ => (),
                 }

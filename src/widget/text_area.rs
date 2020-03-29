@@ -212,14 +212,14 @@ where
         let inner_width = self.inner_width(&layout_tree.layout);
 
         // draw the text content
-        let text_loc_y = loc_y + 1 - self.scroll_top;
+        let text_loc_y = loc_y as i32 + 1 - self.scroll_top as i32;
         for (j, line) in self.area_buffer.content.iter().enumerate() {
             if j >= self.scroll_top && j < inner_height + self.scroll_top {
                 for (i, ch) in line.iter().enumerate() {
                     if loc_x + i < inner_width {
                         buf.set_symbol(
                             loc_x + 1 + i,
-                            text_loc_y + j,
+                            text_loc_y as usize + j,
                             ch,
                         );
                     }

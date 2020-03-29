@@ -31,6 +31,7 @@ use stretch::{
         Style,
     },
 };
+use std::marker::PhantomData;
 
 #[derive(PartialEq, Clone)]
 pub struct Button<MSG>
@@ -42,7 +43,8 @@ where
     pub width: Option<f32>,
     pub height: Option<f32>,
     focused: bool,
-    pub on_click: Vec<Callback<Event, MSG>>,
+    pub on_click: Vec<Callback<Event, ()>>,
+    _phantom_msg: PhantomData<MSG>,
 }
 
 impl<MSG> Default for Button<MSG> {
@@ -54,6 +56,7 @@ impl<MSG> Default for Button<MSG> {
             height: None,
             focused: false,
             on_click: vec![],
+            _phantom_msg: PhantomData,
         }
     }
 }
@@ -79,6 +82,12 @@ where
             is_rounded: true,
             ..Default::default()
         }
+    }
+
+    pub fn add_click_listener<F>(&mut self, func: F) 
+        where F: Fn(Event) + 'static
+    {
+        self.on_click.push(Callback::from(func));
     }
 
     pub fn set_label<S: ToString>(&mut self, label: S) {
@@ -121,16 +130,16 @@ where
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
 
-        let bottom = loc_y + height - 1;
-        let right = loc_x + width - 1;
+        let bottom = loc_y as i32 + height as i32 - 1;
+        let right = loc_x as i32 + width as i32 - 1;
 
         for i in 0..width {
             buf.set_symbol(loc_x + i, loc_y, line::HORIZONTAL);
-            buf.set_symbol(loc_x + i, bottom, line::HORIZONTAL);
+            buf.set_symbol(loc_x + i, bottom as usize, line::HORIZONTAL);
         }
         for j in 0..height {
             buf.set_symbol(loc_x, loc_y + j, line::VERTICAL);
-            buf.set_symbol(right, loc_y + j, line::VERTICAL);
+            buf.set_symbol(right as usize, loc_y + j, line::VERTICAL);
         }
         for (t, ch) in self.label.chars().enumerate() {
             let mut cell = Cell::new(ch);
@@ -161,9 +170,9 @@ where
             line::BOTTOM_RIGHT
         };
         buf.set_symbol(loc_x, loc_y, top_left_symbol);
-        buf.set_symbol(loc_x, bottom, bottom_left_symbol);
-        buf.set_symbol(right, loc_y, top_right_symbol);
-        buf.set_symbol(right, bottom, bottom_right_symbol);
+        buf.set_symbol(loc_x, bottom as usize, bottom_left_symbol);
+        buf.set_symbol(right as usize, loc_y, top_right_symbol);
+        buf.set_symbol(right as usize, bottom as usize, bottom_right_symbol);
         vec![]
     }
 
@@ -187,7 +196,8 @@ where
     fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(..)) => {
-                self.on_click.iter().map(|cb| cb.emit(event)).collect()
+                let _:Vec<_> = self.on_click.iter().map(|cb| cb.emit(event)).collect();
+                vec![]
             }
             _ => vec![],
         }

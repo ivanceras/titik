@@ -10,6 +10,7 @@ pub use buffer::{
 pub use cmd::Cmd;
 pub use crossterm;
 pub use input_buffer::InputBuffer;
+pub use sauron_vdom::Callback;
 pub use layout::{
     compute_layout,
     find_layout,

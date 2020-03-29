@@ -1,4 +1,3 @@
-
 pub use crossterm::{
     cursor,
     event::{
@@ -36,18 +35,19 @@ use std::{
 };
 
 use titik::{
-    renderer,
-    renderer::Renderer,
-    compute_layout,
     command,
+    compute_layout,
     find_layout,
     find_widget,
     find_widget_mut,
+    renderer,
+    renderer::Renderer,
     set_focused_node,
     widget_hit_at,
     widget_node_idx_at,
     Buffer,
     Button,
+    Callback,
     Checkbox,
     Cmd,
     FlexBox,
@@ -60,8 +60,6 @@ use titik::{
     TextInput,
     Widget,
 };
-
-
 
 fn build_ui<MSG>() -> Box<dyn Widget<MSG>>
 where
@@ -133,7 +131,8 @@ where
 
 fn main() -> Result<()> {
     let mut stdout = io::stdout();
-    let root_node: Box<dyn Widget<()>> = build_ui();
+    let mut root_node: Box<dyn Widget<()>> = build_ui();
     let mut renderer = Renderer::new(&mut stdout, root_node);
     renderer.run()
 }
+
