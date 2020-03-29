@@ -138,8 +138,7 @@ impl Buffer {
         for (j, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
                 crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16));
-                //TODO: when the previous character is unicode with 2 width,
-                //ig got erased with a blank
+                // fillter is \0 null character, filler is not printable
                 if !cell.is_filler() {
                     crossterm::queue!(w, Print(cell));
                 }

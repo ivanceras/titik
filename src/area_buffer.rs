@@ -167,7 +167,7 @@ mod tests {
 
     #[test]
     fn add_char1() {
-        let s = "The quick brown fox ";
+        let s = "The quick brown fox ".to_string();
         let mut area_buffer = AreaBuffer::from(s);
         assert_eq!(0, area_buffer.cursor_loc_y);
         assert_eq!(20, area_buffer.cursor_loc_x);
@@ -177,7 +177,7 @@ mod tests {
 
     #[test]
     fn add_char2() {
-        let s = "The quick brown fox ";
+        let s = "The quick brown fox ".to_string();
         let mut area_buffer = AreaBuffer::from(s);
         assert_eq!(0, area_buffer.cursor_loc_y);
         assert_eq!(20, area_buffer.cursor_loc_x);
@@ -190,7 +190,7 @@ mod tests {
 
     #[test]
     fn add_enter() {
-        let s = "The quick brown fox ";
+        let s = "The quick brown fox ".to_string();
         let mut area_buffer = AreaBuffer::from(s);
         assert_eq!(0, area_buffer.cursor_loc_y);
         assert_eq!(20, area_buffer.cursor_loc_x);
