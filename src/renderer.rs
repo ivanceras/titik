@@ -96,6 +96,7 @@ where
 
     pub fn run(&mut self) -> Result<()> {
         command::init(&mut self.write)?;
+        command::reset_top(&mut self.write)?;
         loop {
             let (width, height) = self.terminal_size;
             let mut buf = Buffer::new(width as usize, height as usize);

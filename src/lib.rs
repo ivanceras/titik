@@ -33,6 +33,7 @@ pub use widget::{
     TextInput,
     Widget,
 };
+pub use renderer::Renderer;
 
 mod area_buffer;
 mod buffer;

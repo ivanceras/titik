@@ -1,23 +1,20 @@
 use crate::{
-    buffer::{
-        Buffer,
-    },
+    buffer::Buffer,
     symbol::{
         line,
         rounded,
         thick_line,
+        bar,
     },
     AreaBuffer,
     Cmd,
     LayoutTree,
     Widget,
 };
-use crossterm::{
-    event::{
-        Event,
-        KeyEvent,
-        MouseEvent,
-    },
+use crossterm::event::{
+    Event,
+    KeyEvent,
+    MouseEvent,
 };
 use std::{
     any::Any,
@@ -91,25 +88,29 @@ impl<MSG> TextArea<MSG> {
     fn border_left(&self) -> f32 {
         1.0
     }
+
     fn border_right(&self) -> f32 {
         1.0
     }
 
-
     fn inner_height(&self, layout: &Layout) -> usize {
-        let ih = layout.size.height.round() - self.border_top() - self.border_bottom();
+        let ih = layout.size.height.round()
+            - self.border_top()
+            - self.border_bottom();
         if ih > 0.0 {
             ih as usize
-        }else{
+        } else {
             0
         }
     }
 
     fn inner_width(&self, layout: &Layout) -> usize {
-        let iw = layout.size.width.round() - self.border_left() - self.border_right();
+        let iw = layout.size.width.round()
+            - self.border_left()
+            - self.border_right();
         if iw > 0.0 {
             iw as usize
-        }else{
+        } else {
             0
         }
     }
@@ -131,14 +132,13 @@ where
                     Dimension::Points(height)
                 } else {
                     Dimension::Points(
-                        2.0 + self.area_buffer.content.len() as f32,
+                        self.area_buffer.content.len() as f32,
                     )
                 },
             },
             ..Default::default()
         }
     }
-
 
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
@@ -196,16 +196,12 @@ where
             buf.set_symbol(loc_x, loc_y + j, vertical_symbol);
             buf.set_symbol(right, loc_y + j, vertical_symbol);
         }
-
-        let scroller_height = height * height / self.area_buffer.content.len();
+        let content_height = self.area_buffer.content.len() as f32 + self.border_top() + self.border_bottom();
+        let scroller_height = (height as f32 * height as f32 / content_height).round() as usize;
         if inner_height > 0 {
-        let scroller_loc = self.scroll_top / inner_height;
+            let scroller_loc = self.scroll_top / inner_height;
             for j in 0..scroller_height {
-                buf.set_symbol(
-                    right,
-                    loc_y + scroller_loc + j + 1,
-                    '▇',
-                );
+                buf.set_symbol(right, loc_y + scroller_loc + j + 1, bar::SEVEN_EIGHTHS);
             }
         }
 
@@ -237,17 +233,10 @@ where
         let abs_cursor_x = loc_x + cursor_loc_x + 1;
         let abs_cursor_y = loc_y + cursor_loc_y + 1 - self.scroll_top;
 
-        let is_cursor_visible =
-            abs_cursor_y > loc_y && abs_cursor_y < bottom;
+        let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < bottom;
 
         if self.focused && is_cursor_visible {
-            vec![
-                Cmd::ShowCursor,
-                Cmd::MoveTo(
-                    abs_cursor_x,
-                    abs_cursor_y,
-                ),
-            ]
+            vec![Cmd::ShowCursor, Cmd::MoveTo(abs_cursor_x, abs_cursor_y)]
         } else {
             vec![]
         }

@@ -31,7 +31,6 @@ use stretch::{
         Style,
     },
 };
-use std::marker::PhantomData;
 
 #[derive(PartialEq, Clone)]
 pub struct Button<MSG>
@@ -43,8 +42,7 @@ where
     pub width: Option<f32>,
     pub height: Option<f32>,
     focused: bool,
-    pub on_click: Vec<Callback<Event, ()>>,
-    _phantom_msg: PhantomData<MSG>,
+    pub on_click: Vec<Callback<Event, MSG>>,
 }
 
 impl<MSG> Default for Button<MSG> {
@@ -56,7 +54,6 @@ impl<MSG> Default for Button<MSG> {
             height: None,
             focused: false,
             on_click: vec![],
-            _phantom_msg: PhantomData,
         }
     }
 }
@@ -85,7 +82,7 @@ where
     }
 
     pub fn add_click_listener<F>(&mut self, func: F) 
-        where F: Fn(Event) + 'static
+        where F: Fn(Event) -> MSG + 'static
     {
         self.on_click.push(Callback::from(func));
     }
@@ -196,8 +193,7 @@ where
     fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(..)) => {
-                let _:Vec<_> = self.on_click.iter().map(|cb| cb.emit(event)).collect();
-                vec![]
+                self.on_click.iter().map(|cb| cb.emit(event)).collect()
             }
             _ => vec![],
         }
