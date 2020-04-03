@@ -185,23 +185,23 @@ where
             vertical_symbol = thick_line::VERTICAL;
         }
 
-        let bottom = loc_y + height - 1;
-        let right = loc_x + width - 1;
+        let bottom = loc_y as i32 + height as i32 - 1;
+        let right = loc_x as i32 + width as i32 - 1;
 
         for i in 0..width {
             buf.set_symbol(loc_x + i, loc_y, horizontal_symbol);
-            buf.set_symbol(loc_x + i, bottom, horizontal_symbol);
+            buf.set_symbol(loc_x + i, bottom as usize, horizontal_symbol);
         }
         for j in 0..height {
             buf.set_symbol(loc_x, loc_y + j, vertical_symbol);
-            buf.set_symbol(right, loc_y + j, vertical_symbol);
+            buf.set_symbol(right as usize, loc_y + j, vertical_symbol);
         }
         let content_height = self.area_buffer.content.len() as f32 + self.border_top() + self.border_bottom();
         let scroller_height = (height as f32 * height as f32 / content_height).round() as usize;
         if inner_height > 0 {
             let scroller_loc = self.scroll_top / inner_height;
             for j in 0..scroller_height {
-                buf.set_symbol(right, loc_y + scroller_loc + j + 1, bar::SEVEN_EIGHTHS);
+                buf.set_symbol(right as usize, loc_y + scroller_loc + j + 1, bar::SEVEN_EIGHTHS);
             }
         }
 
@@ -224,16 +224,16 @@ where
         }
 
         buf.set_symbol(loc_x, loc_y, top_left_symbol);
-        buf.set_symbol(loc_x, bottom, bottom_left_symbol);
-        buf.set_symbol(right, loc_y, top_right_symbol);
-        buf.set_symbol(right, bottom, bottom_right_symbol);
+        buf.set_symbol(loc_x, bottom as usize, bottom_left_symbol);
+        buf.set_symbol(right as usize, loc_y, top_right_symbol);
+        buf.set_symbol(right as usize, bottom as usize, bottom_right_symbol);
         let (cursor_loc_x, cursor_loc_y) =
             self.area_buffer.get_cursor_location();
 
         let abs_cursor_x = loc_x + cursor_loc_x + 1;
         let abs_cursor_y = loc_y + cursor_loc_y + 1 - self.scroll_top;
 
-        let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < bottom;
+        let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < bottom as usize;
 
         if self.focused && is_cursor_visible {
             vec![Cmd::ShowCursor, Cmd::MoveTo(abs_cursor_x, abs_cursor_y)]

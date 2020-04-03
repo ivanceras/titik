@@ -135,11 +135,14 @@ impl From<String> for AreaBuffer {
             content.push(row);
             cursor_loc_y += 1;
         }
+        if cursor_loc_y > 0 {
+            cursor_loc_y = cursor_loc_y - 1;
+        }
 
         AreaBuffer {
             content,
             cursor_loc_x,
-            cursor_loc_y: cursor_loc_y - 1,
+            cursor_loc_y,
         }
     }
 }
