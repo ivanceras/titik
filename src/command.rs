@@ -2,6 +2,7 @@
 use crossterm::{
     cursor,
     event::EnableMouseCapture,
+    event::DisableMouseCapture,
     style,
     terminal,
     terminal::ClearType,
@@ -23,8 +24,7 @@ pub fn reset_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
 }
 
 pub fn init<W: Write>(w: &mut W) -> crossterm::Result<()> {
-    crossterm::execute!(w, terminal::EnterAlternateScreen)?;
-    crossterm::execute!(w, EnableMouseCapture)?;
+    crossterm::execute!(w, terminal::EnterAlternateScreen, EnableMouseCapture)?;
     terminal::enable_raw_mode()
 }
 
@@ -33,7 +33,8 @@ pub fn finalize<W: Write>(w: &mut W) -> crossterm::Result<()> {
         w,
         style::ResetColor,
         cursor::Show,
-        terminal::LeaveAlternateScreen
+        terminal::LeaveAlternateScreen,
+        DisableMouseCapture,
     )?;
     terminal::disable_raw_mode()
 }
