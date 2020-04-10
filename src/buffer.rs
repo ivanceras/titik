@@ -30,6 +30,7 @@ pub struct Cell {
     pub attributes: Attributes,
 }
 
+#[derive(PartialEq, Debug)]
 pub struct Buffer {
     pub cells: Vec<Vec<Cell>>,
 }
@@ -109,8 +110,9 @@ impl Buffer {
                 let unicode_width = new_cell.unicode_width();
                 *cell = new_cell;
                 if unicode_width > 1 {
-                    for _i in 1..unicode_width {
-                        self.set_symbol(x + 1, y, '\0');
+                    for i in 1..unicode_width {
+                        //TODO: this needs to be x + i ;
+                        self.set_symbol(x + i, y, '\0');
                     }
                 }
             }

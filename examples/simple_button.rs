@@ -66,6 +66,7 @@ where
     MSG: fmt::Debug + 'static,
 {
     let mut root_node = FlexBox::new();
+    root_node.set_scroll_top(0.0);
     let cb1 = Checkbox::new("Checkbox1");
     let cb2 = Checkbox::new("Checkbox2");
     let rb1 = Radio::new("Radio1");
@@ -130,7 +131,7 @@ where
 }
 
 fn main() -> Result<()> {
-    let mut stdout = io::stdout();
+    let mut stdout = io::stderr();
     let mut root_node: Box<dyn Widget<()>> = build_ui();
     let mut renderer = Renderer::new(&mut stdout, None, root_node);
     renderer.run()

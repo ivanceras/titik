@@ -19,6 +19,7 @@ use stretch::{
         Style,
     },
 };
+use stretch::geometry::Rect;
 
 #[derive(Default, Debug)]
 pub struct FlexBox<MSG> {
@@ -26,6 +27,7 @@ pub struct FlexBox<MSG> {
     pub width: Option<f32>,
     pub height: Option<f32>,
     pub flex_direction: FlexDirection,
+    pub scroll_top: f32,
 }
 
 impl<MSG> FlexBox<MSG> {
@@ -35,6 +37,7 @@ impl<MSG> FlexBox<MSG> {
             height: None,
             children: vec![],
             flex_direction: FlexDirection::Row,
+            scroll_top: 0.0,
         }
     }
 
@@ -51,6 +54,10 @@ impl<MSG> FlexBox<MSG> {
     /// set to horizontal row direction
     pub fn horizontal(&mut self) {
         self.flex_direction = FlexDirection::Row;
+    }
+
+    pub fn set_scroll_top(&mut self, scroll_top: f32) {
+        self.scroll_top = scroll_top;
     }
 }
 
@@ -85,16 +92,47 @@ where
                     Dimension::Auto
                 },
             },
+            padding: Rect {
+                top: Dimension::Points(0.0),
+                ..Default::default()
+            },
             ..Default::default()
         }
     }
 
+    /*
     fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         self.children
             .iter()
             .zip(layout_tree.children_layout.iter())
             .flat_map(|(child, child_layout)| child.draw(buf, child_layout))
             .collect()
+    }
+    */
+
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+        let layout = layout_tree.layout;
+        let loc_x = layout.location.x.round() as usize;
+        let loc_y = layout.location.y.round() as usize;
+        let width = layout.size.width.round();
+        let height = layout.size.height.round();
+        let mut inner_buf = Buffer::new(width as usize, height as usize);
+        let cmds = self.children
+            .iter()
+            .zip(layout_tree.children_layout.iter())
+            .flat_map(|(child, child_layout)| child.draw(&mut inner_buf, child_layout))
+            .collect();
+
+        
+        for (j,line) in inner_buf.cells.iter().enumerate(){
+            for (i, cell) in line.iter().enumerate(){
+                    if j >= self.scroll_top as usize{
+                        let y = j - self.scroll_top as usize;
+                        buf.set_cell(loc_x + i, loc_y + y, cell.clone())
+                    }
+            }
+        }
+        cmds
     }
 
     fn add_child(&mut self, child: Box<dyn Widget<MSG>>) -> bool {

@@ -1,7 +1,7 @@
 //! Titik is a crossplatform TUI widget library.
 //! It uses crossterm as the underlying backend.
 //!
-#![deny(warnings)]
+//#![deny(warnings)]
 pub use area_buffer::AreaBuffer;
 pub use buffer::{
     Buffer,
