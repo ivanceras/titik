@@ -79,7 +79,7 @@ where
         "This is a text area\
             \n1. With a line\
             \n2. and another line\
-            \n3. With a line\
+            \n3. With a veryyyyyyy looooooooooooooooooooooooooooooooooooonnnnnnnnnnngggggggg line\
             \n4. and another line\
             \n5. With a line\
             \n6. With a line\
@@ -98,7 +98,7 @@ where
             \n19. and another line\
             \n",
     );
-    text_area1.set_size(None, Some(7.0));
+    text_area1.set_size(Some(40.0), Some(7.0));
 
     let rb2 = Radio::new("Radio2");
     let mut btn2: Button<MSG> = Button::new("Button2");

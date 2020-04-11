@@ -111,6 +111,14 @@ impl AreaBuffer {
     pub fn get_cursor_location(&self) -> (usize, usize) {
         (self.cursor_loc_x, self.cursor_loc_y)
     }
+
+    pub fn height(&self) -> usize {
+        self.content.len()
+    }
+
+    pub fn width(&self) -> usize {
+        self.content.iter().map(|line|line.len()).max().unwrap_or(0)
+    }
 }
 
 impl From<String> for AreaBuffer {
