@@ -14,8 +14,8 @@ use crate::{
 use crossterm::event::{
     Event,
     KeyEvent,
-    MouseEvent,
     KeyModifiers,
+    MouseEvent,
 };
 use std::{
     any::Any,
@@ -113,7 +113,7 @@ impl<MSG> TextArea<MSG> {
             - self.border_left()
             - self.border_right();
         if iw > 0.0 {
-            iw 
+            iw
         } else {
             0.0
         }
@@ -169,14 +169,14 @@ impl<MSG> TextArea<MSG> {
     fn content_height(&self) -> f32 {
         self.area_buffer.height() as f32
     }
+
     fn content_width(&self) -> f32 {
         self.area_buffer.width() as f32
     }
 
     fn scroller_height(&self, layout: &Layout) -> f32 {
-        let content_height = self.content_height() 
-            + self.border_top()
-            + self.border_bottom();
+        let content_height =
+            self.content_height() + self.border_top() + self.border_bottom();
 
         let height = layout.size.height.round();
         let scroller_height =
@@ -185,16 +185,14 @@ impl<MSG> TextArea<MSG> {
     }
 
     fn scroller_width(&self, layout: &Layout) -> f32 {
-        let content_width = self.content_width() 
-            + self.border_left()
-            + self.border_right();
+        let content_width =
+            self.content_width() + self.border_left() + self.border_right();
 
         let width = layout.size.width.round();
         let scroller_width =
             (width as f32 * width as f32 / content_width).round();
         scroller_width
     }
-    
 
     fn cursor_location(&self, layout: &Layout) -> (f32, f32) {
         let (cursor_loc_x, cursor_loc_y) =
@@ -287,8 +285,12 @@ where
 
         if inner_width > 0.0 {
             let scroller_left_loc = self.scroll_left / inner_width;
-            for i in 0..scroller_width{
-                buf.set_symbol(loc_x as usize + scroller_left_loc as usize + i + 1, bottom as usize, '▮');
+            for i in 0..scroller_width {
+                buf.set_symbol(
+                    loc_x as usize + scroller_left_loc as usize + i + 1,
+                    bottom as usize,
+                    '▮',
+                );
             }
         }
 
@@ -301,7 +303,9 @@ where
         for (j, line) in self.area_buffer.content.iter().enumerate() {
             if (j as f32) >= self.scroll_top && (j as f32) < bottom_scroll {
                 for (i, ch) in line.iter().enumerate() {
-                    if (i as f32) >= self.scroll_left && (i as f32) < right_scroll {
+                    if (i as f32) >= self.scroll_left
+                        && (i as f32) < right_scroll
+                    {
                         buf.set_symbol(
                             (text_loc_x + i as f32 + 1.0) as usize,
                             (text_loc_y + j as f32 + 1.0) as usize,
@@ -383,12 +387,11 @@ where
                 vec![]
             }
             Event::Mouse(MouseEvent::ScrollUp(_x, _y, modifier)) => {
-                if modifier.contains(KeyModifiers::SHIFT){
+                if modifier.contains(KeyModifiers::SHIFT) {
                     if self.scroll_left > 0.0 {
                         self.scroll_left -= 1.0;
                     }
-                }
-                else {
+                } else {
                     if self.scroll_top > 0.0 {
                         self.scroll_top -= 1.0;
                     }
@@ -396,11 +399,12 @@ where
                 vec![]
             }
             Event::Mouse(MouseEvent::ScrollDown(_x, _y, modifier)) => {
-                if modifier.contains(KeyModifiers::SHIFT){
-                        self.scroll_left += 1.0;
-                }
-                else {
-                    if self.content_height() - self.scroll_top > self.inner_height(&layout) {
+                if modifier.contains(KeyModifiers::SHIFT) {
+                    self.scroll_left += 1.0;
+                } else {
+                    if self.content_height() - self.scroll_top
+                        > self.inner_height(&layout)
+                    {
                         self.scroll_top += 1.0;
                     }
                 }

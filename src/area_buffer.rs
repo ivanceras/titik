@@ -117,7 +117,11 @@ impl AreaBuffer {
     }
 
     pub fn width(&self) -> usize {
-        self.content.iter().map(|line|line.len()).max().unwrap_or(0)
+        self.content
+            .iter()
+            .map(|line| line.len())
+            .max()
+            .unwrap_or(0)
     }
 }
 
