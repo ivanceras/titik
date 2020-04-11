@@ -8,9 +8,7 @@ use crate::{
     LayoutTree,
     Widget,
 };
-use crossterm::{
-    style::Color,
-};
+use crossterm::style::Color;
 use image::{
     self,
     DynamicImage,

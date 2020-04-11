@@ -1,7 +1,5 @@
 use crate::{
-    buffer::{
-        Buffer,
-    },
+    buffer::Buffer,
     Cmd,
     LayoutTree,
     Widget,
@@ -12,14 +10,16 @@ use std::{
     fmt,
 };
 use stretch::{
-    geometry::Size,
+    geometry::{
+        Rect,
+        Size,
+    },
     style::{
         Dimension,
         FlexDirection,
         Style,
     },
 };
-use stretch::geometry::Rect;
 
 #[derive(Default, Debug)]
 pub struct FlexBox<MSG> {
@@ -117,19 +117,21 @@ where
         let width = layout.size.width.round();
         let height = layout.size.height.round();
         let mut inner_buf = Buffer::new(width as usize, height as usize);
-        let cmds = self.children
+        let cmds = self
+            .children
             .iter()
             .zip(layout_tree.children_layout.iter())
-            .flat_map(|(child, child_layout)| child.draw(&mut inner_buf, child_layout))
+            .flat_map(|(child, child_layout)| {
+                child.draw(&mut inner_buf, child_layout)
+            })
             .collect();
 
-        
-        for (j,line) in inner_buf.cells.iter().enumerate(){
-            for (i, cell) in line.iter().enumerate(){
-                    if j >= self.scroll_top as usize{
-                        let y = j - self.scroll_top as usize;
-                        buf.set_cell(loc_x + i, loc_y + y, cell.clone())
-                    }
+        for (j, line) in inner_buf.cells.iter().enumerate() {
+            for (i, cell) in line.iter().enumerate() {
+                if j >= self.scroll_top as usize {
+                    let y = j - self.scroll_top as usize;
+                    buf.set_cell(loc_x + i, loc_y + y, cell.clone())
+                }
             }
         }
         cmds

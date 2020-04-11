@@ -1,15 +1,11 @@
 use crate::{
-    buffer::{
-        Buffer,
-    },
+    buffer::Buffer,
     Cmd,
     LayoutTree,
 };
 pub use button::Button;
 pub use checkbox::Checkbox;
-use crossterm::{
-    event::Event,
-};
+use crossterm::event::Event;
 pub use flex_box::FlexBox;
 pub use image_control::Image;
 pub use radio::Radio;
@@ -23,9 +19,7 @@ use stretch::{
         Stretch,
     },
     result::Layout,
-    style::{
-        Style,
-    },
+    style::Style,
 };
 pub use svg_image::SvgImage;
 pub use text_area::TextArea;
@@ -57,7 +51,10 @@ where
         None
     }
 
-    fn child_mut(&mut self, _index: usize) -> Option<&mut Box<dyn Widget<MSG>>> {
+    fn child_mut(
+        &mut self,
+        _index: usize,
+    ) -> Option<&mut Box<dyn Widget<MSG>>> {
         None
     }
 

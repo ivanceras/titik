@@ -1,8 +1,9 @@
-
 use crossterm::{
     cursor,
-    event::EnableMouseCapture,
-    event::DisableMouseCapture,
+    event::{
+        DisableMouseCapture,
+        EnableMouseCapture,
+    },
     style,
     terminal,
     terminal::ClearType,

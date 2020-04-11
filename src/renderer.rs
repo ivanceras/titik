@@ -35,15 +35,9 @@ pub use crossterm::{
     Command,
     Result,
 };
-use std::{
-    io::{
-        Write,
-    },
-};
+use std::io::Write;
 use stretch::{
-    geometry::{
-        Size,
-    },
+    geometry::Size,
     number::Number,
 };
 
@@ -51,7 +45,7 @@ pub trait Dispatch<MSG> {
     fn dispatch(&self, msg: MSG);
 }
 
-pub struct Renderer<'a, W, MSG>{
+pub struct Renderer<'a, W, MSG> {
     terminal_size: (u16, u16),
     layout_tree: LayoutTree,
     root_node: Box<dyn Widget<MSG>>,
@@ -64,7 +58,11 @@ impl<'a, W, MSG> Renderer<'a, W, MSG>
 where
     W: Write,
 {
-    pub fn new(write: W, program: Option<&'a dyn Dispatch<MSG>>,mut root_node: Box<dyn Widget<MSG>>) -> Self {
+    pub fn new(
+        write: W,
+        program: Option<&'a dyn Dispatch<MSG>>,
+        mut root_node: Box<dyn Widget<MSG>>,
+    ) -> Self {
         let (width, height) =
             terminal::size().expect("must get the terminal size");
         root_node.set_size(Some((width) as f32), Some(height as f32));
@@ -168,7 +166,7 @@ where
                         }
                     }
                     Event::Resize(w, h) => {
-                        self.recompute_layout(w,h);
+                        self.recompute_layout(w, h);
                     }
                     _ => (),
                 }
@@ -185,9 +183,10 @@ where
                         .expect("must have a layout tree");
 
                     if let Some(hit_widget) = &mut hit_widget {
-                        let msgs = hit_widget.process_event(event, &focused_layout.layout);
-                        if let Some(program) = self.program{
-                            for msg in msgs{
+                        let msgs = hit_widget
+                            .process_event(event, &focused_layout.layout);
+                        if let Some(program) = self.program {
+                            for msg in msgs {
                                 program.dispatch(msg);
                             }
                         }

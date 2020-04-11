@@ -194,7 +194,6 @@ where
         let height = layout.size.height.round();
         let inner_height = self.inner_height(&layout_tree.layout);
 
-
         let (
             top_left_symbol,
             top_right_symbol,

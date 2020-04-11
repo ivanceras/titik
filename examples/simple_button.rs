@@ -136,4 +136,3 @@ fn main() -> Result<()> {
     let mut renderer = Renderer::new(&mut stdout, None, root_node);
     renderer.run()
 }
-

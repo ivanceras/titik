@@ -10,7 +10,6 @@ pub use buffer::{
 pub use cmd::Cmd;
 pub use crossterm;
 pub use input_buffer::InputBuffer;
-pub use sauron_vdom::Callback;
 pub use layout::{
     compute_layout,
     find_layout,
@@ -21,6 +20,11 @@ pub use layout::{
     widget_node_idx_at,
     LayoutTree,
 };
+pub use renderer::{
+    Dispatch,
+    Renderer,
+};
+pub use sauron_vdom::Callback;
 pub use stretch;
 pub use widget::{
     Button,
@@ -33,16 +37,14 @@ pub use widget::{
     TextInput,
     Widget,
 };
-pub use renderer::Renderer;
-pub use renderer::Dispatch;
 
 mod area_buffer;
 mod buffer;
 mod cmd;
+pub mod command;
 mod input_buffer;
 mod layout;
+pub mod renderer;
 #[allow(unused)]
 mod symbol;
 mod widget;
-pub mod command;
-pub mod renderer;

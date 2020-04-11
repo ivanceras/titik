@@ -45,8 +45,7 @@ impl AreaBuffer {
                 self.add_char(c);
             }
             KeyCode::Enter => {
-                if let Some(line) = self.content.get_mut(self.cursor_loc_y)
-                {
+                if let Some(line) = self.content.get_mut(self.cursor_loc_y) {
                     let new_line = line.split_off(self.cursor_loc_x);
                     self.cursor_loc_y += 1;
                     self.cursor_loc_x = 0;

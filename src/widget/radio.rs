@@ -1,17 +1,13 @@
 use crate::{
-    buffer::{
-        Buffer,
-    },
+    buffer::Buffer,
     symbol,
     Cmd,
     LayoutTree,
     Widget,
 };
-use crossterm::{
-    event::{
-        Event,
-        MouseEvent,
-    },
+use crossterm::event::{
+    Event,
+    MouseEvent,
 };
 use std::any::Any;
 use stretch::{
@@ -22,7 +18,6 @@ use stretch::{
         Style,
     },
 };
-
 
 #[derive(Default, Debug, PartialEq)]
 pub struct Radio {

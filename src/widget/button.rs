@@ -11,11 +11,9 @@ use crate::{
     LayoutTree,
     Widget,
 };
-use crossterm::{
-    event::{
-        Event,
-        MouseEvent,
-    },
+use crossterm::event::{
+    Event,
+    MouseEvent,
 };
 use sauron_vdom::Callback;
 use std::{
@@ -81,8 +79,9 @@ where
         }
     }
 
-    pub fn add_click_listener<F>(&mut self, func: F) 
-        where F: Fn(Event) -> MSG + 'static
+    pub fn add_click_listener<F>(&mut self, func: F)
+    where
+        F: Fn(Event) -> MSG + 'static,
     {
         self.on_click.push(Callback::from(func));
     }
