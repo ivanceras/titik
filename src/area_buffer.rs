@@ -8,6 +8,7 @@ use unicode_width::UnicodeWidthChar;
 #[derive(Default, Debug, PartialEq, Clone)]
 pub struct AreaBuffer {
     pub(crate) content: Vec<Vec<char>>,
+    content_width: usize,
     cursor_loc_x: usize,
     cursor_loc_y: usize,
 }
@@ -16,6 +17,7 @@ impl AreaBuffer {
     pub fn new() -> Self {
         AreaBuffer {
             content: vec![],
+            content_width: 0,
             cursor_loc_x: 0,
             cursor_loc_y: 0,
         }
@@ -28,12 +30,23 @@ impl AreaBuffer {
             .expect("must have a line");
         line.insert(self.cursor_loc_x, c);
         self.cursor_loc_x += 1;
+        self.calc_content_width();
+    }
+
+    fn calc_content_width(&mut self) {
+        self.content_width = 
+        self.content
+            .iter()
+            .map(|line| line.len())
+            .max()
+            .unwrap_or(0);
     }
 
     pub fn add_line<S: ToString>(&mut self, s: S) {
         let line = s.to_string().chars().collect();
         self.content.push(line);
         self.cursor_loc_y += 1;
+        self.calc_content_width();
     }
 
     pub fn process_key_event(
@@ -50,6 +63,7 @@ impl AreaBuffer {
                     self.cursor_loc_y += 1;
                     self.cursor_loc_x = 0;
                     self.content.insert(self.cursor_loc_y, new_line);
+                    self.calc_content_width();
                 }
             }
             KeyCode::Left => {
@@ -90,6 +104,7 @@ impl AreaBuffer {
                         self.cursor_loc_x -= 1;
                         line.remove(self.cursor_loc_x);
                     }
+                    self.calc_content_width();
                 }
             }
             KeyCode::Delete => {
@@ -97,6 +112,7 @@ impl AreaBuffer {
                     if self.cursor_loc_x < line.len() {
                         line.remove(self.cursor_loc_x);
                     }
+                    self.calc_content_width();
                 }
             }
             _ => (),
@@ -117,11 +133,7 @@ impl AreaBuffer {
     }
 
     pub fn width(&self) -> usize {
-        self.content
-            .iter()
-            .map(|line| line.len())
-            .max()
-            .unwrap_or(0)
+        self.content_width
     }
 }
 
@@ -130,6 +142,7 @@ impl From<String> for AreaBuffer {
         let mut content = vec![];
         let mut cursor_loc_x = 0;
         let mut cursor_loc_y = 0;
+        let mut content_width = 0;
         for line in s.lines() {
             cursor_loc_x = 0;
             let mut row = vec![];
@@ -143,6 +156,9 @@ impl From<String> for AreaBuffer {
                     }
                 }
             }
+            if content_width < row.len(){
+                content_width = row.len();
+            }
             content.push(row);
             cursor_loc_y += 1;
         }
@@ -152,6 +168,7 @@ impl From<String> for AreaBuffer {
 
         AreaBuffer {
             content,
+            content_width,
             cursor_loc_x,
             cursor_loc_y,
         }
