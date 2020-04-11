@@ -1,10 +1,10 @@
 use crate::{
     buffer::Buffer,
     symbol::{
+        bar,
         line,
         rounded,
         thick_line,
-        bar,
     },
     AreaBuffer,
     Cmd,
@@ -114,41 +114,8 @@ impl<MSG> TextArea<MSG> {
             0
         }
     }
-}
 
-impl<MSG> Widget<MSG> for TextArea<MSG>
-where
-    MSG: fmt::Debug + 'static,
-{
-    fn style(&self) -> Style {
-        Style {
-            size: Size {
-                width: if let Some(width) = self.width {
-                    Dimension::Points(width)
-                } else {
-                    Dimension::Percent(1.0)
-                },
-                height: if let Some(height) = self.height {
-                    Dimension::Points(height)
-                } else {
-                    Dimension::Points(
-                        self.area_buffer.content.len() as f32,
-                    )
-                },
-            },
-            ..Default::default()
-        }
-    }
-
-    /// draw this button to the buffer, with the given computed layout
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
-        let loc_x = layout.location.x.round();
-        let loc_y = layout.location.y.round();
-        let width = layout.size.width.round();
-        let height = layout.size.height.round();
-        let inner_height = self.inner_height(&layout_tree.layout);
-
+    fn get_symbols(&self) -> (&str, &str, &str, &str, &str, &str) {
         let mut top_left_symbol = if self.is_rounded {
             rounded::TOP_LEFT
         } else {
@@ -185,23 +152,90 @@ where
             vertical_symbol = thick_line::VERTICAL;
         }
 
+        (
+            top_left_symbol,
+            top_right_symbol,
+            bottom_left_symbol,
+            bottom_right_symbol,
+            horizontal_symbol,
+            vertical_symbol,
+        )
+    }
+}
+
+impl<MSG> Widget<MSG> for TextArea<MSG>
+where
+    MSG: fmt::Debug + 'static,
+{
+    fn style(&self) -> Style {
+        Style {
+            size: Size {
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Percent(1.0)
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Points(self.area_buffer.content.len() as f32)
+                },
+            },
+            ..Default::default()
+        }
+    }
+
+    /// draw this button to the buffer, with the given computed layout
+    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+        let layout = layout_tree.layout;
+        let loc_x = layout.location.x.round();
+        let loc_y = layout.location.y.round();
+        let width = layout.size.width.round();
+        let height = layout.size.height.round();
+        let inner_height = self.inner_height(&layout_tree.layout);
+
+
+        let (
+            top_left_symbol,
+            top_right_symbol,
+            bottom_left_symbol,
+            bottom_right_symbol,
+            horizontal_symbol,
+            vertical_symbol,
+        ) = self.get_symbols();
+
         let bottom = loc_y + height - 1.0;
         let right = loc_x + width - 1.0;
 
-        for i in 0..width as usize{
-            buf.set_symbol(loc_x as usize + i, loc_y as usize, horizontal_symbol);
-            buf.set_symbol(loc_x as usize + i, bottom as usize, horizontal_symbol);
+        for i in 0..width as usize {
+            buf.set_symbol(
+                loc_x as usize + i,
+                loc_y as usize,
+                horizontal_symbol,
+            );
+            buf.set_symbol(
+                loc_x as usize + i,
+                bottom as usize,
+                horizontal_symbol,
+            );
         }
-        for j in 0..height as usize{
+        for j in 0..height as usize {
             buf.set_symbol(loc_x as usize, loc_y as usize + j, vertical_symbol);
             buf.set_symbol(right as usize, loc_y as usize + j, vertical_symbol);
         }
-        let content_height = self.area_buffer.content.len() as f32 + self.border_top() + self.border_bottom();
-        let scroller_height = (height as f32 * height as f32 / content_height).round() as usize;
+        let content_height = self.area_buffer.content.len() as f32
+            + self.border_top()
+            + self.border_bottom();
+        let scroller_height =
+            (height as f32 * height as f32 / content_height).round() as usize;
         if inner_height > 0.0 {
             let scroller_loc = self.scroll_top / inner_height;
             for j in 0..scroller_height {
-                buf.set_symbol(right as usize, loc_y as usize + scroller_loc  as usize + j + 1, bar::SEVEN_EIGHTHS);
+                buf.set_symbol(
+                    right as usize,
+                    loc_y as usize + scroller_loc as usize + j + 1,
+                    bar::SEVEN_EIGHTHS,
+                );
             }
         }
 
@@ -210,7 +244,9 @@ where
         // draw the text content
         let text_loc_y = loc_y as i32 + 1 - self.scroll_top as i32;
         for (j, line) in self.area_buffer.content.iter().enumerate() {
-            if (j as f32) >= self.scroll_top && (j as f32) < inner_height + self.scroll_top {
+            if (j as f32) >= self.scroll_top
+                && (j as f32) < inner_height + self.scroll_top
+            {
                 for (i, ch) in line.iter().enumerate() {
                     if loc_x as usize + i < inner_width {
                         buf.set_symbol(
@@ -231,12 +267,15 @@ where
             self.area_buffer.get_cursor_location();
 
         let abs_cursor_x = loc_x + cursor_loc_x as f32 + 1.0;
-        let abs_cursor_y = loc_y + cursor_loc_y as f32 + 1.0 - self.scroll_top as f32;
+        let abs_cursor_y = loc_y + cursor_loc_y as f32 + 1.0 - self.scroll_top;
 
         let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < bottom;
 
         if self.focused && is_cursor_visible {
-            vec![Cmd::ShowCursor, Cmd::MoveTo(abs_cursor_x as usize, abs_cursor_y as usize)]
+            vec![
+                Cmd::ShowCursor,
+                Cmd::MoveTo(abs_cursor_x as usize, abs_cursor_y as usize),
+            ]
         } else {
             vec![]
         }
@@ -280,14 +319,17 @@ where
                     x = 0.0;
                 }
                 let cursor_y = y + self.scroll_top;
-                if let Some(line) = self.area_buffer.content.get(cursor_y as usize) {
+                if let Some(line) =
+                    self.area_buffer.content.get(cursor_y as usize)
+                {
                     if x > line.len() as f32 {
                         x = line.len() as f32;
                     }
                 }
                 let cursor_x = x;
 
-                self.area_buffer.set_cursor_loc(cursor_x as usize, cursor_y as usize);
+                self.area_buffer
+                    .set_cursor_loc(cursor_x as usize, cursor_y as usize);
                 vec![]
             }
             Event::Mouse(MouseEvent::ScrollUp(_x, _y, _modifier)) => {
