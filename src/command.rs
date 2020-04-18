@@ -1,11 +1,7 @@
 use crossterm::{
     cursor,
-    event::{
-        DisableMouseCapture,
-        EnableMouseCapture,
-    },
-    style,
-    terminal,
+    event::{DisableMouseCapture, EnableMouseCapture},
+    style, terminal,
     terminal::ClearType,
 };
 use std::io::Write;

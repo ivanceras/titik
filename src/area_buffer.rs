@@ -1,7 +1,4 @@
-use crossterm::event::{
-    KeyCode,
-    KeyEvent,
-};
+use crossterm::event::{KeyCode, KeyEvent};
 use unicode_width::UnicodeWidthChar;
 
 /// Area buffer is a 2 dimensional text buffer
@@ -34,8 +31,8 @@ impl AreaBuffer {
     }
 
     fn calc_content_width(&mut self) {
-        self.content_width = 
-        self.content
+        self.content_width = self
+            .content
             .iter()
             .map(|line| line.len())
             .max()
@@ -156,7 +153,7 @@ impl From<String> for AreaBuffer {
                     }
                 }
             }
-            if content_width < row.len(){
+            if content_width < row.len() {
                 content_width = row.len();
             }
             content.push(row);

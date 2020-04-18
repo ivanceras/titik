@@ -1,33 +1,15 @@
 use crate::{
-    buffer::{
-        Buffer,
-        Cell,
-    },
-    symbol::{
-        line,
-        rounded,
-    },
-    Cmd,
-    LayoutTree,
-    Widget,
+    buffer::{Buffer, Cell},
+    symbol::{line, rounded},
+    Cmd, LayoutTree, Widget,
 };
-use crossterm::event::{
-    Event,
-    MouseEvent,
-};
+use crossterm::event::{Event, MouseEvent};
 use sauron_vdom::Callback;
-use std::{
-    any::Any,
-    fmt,
-    fmt::Debug,
-};
+use std::{any::Any, fmt, fmt::Debug};
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 #[derive(PartialEq, Clone)]

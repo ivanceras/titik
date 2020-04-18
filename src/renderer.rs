@@ -1,45 +1,17 @@
 use crate::{
-    command,
-    compute_layout,
-    find_layout,
-    find_widget_mut,
-    set_focused_node,
-    widget_node_idx_at,
-    Buffer,
-    LayoutTree,
-    Widget,
+    command, compute_layout, find_layout, find_widget_mut, set_focused_node,
+    widget_node_idx_at, Buffer, LayoutTree, Widget,
 };
 pub use crossterm::{
     cursor,
-    event::{
-        self,
-        Event,
-        KeyCode,
-        KeyEvent,
-        KeyModifiers,
-        MouseEvent,
-    },
-    execute,
-    queue,
-    style,
-    style::{
-        Attribute,
-        Attributes,
-        Color,
-        ContentStyle,
-    },
-    terminal::{
-        self,
-        ClearType,
-    },
-    Command,
-    Result,
+    event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
+    execute, queue, style,
+    style::{Attribute, Attributes, Color, ContentStyle},
+    terminal::{self, ClearType},
+    Command, Result,
 };
 use std::io::Write;
-use stretch::{
-    geometry::Size,
-    number::Number,
-};
+use stretch::{geometry::Size, number::Number};
 
 pub trait Dispatch<MSG> {
     fn dispatch(&self, msg: MSG);
@@ -121,14 +93,12 @@ where
                         //  - CTRL-z
                         if key_event.modifiers.contains(KeyModifiers::CONTROL) {
                             match key_event.code {
-                                KeyCode::Char(c) => {
-                                    match c {
-                                        'c' | 'q' | 'd' | 'z' => {
-                                            break;
-                                        }
-                                        _ => (),
+                                KeyCode::Char(c) => match c {
+                                    'c' | 'q' | 'd' | 'z' => {
+                                        break;
                                     }
-                                }
+                                    _ => (),
+                                },
                                 _ => (),
                             }
                         } else {

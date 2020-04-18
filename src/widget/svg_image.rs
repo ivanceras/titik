@@ -1,32 +1,14 @@
 use crate::{
-    buffer::{
-        Buffer,
-        Cell,
-    },
+    buffer::{Buffer, Cell},
     symbol::bar,
-    Cmd,
-    LayoutTree,
-    Widget,
+    Cmd, LayoutTree, Widget,
 };
 use crossterm::style::Color;
-use image::{
-    self,
-    DynamicImage,
-    GenericImageView,
-    ImageBuffer,
-    RgbaImage,
-};
-use std::{
-    any::Any,
-    fmt,
-    marker::PhantomData,
-};
+use image::{self, DynamicImage, GenericImageView, ImageBuffer, RgbaImage};
+use std::{any::Any, fmt, marker::PhantomData};
 use stretch::{
     geometry::Size,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 pub struct SvgImage<MSG> {
@@ -76,7 +58,7 @@ impl<MSG> SvgImage<MSG> {
         let img = self.image.thumbnail(width as u32, height as u32);
         let (img_width, img_height) = img.dimensions();
         let rgb = img.to_rgb();
-        let cells = (0..img_height as usize)
+        let cells = (0..img_height as usize - 1)
             .step_by(2)
             .enumerate()
             .map(|(_y, j)| {

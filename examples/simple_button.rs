@@ -1,63 +1,23 @@
 pub use crossterm::{
     cursor,
-    event::{
-        self,
-        Event,
-        KeyCode,
-        KeyEvent,
-        KeyModifiers,
-        MouseEvent,
-    },
-    execute,
-    queue,
-    style,
-    style::{
-        Attribute,
-        Attributes,
-        Color,
-        ContentStyle,
-    },
-    terminal::{
-        self,
-        ClearType,
-    },
-    Command,
-    Result,
+    event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
+    execute, queue, style,
+    style::{Attribute, Attributes, Color, ContentStyle},
+    terminal::{self, ClearType},
+    Command, Result,
 };
 use std::{
     cell::RefCell,
     fmt,
-    io::{
-        self,
-        Write,
-    },
+    io::{self, Write},
     rc::Rc,
 };
 
 use titik::{
-    command,
-    compute_layout,
-    find_layout,
-    find_widget,
-    find_widget_mut,
-    renderer,
-    renderer::Renderer,
-    set_focused_node,
-    widget_hit_at,
-    widget_node_idx_at,
-    Buffer,
-    Button,
-    Callback,
-    Checkbox,
-    Cmd,
-    FlexBox,
-    Image,
-    InputBuffer,
-    LayoutTree,
-    Radio,
-    SvgImage,
-    TextArea,
-    TextInput,
+    command, compute_layout, find_layout, find_widget, find_widget_mut,
+    renderer, renderer::Renderer, set_focused_node, widget_hit_at,
+    widget_node_idx_at, Buffer, Button, Callback, Checkbox, Cmd, FlexBox,
+    Image, InputBuffer, LayoutTree, Radio, SvgImage, TextArea, TextInput,
     Widget,
 };
 
@@ -108,7 +68,7 @@ where
     img.set_size(Some(60.0), Some(20.0));
 
     let svg: SvgImage<MSG> =
-        SvgImage::new(include_str!("../tiger.svg").to_string());
+        SvgImage::new(include_str!("/home/lee/Desktop/bob.svg").to_string());
     root_node.vertical();
 
     let btn1: Button<MSG> = Button::new("Button 1");

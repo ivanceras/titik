@@ -1,24 +1,9 @@
-use crate::{
-    buffer::Buffer,
-    Cmd,
-    LayoutTree,
-    Widget,
-};
+use crate::{buffer::Buffer, Cmd, LayoutTree, Widget};
 
-use std::{
-    any::Any,
-    fmt,
-};
+use std::{any::Any, fmt};
 use stretch::{
-    geometry::{
-        Rect,
-        Size,
-    },
-    style::{
-        Dimension,
-        FlexDirection,
-        Style,
-    },
+    geometry::{Rect, Size},
+    style::{Dimension, FlexDirection, Style},
 };
 
 #[derive(Default, Debug)]

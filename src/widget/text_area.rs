@@ -1,34 +1,14 @@
 use crate::{
     buffer::Buffer,
-    symbol::{
-        bar,
-        line,
-        rounded,
-        thick_line,
-    },
-    AreaBuffer,
-    Cmd,
-    LayoutTree,
-    Widget,
+    symbol::{bar, line, rounded, thick_line},
+    AreaBuffer, Cmd, LayoutTree, Widget,
 };
-use crossterm::event::{
-    Event,
-    KeyEvent,
-    KeyModifiers,
-    MouseEvent,
-};
-use std::{
-    any::Any,
-    fmt,
-    marker::PhantomData,
-};
+use crossterm::event::{Event, KeyEvent, KeyModifiers, MouseEvent};
+use std::{any::Any, fmt, marker::PhantomData};
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 //TODO: make the widget scroll to the cursor location when cursor is not visible

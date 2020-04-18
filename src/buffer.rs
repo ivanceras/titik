@@ -1,21 +1,11 @@
 use crossterm::{
-    cursor,
-    queue,
+    cursor, queue,
     style::{
-        Attribute,
-        Attributes,
-        Color,
-        Print,
-        ResetColor,
-        SetAttributes,
-        SetBackgroundColor,
-        SetForegroundColor,
+        Attribute, Attributes, Color, Print, ResetColor, SetAttributes,
+        SetBackgroundColor, SetForegroundColor,
     },
 };
-use std::{
-    fmt,
-    io::Write,
-};
+use std::{fmt, io::Write};
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Clone, Default, PartialEq, Debug)]

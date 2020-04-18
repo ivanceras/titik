@@ -1,7 +1,4 @@
-use crossterm::event::{
-    KeyCode,
-    KeyEvent,
-};
+use crossterm::event::{KeyCode, KeyEvent};
 
 /// Input buffer is a 1 dimensional text buffer.
 /// It process keystroke and create a string representation

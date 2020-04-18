@@ -1,13 +1,7 @@
 use crate::Widget;
 use stretch::{
-    geometry::{
-        Point,
-        Size,
-    },
-    node::{
-        Node,
-        Stretch,
-    },
+    geometry::{Point, Size},
+    node::{Node, Stretch},
     number::Number,
     result::Layout,
 };
