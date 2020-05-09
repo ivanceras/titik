@@ -23,7 +23,7 @@ where
     pub height: Option<f32>,
     focused: bool,
     pub on_click: Vec<Callback<Event, MSG>>,
-	pub id: Option<String>,
+    pub id: Option<String>,
 }
 
 impl<MSG> Default for Button<MSG> {
@@ -35,7 +35,7 @@ impl<MSG> Default for Button<MSG> {
             height: None,
             focused: false,
             on_click: vec![],
-			id: None,
+            id: None,
         }
     }
 }
@@ -44,7 +44,7 @@ impl<MSG> Debug for Button<MSG> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("Button")
             .field("label", &self.label)
-			.field("id", &self.id)
+            .field("id", &self.id)
             .finish()
     }
 }
@@ -183,11 +183,11 @@ where
         }
     }
 
-	fn set_id(&mut self, id: &str){
-		self.id = Some(id.to_string());
-	}
+    fn set_id(&mut self, id: &str) {
+        self.id = Some(id.to_string());
+    }
 
-	fn get_id(&self) -> &Option<String> {
-		&self.id
-	}
+    fn get_id(&self) -> &Option<String> {
+        &self.id
+    }
 }

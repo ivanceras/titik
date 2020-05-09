@@ -24,11 +24,8 @@ pub struct Renderer<MSG> {
     focused_widget_idx: Option<usize>,
 }
 
-impl<MSG> Renderer<MSG>
-{
-    pub fn new(
-        mut root_node: Box<dyn Widget<MSG>>,
-    ) -> Self {
+impl<MSG> Renderer<MSG> {
+    pub fn new(mut root_node: Box<dyn Widget<MSG>>) -> Self {
         let (width, height) =
             terminal::size().expect("must get the terminal size");
         root_node.set_size(Some((width) as f32), Some(height as f32));
@@ -48,9 +45,9 @@ impl<MSG> Renderer<MSG>
         }
     }
 
-	pub fn set_root_node(&mut self, root_node: Box< dyn Widget<MSG>>) {
-		self.root_node = root_node;
-	}
+    pub fn set_root_node(&mut self, root_node: Box<dyn Widget<MSG>>) {
+        self.root_node = root_node;
+    }
 
     fn recompute_layout(&mut self, width: u16, height: u16) {
         self.root_node
@@ -65,7 +62,11 @@ impl<MSG> Renderer<MSG>
         self.terminal_size = (width, height);
     }
 
-    pub fn run(&mut self, write: &mut dyn Write, program: Option<&dyn Dispatch<MSG>>) -> Result<()> {
+    pub fn run(
+        &mut self,
+        write: &mut dyn Write,
+        program: Option<&dyn Dispatch<MSG>>,
+    ) -> Result<()> {
         command::init(write)?;
         command::reset_top(write)?;
         loop {
@@ -74,9 +75,8 @@ impl<MSG> Renderer<MSG>
             buf.reset();
             let cmds = self.root_node.draw(&mut buf, &self.layout_tree);
             buf.render(write)?;
-            cmds.iter().for_each(|cmd| {
-                cmd.execute(write).expect("must execute")
-            });
+            cmds.iter()
+                .for_each(|cmd| cmd.execute(write).expect("must execute"));
             write.flush()?;
 
             if let Ok(event) = event::read() {

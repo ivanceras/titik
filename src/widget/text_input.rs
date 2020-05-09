@@ -18,7 +18,7 @@ pub struct TextInput {
     focused: bool,
     pub width: Option<f32>,
     pub height: Option<f32>,
-	pub id: Option<String>,
+    pub id: Option<String>,
 }
 
 impl TextInput {
@@ -29,7 +29,7 @@ impl TextInput {
         TextInput {
             input_buffer: InputBuffer::new_with_value(value),
             is_rounded: false,
-			id: None,
+            id: None,
             ..Default::default()
         }
     }
@@ -221,11 +221,11 @@ impl<MSG> Widget<MSG> for TextInput {
             _ => vec![],
         }
     }
-	fn set_id(&mut self, id: &str){
-		self.id = Some(id.to_string());
-	}
+    fn set_id(&mut self, id: &str) {
+        self.id = Some(id.to_string());
+    }
 
-	fn get_id(&self) -> &Option<String> {
-		&self.id
-	}
+    fn get_id(&self) -> &Option<String> {
+        &self.id
+    }
 }

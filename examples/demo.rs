@@ -63,7 +63,7 @@ where
     let rb2 = Radio::new("Radio2");
     let mut btn2: Button<MSG> = Button::new("Button2");
     btn2.set_rounded(true);
-	btn2.set_id("btn2");
+    btn2.set_id("btn2");
     let mut img: Image<MSG> =
         Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(60.0), Some(20.0));

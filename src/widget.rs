@@ -79,9 +79,9 @@ where
         vec![]
     }
 
-	fn set_id(&mut self, id: &str);
+    fn set_id(&mut self, id: &str);
 
-	fn get_id(&self) -> &Option<String>;
+    fn get_id(&self) -> &Option<String>;
 }
 
 #[cfg(test)]
