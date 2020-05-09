@@ -19,6 +19,7 @@ pub struct Image<MSG> {
     /// style layout
     pub height: Option<f32>,
     pub cells: Vec<Vec<Cell>>,
+	pub id: Option<String>,
     _phantom_msg: PhantomData<MSG>,
 }
 
@@ -30,6 +31,7 @@ impl<MSG> Image<MSG> {
             width: None,
             height: None,
             cells: vec![],
+			id: None,
             _phantom_msg: PhantomData,
         };
         image.create_cells();
@@ -127,6 +129,13 @@ where
             self.create_cells();
         }
     }
+	fn set_id(&mut self, id: &str){
+		self.id = Some(id.to_string());
+	}
+
+	fn get_id(&self) -> &Option<String> {
+		&self.id
+	}
 }
 
 impl<MSG> fmt::Debug for Image<MSG> {

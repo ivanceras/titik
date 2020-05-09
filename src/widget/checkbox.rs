@@ -11,6 +11,7 @@ use stretch::{
 pub struct Checkbox {
     pub label: String,
     pub is_checked: bool,
+	pub id: Option<String>,
 }
 
 impl Checkbox {
@@ -81,4 +82,11 @@ impl<MSG> Widget<MSG> for Checkbox {
             _ => vec![],
         }
     }
+	fn set_id(&mut self, id: &str){
+		self.id = Some(id.to_string());
+	}
+
+	fn get_id(&self) -> &Option<String> {
+		&self.id
+	}
 }

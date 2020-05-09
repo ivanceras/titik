@@ -13,6 +13,7 @@ pub struct FlexBox<MSG> {
     pub height: Option<f32>,
     pub flex_direction: FlexDirection,
     pub scroll_top: f32,
+	pub id: Option<String>,
 }
 
 impl<MSG> FlexBox<MSG> {
@@ -23,6 +24,7 @@ impl<MSG> FlexBox<MSG> {
             children: vec![],
             flex_direction: FlexDirection::Row,
             scroll_top: 0.0,
+			id: None,
         }
     }
 
@@ -154,6 +156,13 @@ where
         self.width = width;
         self.height = height;
     }
+	fn set_id(&mut self, id: &str){
+		self.id = Some(id.to_string());
+	}
+
+	fn get_id(&self) -> &Option<String> {
+		&self.id
+	}
 }
 
 #[cfg(test)]

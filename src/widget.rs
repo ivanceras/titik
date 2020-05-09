@@ -78,6 +78,10 @@ where
     fn process_event(&mut self, _event: Event, _layout: &Layout) -> Vec<MSG> {
         vec![]
     }
+
+	fn set_id(&mut self, id: &str);
+
+	fn get_id(&self) -> &Option<String>;
 }
 
 #[cfg(test)]

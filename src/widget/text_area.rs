@@ -21,6 +21,7 @@ pub struct TextArea<MSG> {
     pub height: Option<f32>,
     pub scroll_top: f32,
     pub scroll_left: f32,
+	pub id: Option<String>,
     _phantom_msg: PhantomData<MSG>,
 }
 
@@ -37,6 +38,7 @@ impl<MSG> TextArea<MSG> {
             focused: false,
             scroll_top: 0.0,
             scroll_left: 0.0,
+			id: None,
             _phantom_msg: PhantomData,
         }
     }
@@ -395,4 +397,11 @@ where
             _ => vec![],
         }
     }
+	fn set_id(&mut self, id: &str){
+		self.id = Some(id.to_string());
+	}
+
+	fn get_id(&self) -> &Option<String> {
+		&self.id
+	}
 }
