@@ -5,6 +5,7 @@ use stretch::{
     number::Number,
     result::Layout,
 };
+use crate::find_node::find_widget;
 
 /// Contains the layout information of all the controls in the tree
 /// This is needed for optimization purposes since recomputing layout is an expensive operation,
@@ -51,20 +52,6 @@ impl LayoutTree {
 // area and position of the layout also determines
 // if the element is hit with a click
 
-/// Get the widget with the node_idx by traversing to through the root_widget specified
-pub fn find_widget<MSG>(
-    root_widget: &dyn Widget<MSG>,
-    node_idx: usize,
-) -> Option<&dyn Widget<MSG>> {
-    find_node(root_widget, node_idx, &mut 0)
-}
-
-pub fn find_widget_mut<MSG>(
-    root_widget: &mut dyn Widget<MSG>,
-    node_idx: usize,
-) -> Option<&mut dyn Widget<MSG>> {
-    find_node_mut(root_widget, node_idx, &mut 0)
-}
 
 /// return the widget that is hit at this location
 /// base on the layout tree
@@ -89,40 +76,6 @@ pub fn widget_node_idx_at<'a>(
     layout_tree.hit(x, y).pop()
 }
 
-/// Traverse the node tree until the node_idx is found
-fn find_node<'a, MSG>(
-    node: &'a dyn Widget<MSG>,
-    node_idx: usize,
-    cur_index: &mut usize,
-) -> Option<&'a dyn Widget<MSG>> {
-    if let Some(children) = node.children() {
-        children.iter().find_map(|child| {
-            *cur_index += 1;
-            find_node(child.as_ref(), node_idx, cur_index)
-        })
-    } else if node_idx == *cur_index {
-        return Some(node);
-    } else {
-        None
-    }
-}
-
-fn find_node_mut<'a, MSG>(
-    node: &'a mut dyn Widget<MSG>,
-    node_idx: usize,
-    cur_index: &mut usize,
-) -> Option<&'a mut dyn Widget<MSG>> {
-    if node_idx == *cur_index {
-        return Some(node);
-    } else if let Some(children) = node.children_mut() {
-        children.iter_mut().find_map(|child| {
-            *cur_index += 1;
-            find_node_mut(child.as_mut(), node_idx, cur_index)
-        })
-    } else {
-        None
-    }
-}
 
 pub fn find_layout<'a>(
     node: &'a LayoutTree,

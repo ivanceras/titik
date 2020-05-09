@@ -90,6 +90,7 @@ mod tests {
     use crate::*;
     use std::boxed;
     use stretch::geometry::*;
+	use stretch::number::Number;
 
     #[test]
     fn layout() {
