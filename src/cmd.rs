@@ -8,7 +8,7 @@ pub enum Cmd {
 }
 
 impl Cmd {
-    pub fn execute<W: Write>(&self, w: &mut W) -> crossterm::Result<()> {
+    pub fn execute(&self, w: &mut dyn Write) -> crossterm::Result<()> {
         match self {
             Cmd::MoveTo(x, y) => {
                 crossterm::queue!(w, cursor::MoveTo(*x as u16, *y as u16))

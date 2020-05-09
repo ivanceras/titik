@@ -124,7 +124,7 @@ impl Buffer {
         patches
     }
 
-    pub fn render<W: Write>(&self, w: &mut W) -> crossterm::Result<()> {
+    pub fn render(&self, w: &mut dyn Write) -> crossterm::Result<()> {
         crossterm::queue!(w, cursor::Hide)?;
         for (j, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {

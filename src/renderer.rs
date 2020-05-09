@@ -17,22 +17,16 @@ pub trait Dispatch<MSG> {
     fn dispatch(&self, msg: MSG);
 }
 
-pub struct Renderer<'a, W, MSG> {
+pub struct Renderer<MSG> {
     terminal_size: (u16, u16),
     layout_tree: LayoutTree,
     root_node: Box<dyn Widget<MSG>>,
     focused_widget_idx: Option<usize>,
-    write: W,
-    program: Option<&'a dyn Dispatch<MSG>>,
 }
 
-impl<'a, W, MSG> Renderer<'a, W, MSG>
-where
-    W: Write,
+impl<MSG> Renderer<MSG>
 {
     pub fn new(
-        write: W,
-        program: Option<&'a dyn Dispatch<MSG>>,
         mut root_node: Box<dyn Widget<MSG>>,
     ) -> Self {
         let (width, height) =
@@ -51,10 +45,12 @@ where
             root_node,
             focused_widget_idx: None,
             layout_tree,
-            write,
-            program,
         }
     }
+
+	pub fn set_root_node(&mut self, root_node: Box< dyn Widget<MSG>>) {
+		self.root_node = root_node;
+	}
 
     fn recompute_layout(&mut self, width: u16, height: u16) {
         self.root_node
@@ -69,19 +65,19 @@ where
         self.terminal_size = (width, height);
     }
 
-    pub fn run(&mut self) -> Result<()> {
-        command::init(&mut self.write)?;
-        command::reset_top(&mut self.write)?;
+    pub fn run(&mut self, write: &mut dyn Write, program: Option<&dyn Dispatch<MSG>>) -> Result<()> {
+        command::init(write)?;
+        command::reset_top(write)?;
         loop {
             let (width, height) = self.terminal_size;
             let mut buf = Buffer::new(width as usize, height as usize);
             buf.reset();
             let cmds = self.root_node.draw(&mut buf, &self.layout_tree);
-            buf.render(&mut self.write)?;
+            buf.render(write)?;
             cmds.iter().for_each(|cmd| {
-                cmd.execute(&mut self.write).expect("must execute")
+                cmd.execute(write).expect("must execute")
             });
-            self.write.flush()?;
+            write.flush()?;
 
             if let Ok(event) = event::read() {
                 match event {
@@ -155,7 +151,7 @@ where
                     if let Some(hit_widget) = &mut hit_widget {
                         let msgs = hit_widget
                             .process_event(event, &focused_layout.layout);
-                        if let Some(program) = self.program {
+                        if let Some(program) = program {
                             for msg in msgs {
                                 program.dispatch(msg);
                             }
@@ -164,7 +160,7 @@ where
                 }
             }
         }
-        command::finalize(&mut self.write)?;
+        command::finalize(write)?;
         Ok(())
     }
 }

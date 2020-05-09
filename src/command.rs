@@ -6,11 +6,11 @@ use crossterm::{
 };
 use std::io::Write;
 
-pub fn move_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
+pub fn move_to(w: &mut dyn Write) -> crossterm::Result<()> {
     crossterm::execute!(w, cursor::Hide, cursor::MoveTo(1, 1))
 }
 
-pub fn reset_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
+pub fn reset_top(w: &mut dyn Write) -> crossterm::Result<()> {
     crossterm::queue!(
         w,
         style::ResetColor,
@@ -20,12 +20,12 @@ pub fn reset_top<W: Write>(w: &mut W) -> crossterm::Result<()> {
     )
 }
 
-pub fn init<W: Write>(w: &mut W) -> crossterm::Result<()> {
+pub fn init(w: &mut dyn Write) -> crossterm::Result<()> {
     crossterm::execute!(w, terminal::EnterAlternateScreen, EnableMouseCapture)?;
     terminal::enable_raw_mode()
 }
 
-pub fn finalize<W: Write>(w: &mut W) -> crossterm::Result<()> {
+pub fn finalize(w: &mut dyn Write) -> crossterm::Result<()> {
     crossterm::execute!(
         w,
         style::ResetColor,

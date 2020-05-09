@@ -202,7 +202,9 @@ where
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Points(self.content_height())
+                    //Dimension::Points(self.content_height())
+                    //Dimension::Percent(1.0)
+                    Dimension::Auto
                 },
             },
             ..Default::default()
@@ -369,23 +371,23 @@ where
             Event::Mouse(MouseEvent::ScrollUp(_x, _y, modifier)) => {
                 if modifier.contains(KeyModifiers::SHIFT) {
                     if self.scroll_left > 0.0 {
-                        self.scroll_left -= 1.0;
+                        self.scroll_left -= 4.0;
                     }
                 } else {
                     if self.scroll_top > 0.0 {
-                        self.scroll_top -= 1.0;
+                        self.scroll_top -= 4.0;
                     }
                 }
                 vec![]
             }
             Event::Mouse(MouseEvent::ScrollDown(_x, _y, modifier)) => {
                 if modifier.contains(KeyModifiers::SHIFT) {
-                    self.scroll_left += 1.0;
+                    self.scroll_left += 4.0;
                 } else {
                     if self.content_height() - self.scroll_top
                         > self.inner_height(&layout)
                     {
-                        self.scroll_top += 1.0;
+                        self.scroll_top += 4.0;
                     }
                 }
                 vec![]
