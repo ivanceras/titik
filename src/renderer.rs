@@ -20,7 +20,7 @@ pub trait Dispatch<MSG> {
 pub struct Renderer<MSG> {
     terminal_size: (u16, u16),
     layout_tree: LayoutTree,
-    root_node: Box<dyn Widget<MSG>>,
+    pub root_node: Box<dyn Widget<MSG>>,
     focused_widget_idx: Option<usize>,
 }
 

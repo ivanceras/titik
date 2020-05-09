@@ -11,7 +11,7 @@ pub use layout::{
     compute_layout, find_layout,
     set_focused_node, widget_hit_at, widget_node_idx_at, LayoutTree,
 };
-pub use find_node::{find_widget, find_widget_mut};
+pub use find_node::{find_widget, find_widget_mut, find_widget_by_id};
 pub use renderer::{Dispatch, Renderer};
 pub use sauron_vdom::Callback;
 pub use stretch;

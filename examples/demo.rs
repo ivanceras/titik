@@ -19,11 +19,10 @@ use titik::{
     widget_node_idx_at, Buffer, Button, Callback, Checkbox, Cmd, FlexBox,
     Image, InputBuffer, LayoutTree, Radio, SvgImage, TextArea, TextInput,
     Widget,
+	find_widget_by_id,
 };
 
-fn build_ui<MSG>() -> Box<dyn Widget<MSG>>
-where
-    MSG: fmt::Debug + 'static,
+fn build_ui() -> Box<dyn Widget<()>>
 {
     let mut root_node = FlexBox::new();
     root_node.set_scroll_top(0.0);
@@ -35,7 +34,7 @@ where
     let input2 =
         TextInput::new("The quick brown fox jumps over the lazy dog...");
 
-    let mut text_area1: TextArea<MSG> = TextArea::new(
+    let mut text_area1: TextArea<()> = TextArea::new(
         "This is a text area\
             \n1. With a line that is a bit long.. but not very long....\
             \n2. and another line\
@@ -61,18 +60,18 @@ where
     text_area1.set_size(Some(40.0), Some(7.0));
 
     let rb2 = Radio::new("Radio2");
-    let mut btn2: Button<MSG> = Button::new("Button2");
+    let mut btn2: Button<()> = Button::new("Button2");
     btn2.set_rounded(true);
     btn2.set_id("btn2");
-    let mut img: Image<MSG> =
+    let mut img: Image<()> =
         Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(60.0), Some(20.0));
 
-    let svg: SvgImage<MSG> =
+    let svg: SvgImage<()> =
         SvgImage::new(include_str!("/home/lee/Desktop/bob.svg").to_string());
     root_node.vertical();
 
-    let btn1: Button<MSG> = Button::new("Button 1");
+    let mut btn1: Button<()> = Button::new("Button 1");
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
     let mut row = FlexBox::new();
@@ -95,5 +94,17 @@ fn main() -> Result<()> {
     let mut stdout = io::stderr();
     let mut root_node: Box<dyn Widget<()>> = build_ui();
     let mut renderer = Renderer::new(root_node);
+
+	/*
+	let btn1 = find_widget_by_id(&*renderer.root_node, "btn1")
+		.expect("must return a widget")
+		.as_any()
+		.downcast_ref::<Button<()>>()
+		.expect("must be button");
+
+	btn1.add_click_listener(move|_|{
+		let btn2 = find_widget_by_id(&*renderer.root_node, "btn2");
+	});
+	*/
     renderer.run(&mut stdout, None)
 }
