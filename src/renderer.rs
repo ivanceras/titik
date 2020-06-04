@@ -12,6 +12,7 @@ pub use crossterm::{
 };
 use std::io::Write;
 use stretch::{geometry::Size, number::Number};
+use std::marker::PhantomData;
 
 pub trait Dispatch<MSG> {
     fn dispatch(&self, msg: MSG);
@@ -19,61 +20,49 @@ pub trait Dispatch<MSG> {
 
 pub struct Renderer<MSG> {
     terminal_size: (u16, u16),
-    layout_tree: LayoutTree,
-    pub root_node: Box<dyn Widget<MSG>>,
     focused_widget_idx: Option<usize>,
+	_phantom_msg: PhantomData<MSG>,
 }
 
 impl<MSG> Renderer<MSG> {
-    pub fn new(mut root_node: Box<dyn Widget<MSG>>) -> Self {
+    pub fn new() -> Self {
         let (width, height) =
             terminal::size().expect("must get the terminal size");
-        root_node.set_size(Some((width) as f32), Some(height as f32));
-        let layout_tree = compute_layout(
-            root_node.as_mut(),
-            Size {
-                width: Number::Defined(width as f32),
-                height: Number::Defined(height as f32),
-            },
-        );
-
         Renderer {
             terminal_size: (width, height),
-            root_node,
             focused_widget_idx: None,
-            layout_tree,
+			_phantom_msg: PhantomData,
         }
     }
 
-    pub fn set_root_node(&mut self, root_node: Box<dyn Widget<MSG>>) {
-        self.root_node = root_node;
-    }
-
-    fn recompute_layout(&mut self, width: u16, height: u16) {
-        self.root_node
+    fn recompute_layout(&mut self, root_node: &mut dyn Widget<MSG>, width: u16, height: u16)->LayoutTree {
+        root_node
             .set_size(Some((width) as f32), Some(height as f32));
-        self.layout_tree = compute_layout(
-            self.root_node.as_mut(),
+        self.terminal_size = (width, height);
+        compute_layout(
+            root_node,
             Size {
                 width: Number::Defined(width as f32),
                 height: Number::Defined(height as f32),
             },
-        );
-        self.terminal_size = (width, height);
+        )
     }
 
     pub fn run(
         &mut self,
         write: &mut dyn Write,
         program: Option<&dyn Dispatch<MSG>>,
+		root_node: &mut dyn Widget<MSG>,
     ) -> Result<()> {
         command::init(write)?;
         command::reset_top(write)?;
+		let (w,h) = self.terminal_size;
+		let layout_tree = self.recompute_layout(root_node, w, h);
         loop {
             let (width, height) = self.terminal_size;
             let mut buf = Buffer::new(width as usize, height as usize);
             buf.reset();
-            let cmds = self.root_node.draw(&mut buf, &self.layout_tree);
+            let cmds = root_node.draw(&mut buf, &layout_tree);
             buf.render(write)?;
             cmds.iter()
                 .for_each(|cmd| cmd.execute(write).expect("must execute"));
@@ -104,11 +93,11 @@ impl<MSG> Renderer<MSG> {
                                 let active_widget: Option<
                                     &mut dyn Widget<MSG>,
                                 > = find_widget_mut(
-                                    self.root_node.as_mut(),
+                                    root_node,
                                     *idx,
                                 );
                                 let focused_layout =
-                                    find_layout(&self.layout_tree, *idx)
+                                    find_layout(&layout_tree, *idx)
                                         .expect("must have a layout tree");
                                 if let Some(focused_widget) = active_widget {
                                     focused_widget.process_event(
@@ -122,17 +111,17 @@ impl<MSG> Renderer<MSG> {
                     // mouse clicks sets the focused the widget underneath
                     Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
                         self.focused_widget_idx = widget_node_idx_at(
-                            &self.layout_tree,
+                            &layout_tree,
                             x as f32,
                             y as f32,
                         );
 
                         if let Some(idx) = self.focused_widget_idx.as_ref() {
-                            set_focused_node(self.root_node.as_mut(), *idx);
+                            set_focused_node(root_node, *idx);
                         }
                     }
                     Event::Resize(w, h) => {
-                        self.recompute_layout(w, h);
+                        self.recompute_layout(root_node, w, h);
                     }
                     _ => (),
                 }
@@ -140,12 +129,12 @@ impl<MSG> Renderer<MSG> {
                 // sent the widget underneath the location, regardless
                 // if it focused or not.
                 if let Some((x, y)) = extract_location(&event) {
-                    let mut hits = self.layout_tree.hit(x as f32, y as f32);
+                    let mut hits = layout_tree.hit(x as f32, y as f32);
                     let hit = hits.pop().expect("process only 1 for now");
                     let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                        find_widget_mut(self.root_node.as_mut(), hit);
+                        find_widget_mut(root_node, hit);
 
-                    let focused_layout = find_layout(&self.layout_tree, hit)
+                    let focused_layout = find_layout(&layout_tree, hit)
                         .expect("must have a layout tree");
 
                     if let Some(hit_widget) = &mut hit_widget {

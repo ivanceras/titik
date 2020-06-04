@@ -72,6 +72,28 @@ pub fn find_widget_by_id<'a, MSG>(root_widget: &'a dyn Widget<MSG>, id: &str) ->
 	}
 }
 
+pub fn find_widget_by_id_mut<'a, MSG>(root_widget: &'a mut dyn Widget<MSG>, id: &str) -> Option<&'a mut dyn Widget<MSG>>{
+	let matched_root = if let Some(node_id) = root_widget.get_id(){
+		if node_id == id{
+			true
+		}else{
+			false
+		}
+	}else{
+		false
+	};
+	if matched_root{
+		return Some(root_widget);
+	}
+	else if let Some(children) = root_widget.children_mut(){
+        children.iter_mut().find_map(|child| {
+            find_widget_by_id_mut(child.as_mut(), id)
+        })
+	}else{
+		None
+	}
+}
+
 
 #[cfg(test)]
 mod test {

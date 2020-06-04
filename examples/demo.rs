@@ -14,16 +14,14 @@ use std::{
 };
 
 use titik::{
-    command, compute_layout, find_layout, find_widget, find_widget_mut,
-    renderer, renderer::Renderer, set_focused_node, widget_hit_at,
-    widget_node_idx_at, Buffer, Button, Callback, Checkbox, Cmd, FlexBox,
-    Image, InputBuffer, LayoutTree, Radio, SvgImage, TextArea, TextInput,
-    Widget,
-	find_widget_by_id,
+    command, compute_layout, find_layout, find_widget, find_widget_by_id,
+    find_widget_by_id_mut, find_widget_mut, renderer, renderer::Renderer,
+    set_focused_node, widget_hit_at, widget_node_idx_at, Buffer, Button,
+    Callback, Checkbox, Cmd, FlexBox, Image, InputBuffer, LayoutTree, Radio,
+    SvgImage, TextArea, TextInput, Widget,
 };
 
-fn build_ui() -> Box<dyn Widget<()>>
-{
+fn build_ui() -> Box<dyn Widget<()>> {
     let mut root_node = FlexBox::new();
     root_node.set_scroll_top(0.0);
     let cb1 = Checkbox::new("Checkbox1");
@@ -67,11 +65,12 @@ fn build_ui() -> Box<dyn Widget<()>>
         Image::new(include_bytes!("../horse.jpg").to_vec());
     img.set_size(Some(60.0), Some(20.0));
 
-    let svg: SvgImage<()> =
-        SvgImage::new(include_str!("/home/lee/Desktop/bob.svg").to_string());
+    let svg: SvgImage<()> = SvgImage::new(include_str!("bob.svg").to_string());
     root_node.vertical();
 
     let mut btn1: Button<()> = Button::new("Button 1");
+    btn1.set_id("btn1");
+
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
     let mut row = FlexBox::new();
@@ -92,19 +91,7 @@ fn build_ui() -> Box<dyn Widget<()>>
 
 fn main() -> Result<()> {
     let mut stdout = io::stderr();
-    let mut root_node: Box<dyn Widget<()>> = build_ui();
-    let mut renderer = Renderer::new(root_node);
-
-	/*
-	let btn1 = find_widget_by_id(&*renderer.root_node, "btn1")
-		.expect("must return a widget")
-		.as_any()
-		.downcast_ref::<Button<()>>()
-		.expect("must be button");
-
-	btn1.add_click_listener(move|_|{
-		let btn2 = find_widget_by_id(&*renderer.root_node, "btn2");
-	});
-	*/
-    renderer.run(&mut stdout, None)
+    let mut root_node = build_ui();
+    let mut renderer = Renderer::new();
+    renderer.run(&mut stdout, None, root_node.as_mut())
 }
