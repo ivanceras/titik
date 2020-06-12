@@ -22,6 +22,7 @@ use titik::{
 };
 
 fn build_ui() -> Box<dyn Widget<()>> {
+    println!("building the ui");
     let mut root_node = FlexBox::new();
     root_node.set_scroll_top(0.0);
     let cb1 = Checkbox::new("Checkbox1");
@@ -70,6 +71,9 @@ fn build_ui() -> Box<dyn Widget<()>> {
 
     let mut btn1: Button<()> = Button::new("Button 1");
     btn1.set_id("btn1");
+    btn1.add_click_listener(|_| {
+        eprintln!("this button is clicked..");
+    });
 
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
@@ -90,7 +94,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
 }
 
 fn main() -> Result<()> {
-    let mut stdout = io::stderr();
+    let mut stdout = io::stdout();
     let mut root_node = build_ui();
     let mut renderer = Renderer::new();
     renderer.run(&mut stdout, None, root_node.as_mut())

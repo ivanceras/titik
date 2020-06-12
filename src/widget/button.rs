@@ -177,6 +177,7 @@ where
     fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(..)) => {
+                eprintln!("mouse is clicked");
                 self.on_click.iter().map(|cb| cb.emit(event)).collect()
             }
             _ => vec![],
