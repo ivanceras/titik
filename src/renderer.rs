@@ -17,12 +17,12 @@ use std::rc::Rc;
 use stretch::{geometry::Size, number::Number};
 
 pub trait Dispatch<MSG> {
-    fn dispatch(&self, msg: MSG) -> Box<Widget<MSG>>;
+    fn dispatch(&self, msg: MSG, root_node: &mut Box<dyn Widget<MSG>>);
 }
 
 pub fn render<MSG>(
     write: &mut dyn Write,
-    program: &dyn Dispatch<MSG>,
+    program: Option<&dyn Dispatch<MSG>>,
     root_node: Rc<RefCell<Box<Widget<MSG>>>>,
 ) -> Result<()> {
     let mut focused_widget_idx: Option<usize> = None;
@@ -76,10 +76,16 @@ pub fn render<MSG>(
                                 find_layout(&layout_tree, *idx)
                                     .expect("must have a layout tree");
                             if let Some(focused_widget) = active_widget {
-                                focused_widget.process_event(
+                                let msgs = focused_widget.process_event(
                                     event,
                                     &focused_layout.layout,
                                 );
+                                if let Some(program) = program {
+                                    for msg in msgs {
+                                        eprintln!("dispatching msg");
+                                        program.dispatch(msg, &mut *root_node);
+                                    }
+                                }
                             }
                         }
                     }
@@ -110,10 +116,9 @@ pub fn render<MSG>(
             if let Some((x, y)) = extract_location(&event) {
                 let mut hits = layout_tree.hit(x as f32, y as f32);
                 let hit = hits.pop().expect("process only 1 for now");
-                let mut root_node_bmut = root_node.borrow_mut();
-                let mut root_node_asmut = root_node_bmut.as_mut();
+                let mut root_node = root_node.borrow_mut();
                 let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                    { find_widget_mut(root_node_asmut, hit) };
+                    { find_widget_mut(root_node.as_mut(), hit) };
 
                 let focused_layout = find_layout(&layout_tree, hit)
                     .expect("must have a layout tree");
@@ -121,8 +126,11 @@ pub fn render<MSG>(
                 if let Some(hit_widget) = &mut hit_widget {
                     let msgs =
                         hit_widget.process_event(event, &focused_layout.layout);
-                    for msg in msgs {
-                        *root_node_bmut = program.dispatch(msg);
+                    if let Some(program) = program {
+                        for msg in msgs {
+                            eprintln!("dispatching msg");
+                            program.dispatch(msg, &mut *root_node);
+                        }
                     }
                 }
             }

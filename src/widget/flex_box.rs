@@ -59,24 +59,24 @@ where
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
             },
             max_size: Size {
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
             },
             padding: Rect {

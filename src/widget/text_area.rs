@@ -4,6 +4,7 @@ use crate::{
     AreaBuffer, Cmd, LayoutTree, Widget,
 };
 use crossterm::event::{Event, KeyEvent, KeyModifiers, MouseEvent};
+use sauron_vdom::Callback;
 use std::{any::Any, fmt, marker::PhantomData};
 use stretch::{
     geometry::Size,
@@ -22,6 +23,7 @@ pub struct TextArea<MSG> {
     pub scroll_top: f32,
     pub scroll_left: f32,
     pub id: Option<String>,
+    pub on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
     _phantom_msg: PhantomData<MSG>,
 }
 
@@ -39,8 +41,13 @@ impl<MSG> TextArea<MSG> {
             scroll_top: 0.0,
             scroll_left: 0.0,
             id: None,
+            on_input: vec![],
             _phantom_msg: PhantomData,
         }
+    }
+
+    pub fn get_content(&self) -> String {
+        self.area_buffer.to_string()
     }
 
     pub fn process_key(&mut self, key_event: KeyEvent) {
@@ -204,9 +211,7 @@ where
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    //Dimension::Points(self.content_height())
-                    //Dimension::Percent(1.0)
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
             },
             ..Default::default()
@@ -340,8 +345,16 @@ where
         eprintln!("textare events..");
         match event {
             Event::Key(ke) => {
+                eprintln!("textare input events..");
                 self.process_key(ke);
-                vec![]
+                let event: sauron_vdom::Event =
+                    sauron_vdom::event::InputEvent::new(self.get_content())
+                        .into();
+                eprintln!("new content: {}", self.get_content());
+                self.on_input
+                    .iter()
+                    .map(|cb| cb.emit(event.clone()))
+                    .collect()
             }
             Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
                 let mut x = x as f32 - layout.location.x.round();
