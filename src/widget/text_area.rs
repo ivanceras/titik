@@ -337,6 +337,7 @@ where
     }
 
     fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
+        eprintln!("textare events..");
         match event {
             Event::Key(ke) => {
                 self.process_key(ke);

@@ -10,148 +10,126 @@ pub use crossterm::{
     terminal::{self, ClearType},
     Command, Result,
 };
+use std::cell::RefCell;
 use std::io::Write;
-use stretch::{geometry::Size, number::Number};
 use std::marker::PhantomData;
+use std::rc::Rc;
+use stretch::{geometry::Size, number::Number};
 
 pub trait Dispatch<MSG> {
-    fn dispatch(&self, msg: MSG);
+    fn dispatch(&self, msg: MSG) -> Box<Widget<MSG>>;
 }
 
-pub struct Renderer<MSG> {
-    terminal_size: (u16, u16),
-    focused_widget_idx: Option<usize>,
-	_phantom_msg: PhantomData<MSG>,
-}
+pub fn render<MSG>(
+    write: &mut dyn Write,
+    program: &dyn Dispatch<MSG>,
+    root_node: Rc<RefCell<Box<Widget<MSG>>>>,
+) -> Result<()> {
+    let mut focused_widget_idx: Option<usize> = None;
+    command::init(write)?;
+    command::reset_top(write)?;
+    let (width, height) = terminal::size().expect("must get the terminal size");
+    (*root_node.borrow_mut())
+        .set_size(Some((width) as f32), Some(height as f32));
+    let layout_tree = compute_layout(
+        root_node.borrow_mut().as_mut(),
+        Size {
+            width: Number::Defined(width as f32),
+            height: Number::Defined(height as f32),
+        },
+    );
 
-impl<MSG> Renderer<MSG> {
-    pub fn new() -> Self {
-        let (width, height) =
-            terminal::size().expect("must get the terminal size");
-        Renderer {
-            terminal_size: (width, height),
-            focused_widget_idx: None,
-			_phantom_msg: PhantomData,
-        }
-    }
+    loop {
+        let mut buf = Buffer::new(width as usize, height as usize);
+        buf.reset();
+        let cmds = root_node.borrow_mut().as_mut().draw(&mut buf, &layout_tree);
+        buf.render(write)?;
+        cmds.iter()
+            .for_each(|cmd| cmd.execute(write).expect("must execute"));
+        write.flush()?;
 
-    fn recompute_layout(&mut self, root_node: &mut dyn Widget<MSG>, width: u16, height: u16)->LayoutTree {
-        root_node
-            .set_size(Some((width) as f32), Some(height as f32));
-        self.terminal_size = (width, height);
-        compute_layout(
-            root_node,
-            Size {
-                width: Number::Defined(width as f32),
-                height: Number::Defined(height as f32),
-            },
-        )
-    }
-
-    pub fn run(
-        &mut self,
-        write: &mut dyn Write,
-        program: Option<&dyn Dispatch<MSG>>,
-		root_node: &mut dyn Widget<MSG>,
-    ) -> Result<()> {
-        command::init(write)?;
-        command::reset_top(write)?;
-		let (w,h) = self.terminal_size;
-		let layout_tree = self.recompute_layout(root_node, w, h);
-        loop {
-            let (width, height) = self.terminal_size;
-            let mut buf = Buffer::new(width as usize, height as usize);
-            buf.reset();
-            let cmds = root_node.draw(&mut buf, &layout_tree);
-            buf.render(write)?;
-            cmds.iter()
-                .for_each(|cmd| cmd.execute(write).expect("must execute"));
-            write.flush()?;
-
-            if let Ok(event) = event::read() {
-                match event {
-                    Event::Key(key_event) => {
-                        // To quite, press any of the following:
-                        //  - CTRL-c
-                        //  - CTRL-q
-                        //  - CTRL-d
-                        //  - CTRL-z
-                        if key_event.modifiers.contains(KeyModifiers::CONTROL) {
-                            match key_event.code {
-                                KeyCode::Char(c) => match c {
-                                    'c' | 'q' | 'd' | 'z' => {
-                                        break;
-                                    }
-                                    _ => (),
-                                },
-                                _ => (),
-                            }
-                        } else {
-                            // send the keypresses to the focused widget
-                            if let Some(idx) = self.focused_widget_idx.as_ref()
-                            {
-                                let active_widget: Option<
-                                    &mut dyn Widget<MSG>,
-                                > = find_widget_mut(
-                                    root_node,
-                                    *idx,
-                                );
-                                let focused_layout =
-                                    find_layout(&layout_tree, *idx)
-                                        .expect("must have a layout tree");
-                                if let Some(focused_widget) = active_widget {
-                                    focused_widget.process_event(
-                                        event,
-                                        &focused_layout.layout,
-                                    );
+        if let Ok(event) = event::read() {
+            match event {
+                Event::Key(key_event) => {
+                    // To quite, press any of the following:
+                    //  - CTRL-c
+                    //  - CTRL-q
+                    //  - CTRL-d
+                    //  - CTRL-z
+                    if key_event.modifiers.contains(KeyModifiers::CONTROL) {
+                        match key_event.code {
+                            KeyCode::Char(c) => match c {
+                                'c' | 'q' | 'd' | 'z' => {
+                                    break;
                                 }
+                                _ => (),
+                            },
+                            _ => (),
+                        }
+                    } else {
+                        // send the keypresses to the focused widget
+                        if let Some(idx) = focused_widget_idx.as_ref() {
+                            let mut root_node = root_node.borrow_mut();
+                            let active_widget: Option<&mut dyn Widget<MSG>> =
+                                find_widget_mut(root_node.as_mut(), *idx);
+                            let focused_layout =
+                                find_layout(&layout_tree, *idx)
+                                    .expect("must have a layout tree");
+                            if let Some(focused_widget) = active_widget {
+                                focused_widget.process_event(
+                                    event,
+                                    &focused_layout.layout,
+                                );
                             }
                         }
                     }
-                    // mouse clicks sets the focused the widget underneath
-                    Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                        self.focused_widget_idx = widget_node_idx_at(
-                            &layout_tree,
-                            x as f32,
-                            y as f32,
-                        );
-
-                        if let Some(idx) = self.focused_widget_idx.as_ref() {
-                            set_focused_node(root_node, *idx);
-                        }
-                    }
-                    Event::Resize(w, h) => {
-                        self.recompute_layout(root_node, w, h);
-                    }
-                    _ => (),
                 }
-                // any other activities, such as mouse scroll is
-                // sent the widget underneath the location, regardless
-                // if it focused or not.
-                if let Some((x, y)) = extract_location(&event) {
-                    let mut hits = layout_tree.hit(x as f32, y as f32);
-                    let hit = hits.pop().expect("process only 1 for now");
-                    let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                        find_widget_mut(root_node, hit);
+                // mouse clicks sets the focused the widget underneath
+                Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
+                    focused_widget_idx =
+                        widget_node_idx_at(&layout_tree, x as f32, y as f32);
 
-                    let focused_layout = find_layout(&layout_tree, hit)
-                        .expect("must have a layout tree");
+                    if let Some(idx) = focused_widget_idx.as_ref() {
+                        set_focused_node(root_node.borrow_mut().as_mut(), *idx);
+                    }
+                }
+                Event::Resize(width, height) => {
+                    compute_layout(
+                        root_node.borrow_mut().as_mut(),
+                        Size {
+                            width: Number::Defined(width as f32),
+                            height: Number::Defined(height as f32),
+                        },
+                    );
+                }
+                _ => (),
+            }
+            // any other activities, such as mouse scroll is
+            // sent the widget underneath the location, regardless
+            // if it focused or not.
+            if let Some((x, y)) = extract_location(&event) {
+                let mut hits = layout_tree.hit(x as f32, y as f32);
+                let hit = hits.pop().expect("process only 1 for now");
+                let mut root_node_bmut = root_node.borrow_mut();
+                let mut root_node_asmut = root_node_bmut.as_mut();
+                let mut hit_widget: Option<&mut dyn Widget<MSG>> =
+                    { find_widget_mut(root_node_asmut, hit) };
 
-                    if let Some(hit_widget) = &mut hit_widget {
-                        let msgs = hit_widget
-                            .process_event(event, &focused_layout.layout);
-                        if let Some(program) = program {
-                            for msg in msgs {
-                                program.dispatch(msg);
-                            }
-                        }
+                let focused_layout = find_layout(&layout_tree, hit)
+                    .expect("must have a layout tree");
+
+                if let Some(hit_widget) = &mut hit_widget {
+                    let msgs =
+                        hit_widget.process_event(event, &focused_layout.layout);
+                    for msg in msgs {
+                        *root_node_bmut = program.dispatch(msg);
                     }
                 }
             }
         }
-        command::finalize(write)?;
-        Ok(())
     }
+    command::finalize(write)?;
+    Ok(())
 }
 
 /// extract the x and y location of a mouse event

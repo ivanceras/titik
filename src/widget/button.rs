@@ -175,6 +175,7 @@ where
     }
 
     fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
+        eprintln!("button events..");
         match event {
             Event::Mouse(MouseEvent::Down(..)) => {
                 eprintln!("mouse is clicked");
