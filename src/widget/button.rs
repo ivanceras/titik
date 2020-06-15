@@ -22,7 +22,7 @@ where
     pub width: Option<f32>,
     pub height: Option<f32>,
     focused: bool,
-    pub on_click: Vec<Callback<Event, MSG>>,
+    pub on_click: Vec<Callback<sauron_vdom::Event, MSG>>,
     pub id: Option<String>,
 }
 
@@ -62,13 +62,6 @@ where
             is_rounded: true,
             ..Default::default()
         }
-    }
-
-    pub fn add_click_listener<F>(&mut self, func: F)
-    where
-        F: Fn(Event) -> MSG + 'static,
-    {
-        self.on_click.push(Callback::from(func));
     }
 
     pub fn set_label<S: ToString>(&mut self, label: S) {
@@ -177,9 +170,15 @@ where
     fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
         eprintln!("button events..");
         match event {
-            Event::Mouse(MouseEvent::Down(..)) => {
+            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
                 eprintln!("mouse is clicked");
-                self.on_click.iter().map(|cb| cb.emit(event)).collect()
+                let s_event: sauron_vdom::Event =
+                    sauron_vdom::event::MouseEvent::click(x as i32, y as i32)
+                        .into();
+                self.on_click
+                    .iter()
+                    .map(|cb| cb.emit(s_event.clone()))
+                    .collect()
             }
             _ => vec![],
         }

@@ -347,13 +347,13 @@ where
             Event::Key(ke) => {
                 eprintln!("textare input events..");
                 self.process_key(ke);
-                let event: sauron_vdom::Event =
+                let s_event: sauron_vdom::Event =
                     sauron_vdom::event::InputEvent::new(self.get_content())
                         .into();
                 eprintln!("new content: {}", self.get_content());
                 self.on_input
                     .iter()
-                    .map(|cb| cb.emit(event.clone()))
+                    .map(|cb| cb.emit(s_event.clone()))
                     .collect()
             }
             Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
