@@ -15,5 +15,10 @@
 - [ ] space
 - [x] text
 - [X] text_input (textbox)
+- [ ] text_area
+    - [ ] scrollbar dynamic to the relative content size
+    - [ ] scrollbar can be dragged
+    - [ ] scrollbar moves relative to the scroll location
 
 - [ ] process the key modifiers in events
+- [ ] Fix a bug in inner buffer of flexbox, 1-line off

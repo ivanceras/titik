@@ -36,7 +36,6 @@ use stretch::{
 #[derive(Debug, PartialEq)]
 pub struct TextArea<MSG> {
     pub area_buffer: AreaBuffer,
-    pub is_rounded: bool,
     focused: bool,
     pub width: Option<f32>,
     pub height: Option<f32>,
@@ -44,7 +43,9 @@ pub struct TextArea<MSG> {
     pub scroll_left: f32,
     pub id: Option<String>,
     pub on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
-    _phantom_msg: PhantomData<MSG>,
+    pub has_border: bool,
+    pub is_rounded_border: bool,
+    pub is_thick_border: bool,
 }
 
 impl<MSG> TextArea<MSG> {
@@ -54,7 +55,6 @@ impl<MSG> TextArea<MSG> {
     {
         TextArea {
             area_buffer: AreaBuffer::from(value.to_string()),
-            is_rounded: false,
             width: None,
             height: None,
             focused: false,
@@ -62,7 +62,9 @@ impl<MSG> TextArea<MSG> {
             scroll_left: 0.0,
             id: None,
             on_input: vec![],
-            _phantom_msg: PhantomData,
+            has_border: true,
+            is_rounded_border: false,
+            is_thick_border: false,
         }
     }
 
@@ -86,24 +88,36 @@ impl<MSG> TextArea<MSG> {
         self.area_buffer.to_string()
     }
 
-    pub fn set_rounded(&mut self, rounded: bool) {
-        self.is_rounded = rounded;
-    }
-
     fn border_top(&self) -> f32 {
-        1.0
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
     }
 
     fn border_bottom(&self) -> f32 {
-        1.0
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
     }
 
     fn border_left(&self) -> f32 {
-        1.0
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
     }
 
     fn border_right(&self) -> f32 {
-        1.0
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
     }
 
     fn inner_height(&self, layout: &Layout) -> f32 {
@@ -129,23 +143,23 @@ impl<MSG> TextArea<MSG> {
     }
 
     fn get_symbols(&self) -> (&str, &str, &str, &str, &str, &str) {
-        let mut top_left_symbol = if self.is_rounded {
+        let mut top_left_symbol = if self.is_rounded_border {
             rounded::TOP_LEFT
         } else {
             line::TOP_LEFT
         };
 
-        let mut top_right_symbol = if self.is_rounded {
+        let mut top_right_symbol = if self.is_rounded_border {
             rounded::TOP_RIGHT
         } else {
             line::TOP_RIGHT
         };
-        let mut bottom_left_symbol = if self.is_rounded {
+        let mut bottom_left_symbol = if self.is_rounded_border {
             rounded::BOTTOM_LEFT
         } else {
             line::BOTTOM_LEFT
         };
-        let mut bottom_right_symbol = if self.is_rounded {
+        let mut bottom_right_symbol = if self.is_rounded_border {
             rounded::BOTTOM_RIGHT
         } else {
             line::BOTTOM_RIGHT
@@ -156,7 +170,7 @@ impl<MSG> TextArea<MSG> {
 
         // Note: the rounded border is override with square thick line since there is no thick
         // rounded corner
-        if self.focused {
+        if self.focused || self.is_thick_border {
             top_left_symbol = thick_line::TOP_LEFT;
             top_right_symbol = thick_line::TOP_RIGHT;
             bottom_left_symbol = thick_line::BOTTOM_LEFT;
@@ -184,23 +198,11 @@ impl<MSG> TextArea<MSG> {
     }
 
     fn scroller_height(&self, layout: &Layout) -> f32 {
-        let content_height =
-            self.content_height() + self.border_top() + self.border_bottom();
-
-        let height = layout.size.height.round();
-        let scroller_height =
-            (height as f32 * height as f32 / content_height).round();
-        scroller_height
+        1.0
     }
 
     fn scroller_width(&self, layout: &Layout) -> f32 {
-        let content_width =
-            self.content_width() + self.border_left() + self.border_right();
-
-        let width = layout.size.width.round();
-        let scroller_width =
-            (width as f32 * width as f32 / content_width).round();
-        scroller_width
+        3.0
     }
 
     fn cursor_location(&self, layout: &Layout) -> (f32, f32) {
@@ -213,6 +215,97 @@ impl<MSG> TextArea<MSG> {
         let abs_cursor_x = loc_x + cursor_loc_x as f32 + 1.0;
         let abs_cursor_y = loc_y + cursor_loc_y as f32 + 1.0 - self.scroll_top;
         (abs_cursor_x, abs_cursor_y)
+    }
+
+    fn draw_border(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+        if self.has_border {
+            let layout = layout_tree.layout;
+            let loc_x = layout.location.x.round();
+            let loc_y = layout.location.y.round();
+            let width = layout.size.width.round();
+            let height = layout.size.height.round();
+
+            let (
+                top_left_symbol,
+                top_right_symbol,
+                bottom_left_symbol,
+                bottom_right_symbol,
+                horizontal_symbol,
+                vertical_symbol,
+            ) = self.get_symbols();
+
+            let bottom = loc_y + height - 1.0;
+            let right = loc_x + width - 1.0;
+            // draw the horizontal border
+            for i in 0..width as usize {
+                buf.set_symbol(
+                    loc_x as usize + i,
+                    loc_y as usize,
+                    horizontal_symbol,
+                );
+                buf.set_symbol(
+                    loc_x as usize + i,
+                    bottom as usize,
+                    horizontal_symbol,
+                );
+            }
+
+            // draw the vertical border
+            for j in 0..height as usize {
+                buf.set_symbol(
+                    loc_x as usize,
+                    loc_y as usize + j,
+                    vertical_symbol,
+                );
+                buf.set_symbol(
+                    right as usize,
+                    loc_y as usize + j,
+                    vertical_symbol,
+                );
+            }
+
+            buf.set_symbol(loc_x as usize, loc_y as usize, top_left_symbol);
+            buf.set_symbol(loc_x as usize, bottom as usize, bottom_left_symbol);
+            buf.set_symbol(right as usize, loc_y as usize, top_right_symbol);
+            buf.set_symbol(
+                right as usize,
+                bottom as usize,
+                bottom_right_symbol,
+            );
+        }
+    }
+
+    fn draw_scrollers(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+        let layout = layout_tree.layout;
+        let loc_x = layout.location.x.round();
+        let loc_y = layout.location.y.round();
+        let width = layout.size.width.round();
+        let height = layout.size.height.round();
+
+        let bottom = loc_y + height - 1.0;
+        let right = loc_x + width - 1.0;
+
+        let scroller_width = self.scroller_width(&layout) as usize;
+        let scroller_height = self.scroller_height(&layout) as usize;
+
+        let inner_width = self.inner_width(&layout_tree.layout);
+        let inner_height = self.inner_height(&layout_tree.layout);
+
+        if inner_height > 0.0 {
+            for j in 0..scroller_height {
+                buf.set_symbol(
+                    right as usize,
+                    bottom as usize - j - 1,
+                    bar::SEVEN_EIGHTHS,
+                );
+            }
+        }
+
+        if inner_width > 0.0 {
+            for i in 0..scroller_width {
+                buf.set_symbol(right as usize - i - 1, bottom as usize, '▮');
+            }
+        }
     }
 }
 
@@ -270,59 +363,13 @@ where
         let bottom = loc_y + height - 1.0;
         let right = loc_x + width - 1.0;
 
-        // draw the horizontal border
-        for i in 0..width as usize {
-            buf.set_symbol(
-                loc_x as usize + i,
-                loc_y as usize,
-                horizontal_symbol,
-            );
-            buf.set_symbol(
-                loc_x as usize + i,
-                bottom as usize,
-                horizontal_symbol,
-            );
-        }
-
-        // draw the vertical border
-        for j in 0..height as usize {
-            buf.set_symbol(loc_x as usize, loc_y as usize + j, vertical_symbol);
-            buf.set_symbol(right as usize, loc_y as usize + j, vertical_symbol);
-        }
-
-        let scroller_height = self.scroller_height(&layout) as usize;
-        let inner_height = self.inner_height(&layout_tree.layout);
-
-        if inner_height > 0.0 {
-            let scroller_top_loc = self.scroll_top / inner_height;
-            for j in 0..scroller_height {
-                buf.set_symbol(
-                    right as usize,
-                    loc_y as usize + scroller_top_loc as usize + j + 1,
-                    bar::SEVEN_EIGHTHS,
-                );
-            }
-        }
-
-        let scroller_width = self.scroller_width(&layout) as usize;
-        let inner_width = self.inner_width(&layout_tree.layout);
-
-        if inner_width > 0.0 {
-            let scroller_left_loc = self.scroll_left / inner_width;
-            for i in 0..scroller_width {
-                buf.set_symbol(
-                    loc_x as usize + scroller_left_loc as usize + i + 1,
-                    bottom as usize,
-                    '▮',
-                );
-            }
-        }
-
         // draw the text content
         let text_loc_y = loc_y - self.scroll_top;
         let text_loc_x = loc_x - self.scroll_left;
-        let bottom_scroll = inner_height + self.scroll_top;
-        let right_scroll = inner_width + self.scroll_left;
+        let bottom_scroll =
+            self.inner_height(&layout_tree.layout) + self.scroll_top;
+        let right_scroll =
+            self.inner_width(&layout_tree.layout) + self.scroll_left;
 
         for (j, line) in self.area_buffer.content.iter().enumerate() {
             if (j as f32) >= self.scroll_top && (j as f32) < bottom_scroll {
@@ -340,14 +387,12 @@ where
             }
         }
 
-        buf.set_symbol(loc_x as usize, loc_y as usize, top_left_symbol);
-        buf.set_symbol(loc_x as usize, bottom as usize, bottom_left_symbol);
-        buf.set_symbol(right as usize, loc_y as usize, top_right_symbol);
-        buf.set_symbol(right as usize, bottom as usize, bottom_right_symbol);
-
         let (abs_cursor_x, abs_cursor_y) = self.cursor_location(&layout);
 
         let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < bottom;
+
+        self.draw_border(buf, layout_tree);
+        self.draw_scrollers(buf, layout_tree);
 
         if self.focused && is_cursor_visible {
             vec![

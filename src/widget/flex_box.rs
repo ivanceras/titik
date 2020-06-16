@@ -52,9 +52,9 @@ impl<MSG> FlexBox<MSG> {
             flex_direction: FlexDirection::Row,
             scroll_top: 0.0,
             id: None,
-            has_border: true,
-            is_rounded_border: true,
-            is_thick_border: true,
+            has_border: false,
+            is_rounded_border: false,
+            is_thick_border: false,
         }
     }
 
