@@ -60,7 +60,7 @@ pub fn render<MSG>(
     {
         root_node.set_size(Some((width) as f32), Some(height as f32));
     }
-    let layout_tree = compute_layout(
+    let mut layout_tree = compute_layout(
         root_node,
         Size {
             width: Number::Defined(width as f32),
@@ -70,11 +70,16 @@ pub fn render<MSG>(
 
     loop {
         let mut buf = Buffer::new(width as usize, height as usize);
+        //eprintln!("rendering root_node: {:#?}", root_node);
+        //eprintln!("layout_tree: {:#?}", layout_tree);
+        eprintln!("looping...");
+
         buf.reset();
         {
-            let cmds = root_node.draw(&mut buf, &layout_tree);
+            let tty_cmds = root_node.draw(&mut buf, &layout_tree);
             buf.render(write)?;
-            cmds.iter()
+            tty_cmds
+                .iter()
                 .for_each(|cmd| cmd.execute(write).expect("must execute"));
         }
         write.flush()?;
@@ -116,6 +121,17 @@ pub fn render<MSG>(
                                     for msg in msgs {
                                         eprintln!("dispatching msg");
                                         program.dispatch(msg, root_node);
+                                        layout_tree = compute_layout(
+                                            root_node,
+                                            Size {
+                                                width: Number::Defined(
+                                                    width as f32,
+                                                ),
+                                                height: Number::Defined(
+                                                    height as f32,
+                                                ),
+                                            },
+                                        );
                                     }
                                 }
                             }
@@ -161,6 +177,13 @@ pub fn render<MSG>(
                         for msg in msgs {
                             eprintln!("dispatching msg");
                             program.dispatch(msg, root_node);
+                            layout_tree = compute_layout(
+                                root_node,
+                                Size {
+                                    width: Number::Defined(width as f32),
+                                    height: Number::Defined(height as f32),
+                                },
+                            );
                         }
                     }
                 }

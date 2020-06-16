@@ -111,9 +111,19 @@ impl<MSG> Widget<MSG> for TextInput {
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    //Dimension::Points((self.label.len() + 1) as f32)
-                    //Dimension::Percent(0.95)
                     Dimension::Percent(1.0)
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Points(3.0)
+                },
+            },
+            min_size: Size {
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Points(5.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)

@@ -231,7 +231,7 @@ where
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Points(3.0)
+                    Dimension::Points(self.content_height() as f32)
                 },
             },
             min_size: Size {
@@ -270,6 +270,7 @@ where
         let bottom = loc_y + height - 1.0;
         let right = loc_x + width - 1.0;
 
+        // draw the horizontal border
         for i in 0..width as usize {
             buf.set_symbol(
                 loc_x as usize + i,
@@ -282,6 +283,8 @@ where
                 horizontal_symbol,
             );
         }
+
+        // draw the vertical border
         for j in 0..height as usize {
             buf.set_symbol(loc_x as usize, loc_y as usize + j, vertical_symbol);
             buf.set_symbol(right as usize, loc_y as usize + j, vertical_symbol);

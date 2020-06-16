@@ -1,11 +1,21 @@
 use crossterm::{
-    cursor, queue,
+    cursor,
+    queue,
     style::{
-        Attribute, Attributes, Color, Print, ResetColor, SetAttributes,
-        SetBackgroundColor, SetForegroundColor,
+        Attribute,
+        Attributes,
+        Color,
+        Print,
+        ResetColor,
+        SetAttributes,
+        SetBackgroundColor,
+        SetForegroundColor,
     },
 };
-use std::{fmt, io::Write};
+use std::{
+    fmt,
+    io::Write,
+};
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Clone, Default, PartialEq, Debug)]
@@ -101,7 +111,6 @@ impl Buffer {
                 *cell = new_cell;
                 if unicode_width > 1 {
                     for i in 1..unicode_width {
-                        //TODO: this needs to be x + i ;
                         self.set_symbol(x + i, y, '\0');
                     }
                 }

@@ -53,6 +53,10 @@ impl<MSG> Widget<MSG> for Radio {
                 width: Dimension::Points((self.label.len() + 3) as f32),
                 height: Dimension::Points(1.0),
             },
+            min_size: Size {
+                width: Dimension::Points((self.label.len() + 3) as f32),
+                height: Dimension::Points(1.0),
+            },
             ..Default::default()
         }
     }
