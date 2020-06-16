@@ -29,8 +29,12 @@ pub fn render<MSG>(
     command::init(write)?;
     command::reset_top(write)?;
     let (width, height) = terminal::size().expect("must get the terminal size");
-    (*root_node.borrow_mut())
-        .set_size(Some((width) as f32), Some(height as f32));
+    {
+        root_node
+            .borrow_mut()
+            .as_mut()
+            .set_size(Some((width) as f32), Some(height as f32));
+    }
     let layout_tree = compute_layout(
         root_node.borrow_mut().as_mut(),
         Size {
@@ -42,10 +46,13 @@ pub fn render<MSG>(
     loop {
         let mut buf = Buffer::new(width as usize, height as usize);
         buf.reset();
-        let cmds = root_node.borrow_mut().as_mut().draw(&mut buf, &layout_tree);
-        buf.render(write)?;
-        cmds.iter()
-            .for_each(|cmd| cmd.execute(write).expect("must execute"));
+        {
+            let cmds =
+                root_node.borrow_mut().as_mut().draw(&mut buf, &layout_tree);
+            buf.render(write)?;
+            cmds.iter()
+                .for_each(|cmd| cmd.execute(write).expect("must execute"));
+        }
         write.flush()?;
 
         if let Ok(event) = event::read() {
