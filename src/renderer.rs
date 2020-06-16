@@ -17,7 +17,7 @@ use std::rc::Rc;
 use stretch::{geometry::Size, number::Number};
 
 pub trait Dispatch<MSG> {
-    fn dispatch(&self, msg: MSG, root_node: &mut Box<dyn Widget<MSG>>);
+    fn dispatch(&self, msg: MSG, root_node: &mut dyn Widget<MSG>);
 }
 
 pub fn render<MSG>(
@@ -90,7 +90,8 @@ pub fn render<MSG>(
                                 if let Some(program) = program {
                                     for msg in msgs {
                                         eprintln!("dispatching msg");
-                                        program.dispatch(msg, &mut *root_node);
+                                        program
+                                            .dispatch(msg, root_node.as_mut());
                                     }
                                 }
                             }
@@ -136,7 +137,7 @@ pub fn render<MSG>(
                     if let Some(program) = program {
                         for msg in msgs {
                             eprintln!("dispatching msg");
-                            program.dispatch(msg, &mut *root_node);
+                            program.dispatch(msg, root_node.as_mut());
                         }
                     }
                 }
