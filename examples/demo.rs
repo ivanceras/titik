@@ -43,6 +43,7 @@ use titik::{
     find_widget_by_id_mut,
     find_widget_mut,
     renderer,
+    renderer::Renderer,
     set_focused_node,
     widget_hit_at,
     widget_node_idx_at,
@@ -137,5 +138,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
 fn main() -> Result<()> {
     let mut stdout = io::stdout();
     let mut root_node = build_ui();
-    titik::renderer::render(&mut stdout, None, root_node.as_mut())
+    let mut renderer = Renderer::new(&mut stdout, None, root_node.as_mut());
+    renderer.run();
+    Ok(())
 }

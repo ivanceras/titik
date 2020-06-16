@@ -69,7 +69,7 @@ impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -96,7 +96,7 @@ impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
 
     fn set_size(&mut self, _width: Option<f32>, _height: Option<f32>) {}
 
-    fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
                 self.is_checked = !self.is_checked;

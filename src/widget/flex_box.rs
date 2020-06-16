@@ -259,7 +259,7 @@ where
     }
     */
 
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
@@ -275,7 +275,7 @@ where
 
         let cmds = self
             .children
-            .iter()
+            .iter_mut()
             .zip(layout_tree.children_layout.iter())
             .flat_map(|(child, child_layout)| {
                 child.draw(&mut inner_buf, child_layout)

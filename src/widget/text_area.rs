@@ -33,7 +33,7 @@ use stretch::{
 };
 
 //TODO: make the widget scroll to the cursor location when cursor is not visible
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct TextArea<MSG> {
     pub area_buffer: AreaBuffer,
     focused: bool,
@@ -46,6 +46,7 @@ pub struct TextArea<MSG> {
     pub has_border: bool,
     pub is_rounded_border: bool,
     pub is_thick_border: bool,
+    layout: Option<Layout>,
 }
 
 impl<MSG> TextArea<MSG> {
@@ -65,6 +66,7 @@ impl<MSG> TextArea<MSG> {
             has_border: true,
             is_rounded_border: false,
             is_thick_border: false,
+            layout: None,
         }
     }
 
@@ -344,12 +346,13 @@ where
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
         let width = layout.size.width.round();
         let height = layout.size.height.round();
+        self.layout = Some(layout.clone());
 
         let (
             top_left_symbol,
@@ -421,8 +424,9 @@ where
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) -> Vec<MSG> {
         eprintln!("textare events..");
+        let layout = self.layout.expect("must have a layout");
         match event {
             Event::Key(ke) => {
                 eprintln!("textare input events..");

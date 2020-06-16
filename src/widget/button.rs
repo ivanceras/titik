@@ -126,7 +126,7 @@ where
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
@@ -196,7 +196,7 @@ where
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) -> Vec<MSG> {
         eprintln!("button events..");
         match event {
             Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {

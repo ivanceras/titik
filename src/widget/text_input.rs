@@ -25,7 +25,7 @@ use stretch::{
     },
 };
 
-#[derive(Default, Debug, PartialEq)]
+#[derive(Default, Debug)]
 pub struct TextInput {
     pub input_buffer: InputBuffer,
     pub is_rounded: bool,
@@ -33,6 +33,7 @@ pub struct TextInput {
     pub width: Option<f32>,
     pub height: Option<f32>,
     pub id: Option<String>,
+    layout: Option<Layout>,
 }
 
 impl TextInput {
@@ -44,6 +45,7 @@ impl TextInput {
             input_buffer: InputBuffer::new_with_value(value),
             is_rounded: false,
             id: None,
+            layout: None,
             ..Default::default()
         }
     }
@@ -136,8 +138,9 @@ impl<MSG> Widget<MSG> for TextInput {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         let layout = layout_tree.layout;
+        self.layout = Some(layout.clone());
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
@@ -231,7 +234,8 @@ impl<MSG> Widget<MSG> for TextInput {
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event, layout: &Layout) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+        let layout = self.layout.expect("must have a layout set");
         match event {
             Event::Key(ke) => {
                 self.process_key(ke);

@@ -58,7 +58,7 @@ where
         None
     }
 
-    fn draw(&self, but: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd>;
+    fn draw(&mut self, but: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd>;
 
     fn style_node(&self, stretch: &mut Stretch) -> Option<Node> {
         let children_styles = if let Some(children) = self.children() {
@@ -85,7 +85,7 @@ where
     {
         self.as_any_mut().downcast_mut::<Self>()
     }
-    fn process_event(&mut self, _event: Event, _layout: &Layout) -> Vec<MSG> {
+    fn process_event(&mut self, _event: Event) -> Vec<MSG> {
         vec![]
     }
 
