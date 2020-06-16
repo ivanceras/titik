@@ -41,6 +41,12 @@ pub trait Flex<MSG>: Widget<MSG> {
     fn width(&self) -> Option<f32>;
     fn height(&self) -> Option<f32>;
     fn scroll_top(&self) -> f32;
+    fn is_expand_width(&self) -> bool {
+        false
+    }
+    fn is_expand_height(&self) -> bool {
+        false
+    }
 
     fn border_top(&self) -> f32 {
         if self.has_border() {
@@ -186,12 +192,20 @@ pub trait Flex<MSG>: Widget<MSG> {
                 width: if let Some(width) = self.width() {
                     Dimension::Points(width)
                 } else {
-                    Dimension::Auto
+                    if self.is_expand_width() {
+                        Dimension::Percent(1.0)
+                    } else {
+                        Dimension::Auto
+                    }
                 },
                 height: if let Some(height) = self.height() {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Auto
+                    if self.is_expand_height() {
+                        Dimension::Percent(1.0)
+                    } else {
+                        Dimension::Auto
+                    }
                 },
             },
             overflow: Overflow::Scroll,

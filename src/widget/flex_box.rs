@@ -45,6 +45,10 @@ pub struct FlexBox<MSG> {
     pub has_border: bool,
     pub is_rounded_border: bool,
     pub is_thick_border: bool,
+    /// take as much height as possible
+    pub is_expand_height: bool,
+    /// take as much width as possible
+    pub is_expand_width: bool,
 }
 
 impl<MSG> FlexBox<MSG> {
@@ -59,6 +63,8 @@ impl<MSG> FlexBox<MSG> {
             has_border: false,
             is_rounded_border: false,
             is_thick_border: false,
+            is_expand_height: false,
+            is_expand_width: false,
         }
     }
 
@@ -155,6 +161,14 @@ where
 
     fn is_thick_border(&self) -> bool {
         self.is_thick_border
+    }
+
+    fn is_expand_width(&self) -> bool {
+        self.is_expand_width
+    }
+
+    fn is_expand_height(&self) -> bool {
+        self.is_expand_height
     }
 
     fn flex_direction(&self) -> FlexDirection {

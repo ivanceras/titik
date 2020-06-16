@@ -111,16 +111,18 @@ fn build_ui() -> Box<dyn Widget<()>> {
             \n19. and another line\
             \n20. This is the last line and also a looooooooooooooooooooong line",
     );
-    //text_area1.set_size(Some(40.0), Some(7.0));
+    text_area1.set_size(Some(60.0), Some(10.0));
 
     let mut btn2: Button<()> = Button::new("Button2");
     btn2.set_rounded(true);
     btn2.set_id("btn2");
     let mut img: Image<()> =
         Image::new(include_bytes!("../horse.jpg").to_vec());
-    //img.set_size(Some(60.0), Some(20.0));
+    img.set_size(Some(60.0), Some(40.0));
 
-    let svg: SvgImage<()> = SvgImage::new(include_str!("bob.svg").to_string());
+    let mut svg: SvgImage<()> =
+        SvgImage::new(include_str!("bob.svg").to_string());
+    svg.set_size(Some(60.0), Some(40.0));
 
     let mut btn1: Button<()> = Button::new("Button 1");
     btn1.set_id("btn1");
@@ -130,6 +132,8 @@ fn build_ui() -> Box<dyn Widget<()>> {
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
     let mut row = FlexBox::new();
+    row.is_expand_width = true;
+    row.is_expand_height = false;
     row.horizontal();
     row.add_child(Box::new(img));
     row.add_child(Box::new(svg));

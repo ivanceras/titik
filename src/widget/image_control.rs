@@ -34,7 +34,6 @@ pub struct Image<MSG> {
     /// the height of unit cells, will be divided by 2 when used for computing
     /// style layout
     pub height: Option<f32>,
-    pub cells: Vec<Vec<Cell>>,
     pub id: Option<String>,
     _phantom_msg: PhantomData<MSG>,
 }
@@ -46,22 +45,18 @@ impl<MSG> Image<MSG> {
                 .expect("unable to load from memory"),
             width: None,
             height: None,
-            cells: vec![],
             id: None,
             _phantom_msg: PhantomData,
         };
-        image.create_cells();
         image
     }
 
     /// the cells will be stored in the image control to avoid re-creation every after redraw
-    fn create_cells(&mut self) {
-        let width = self.width.unwrap_or(10.0);
-        let height = self.height.unwrap_or(10.0) * 2.0;
+    fn create_cells(&self, width: f32, height: f32) -> Vec<Vec<Cell>> {
         let img = self.image.thumbnail(width as u32, height as u32);
         let (img_width, img_height) = img.dimensions();
         let rgb = img.to_rgb();
-        let cells = (0..img_height as usize - 1)
+        (0..img_height as usize - 1)
             .step_by(2)
             .enumerate()
             .map(|(_y, j)| {
@@ -87,8 +82,7 @@ impl<MSG> Image<MSG> {
                     })
                     .collect()
             })
-            .collect();
-        self.cells = cells;
+            .collect()
     }
 }
 
@@ -119,7 +113,8 @@ where
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
-        for (y, line) in self.cells.iter().enumerate() {
+        let cells = self.create_cells(layout.size.width, layout.size.height);
+        for (y, line) in cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
                 if i < layout.size.width as usize {
                     buf.set_cell(loc_x + i, loc_y + y, cell.clone());
@@ -138,12 +133,8 @@ where
     }
 
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
-        let size_changed = self.width != width || self.height != height;
-        if size_changed {
-            self.width = width;
-            self.height = height;
-            self.create_cells();
-        }
+        self.width = width;
+        self.height = height;
     }
 
     fn set_id(&mut self, id: &str) {
