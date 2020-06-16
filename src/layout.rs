@@ -43,7 +43,7 @@ impl LayoutTree {
             .iter()
             .flat_map(|cl| {
                 *cur_index += 1;
-                cl.at_location(x, y, cur_index)
+                cl.at_location(x - loc.x, y - loc.y, cur_index)
             })
             .collect();
 
