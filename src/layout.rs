@@ -56,10 +56,6 @@ impl LayoutTree {
     }
 }
 
-//TODO: keep track of the focused element,
-// area and position of the layout also determines
-// if the element is hit with a click
-
 /// return the widget that is hit at this location
 /// base on the layout tree
 pub fn widget_hit_at<'a, MSG>(

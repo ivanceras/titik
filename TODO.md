@@ -25,3 +25,6 @@
 
 - [ ] process the key modifiers in events
 - [ ] Fix a bug in inner buffer of flexbox, 1-line off
+
+## Document
+- [ ] document each function in the widget interface

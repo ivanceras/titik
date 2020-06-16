@@ -223,6 +223,7 @@ impl<MSG> Widget<MSG> for FlexBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    //TODO: make this style assignable
     fn style(&self) -> Style {
         Style {
             flex_direction: self.flex_direction,
@@ -230,12 +231,12 @@ where
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    Dimension::Percent(1.0)
+                    Dimension::Auto
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Percent(1.0)
+                    Dimension::Auto
                 },
             },
             overflow: Overflow::Scroll,
