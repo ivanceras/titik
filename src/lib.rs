@@ -1,7 +1,9 @@
 //! Titik is a crossplatform TUI widget library with the goal of being able to interact
 //! intuitively on these widgets.
 //!
-//! It uses crossterm as the underlying backend.
+//! ![Screenshot](https://ivanceras.github.io/screenshots/sauron-titik.gif)
+//!
+//! It uses [`crossterm`](https://crates.io/crates/crossterm) as the underlying backend.
 //!
 //! To run the demo use the following command:
 //! ```sh
