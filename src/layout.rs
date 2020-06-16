@@ -205,7 +205,7 @@ mod test {
                 height: 34.0
             }
         );
-        assert_eq!(layout1.location, Point { x: 00.0, y: 0.0 });
+        assert_eq!(layout1.location, Point { x: 1.0, y: 1.0 });
         let mut hit1 = layout_tree.hit(1.0, 1.0);
         assert_eq!(hit1.len(), 2);
         println!("hit1: {:?}", hit1);
@@ -235,7 +235,7 @@ mod test {
             }
         );
 
-        assert_eq!(layout2.location, Point { x: 00.0, y: 34.0 });
+        assert_eq!(layout2.location, Point { x: 1.0, y: 35.0 });
         assert_eq!(
             layout2.size,
             Size {
@@ -244,7 +244,7 @@ mod test {
             }
         );
         let mut hit2 = layout_tree.hit(1.0, 35.0);
-        assert_eq!(hit2.len(), 2);
+        assert_eq!(hit2.len(), 3);
         assert_eq!(hit2.pop(), Some(2));
 
         let trace_btn2 = find_widget(&control, 2)

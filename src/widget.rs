@@ -139,7 +139,7 @@ mod tests {
             }
         );
 
-        assert_eq!(layout1.location, Point { x: 30.0, y: 0.0 });
+        assert_eq!(layout1.location, Point { x: 31.0, y: 1.0 });
     }
 
     #[test]
@@ -178,6 +178,6 @@ mod tests {
 
         let layout_btn2 =
             layout_tree.children_layout[1].children_layout[1].layout;
-        assert_eq!(layout_btn2.location, Point { x: 20.0, y: 20.0 });
+        assert_eq!(layout_btn2.location, Point { x: 21.0, y: 1.0 });
     }
 }
