@@ -26,7 +26,10 @@ use stretch::{
         AlignSelf,
         Dimension,
         FlexDirection,
+        FlexWrap,
         JustifyContent,
+        Overflow,
+        PositionType,
         Style,
     },
 };
@@ -235,6 +238,7 @@ where
                     Dimension::Percent(1.0)
                 },
             },
+            overflow: Overflow::Scroll,
             border: Rect {
                 top: Dimension::Points(self.border_top()),
                 bottom: Dimension::Points(self.border_bottom()),
@@ -245,6 +249,28 @@ where
             justify_content: JustifyContent::FlexStart,
             align_self: AlignSelf::FlexStart,
             align_content: AlignContent::FlexStart,
+            flex_shrink: 1.0,
+            flex_grow: 0.0,
+            position: Rect {
+                top: Dimension::Points(0.0),
+                start: Dimension::Points(0.0),
+                bottom: Dimension::Points(0.0),
+                end: Dimension::Points(0.0),
+            },
+            margin: Rect {
+                top: Dimension::Points(0.0),
+                start: Dimension::Points(0.0),
+                bottom: Dimension::Points(0.0),
+                end: Dimension::Points(0.0),
+            },
+            padding: Rect {
+                top: Dimension::Points(0.0),
+                start: Dimension::Points(0.0),
+                bottom: Dimension::Points(0.0),
+                end: Dimension::Points(0.0),
+            },
+            flex_wrap: FlexWrap::NoWrap,
+            position_type: PositionType::Relative,
             ..Default::default()
         }
     }
