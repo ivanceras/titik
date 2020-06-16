@@ -1,8 +1,16 @@
-use crate::find_node::find_widget;
-use crate::Widget;
+use crate::{
+    find_node::find_widget,
+    Widget,
+};
 use stretch::{
-    geometry::{Point, Size},
-    node::{Node, Stretch},
+    geometry::{
+        Point,
+        Size,
+    },
+    node::{
+        Node,
+        Stretch,
+    },
     number::Number,
     result::Layout,
 };
