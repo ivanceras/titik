@@ -106,14 +106,17 @@ impl<'a, MSG> Renderer<'a, MSG> {
             "done processing event... now processing msgs: {}",
             msgs.len()
         );
+    }
+
+    fn dispatch_msg(&mut self, msgs: Vec<MSG>) {
         if let Some(program) = self.program {
             eprintln!("dispatching the msgs to the program");
             for msg in msgs {
                 eprintln!("dispatching msg");
                 program.dispatch(msg, self.root_node);
-                self.recompute_layout();
             }
         }
+        self.recompute_layout();
     }
 
     pub fn run(&mut self) -> Result<()> {
@@ -168,14 +171,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                                 if let Some(focused_widget) = active_widget {
                                     let msgs =
                                         focused_widget.process_event(event);
-                                    if let Some(program) = self.program {
-                                        for msg in msgs {
-                                            eprintln!("dispatching msg");
-                                            program
-                                                .dispatch(msg, self.root_node);
-                                            self.recompute_layout();
-                                        }
-                                    }
+                                    self.dispatch_msg(msgs);
                                 }
                             }
                         }
@@ -216,14 +212,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                             "done processing event... now processing msgs: {}",
                             msgs.len()
                         );
-                        if let Some(program) = self.program {
-                            eprintln!("dispatching the msgs to the program");
-                            for msg in msgs {
-                                eprintln!("dispatching msg");
-                                program.dispatch(msg, self.root_node);
-                                self.recompute_layout();
-                            }
-                        }
+                        self.dispatch_msg(msgs);
                     }
                 }
             }
