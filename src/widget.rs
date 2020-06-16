@@ -89,6 +89,11 @@ where
         vec![]
     }
 
+    ///  take the children at this index location
+    fn take_child(&mut self, index: usize) -> Option<Box<dyn Widget<MSG>>> {
+        None
+    }
+
     fn set_id(&mut self, id: &str);
 
     fn get_id(&self) -> &Option<String>;

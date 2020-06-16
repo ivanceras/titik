@@ -9,7 +9,11 @@ use crossterm::event::{
     Event,
     MouseEvent,
 };
-use std::any::Any;
+use sauron_vdom::Callback;
+use std::{
+    any::Any,
+    fmt,
+};
 use stretch::{
     geometry::Size,
     result::Layout,
@@ -19,21 +23,24 @@ use stretch::{
     },
 };
 
-#[derive(Default, Debug, PartialEq)]
-pub struct Radio {
+#[derive(Default, PartialEq)]
+pub struct Radio<MSG> {
     pub label: String,
     pub is_checked: bool,
     pub id: Option<String>,
+    pub on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
 }
 
-impl Radio {
+impl<MSG> Radio<MSG> {
     pub fn new<S>(label: S) -> Self
     where
         S: ToString,
     {
         Radio {
             label: label.to_string(),
-            ..Default::default()
+            is_checked: false,
+            id: None,
+            on_input: vec![],
         }
     }
 
@@ -46,7 +53,7 @@ impl Radio {
     }
 }
 
-impl<MSG> Widget<MSG> for Radio {
+impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -105,5 +112,14 @@ impl<MSG> Widget<MSG> for Radio {
 
     fn get_id(&self) -> &Option<String> {
         &self.id
+    }
+}
+
+impl<MSG> fmt::Debug for Radio<MSG> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("Radio")
+            .field("label", &self.label)
+            .field("id", &self.id)
+            .finish()
     }
 }

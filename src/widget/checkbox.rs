@@ -29,7 +29,7 @@ pub struct Checkbox<MSG> {
     pub label: String,
     pub is_checked: bool,
     pub id: Option<String>,
-    pub on_click: Vec<Callback<sauron_vdom::Event, MSG>>,
+    pub on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
 }
 
 impl<MSG> Default for Checkbox<MSG> {
@@ -38,7 +38,7 @@ impl<MSG> Default for Checkbox<MSG> {
             label: String::new(),
             is_checked: false,
             id: None,
-            on_click: vec![],
+            on_input: vec![],
         }
     }
 }
@@ -109,11 +109,15 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
     fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
+                eprintln!("checkbox is clicked");
+                eprintln!(
+                    "there are {} on_input listeners",
+                    self.on_input.len()
+                );
                 self.is_checked = !self.is_checked;
                 let s_event: sauron_vdom::Event =
-                    sauron_vdom::event::MouseEvent::click(x as i32, y as i32)
-                        .into();
-                self.on_click
+                    sauron_vdom::event::InputEvent::new(self.is_checked).into();
+                self.on_input
                     .iter()
                     .map(|cb| cb.emit(s_event.clone()))
                     .collect()

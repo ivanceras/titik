@@ -18,7 +18,7 @@ use stretch::{
 /// Contains the layout information of all the controls in the tree
 /// This is needed for optimization purposes since recomputing layout is an expensive operation,
 /// therefore can not be executed every draw call
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LayoutTree {
     pub layout: Layout,
     pub children_layout: Vec<LayoutTree>,

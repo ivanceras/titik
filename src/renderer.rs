@@ -173,7 +173,12 @@ pub fn render<MSG>(
                 if let Some(hit_widget) = &mut hit_widget {
                     let msgs =
                         hit_widget.process_event(event, &focused_layout.layout);
+                    eprintln!(
+                        "done processing event... now processing msgs: {}",
+                        msgs.len()
+                    );
                     if let Some(program) = program {
+                        eprintln!("dispatching the msgs to the program");
                         for msg in msgs {
                             eprintln!("dispatching msg");
                             program.dispatch(msg, root_node);

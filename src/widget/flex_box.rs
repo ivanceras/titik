@@ -21,6 +21,7 @@ use stretch::{
         Size,
     },
     style::{
+        AlignContent,
         AlignItems,
         AlignSelf,
         Dimension,
@@ -52,7 +53,7 @@ impl<MSG> FlexBox<MSG> {
             flex_direction: FlexDirection::Row,
             scroll_top: 0.0,
             id: None,
-            has_border: false,
+            has_border: true,
             is_rounded_border: false,
             is_thick_border: false,
         }
@@ -243,6 +244,7 @@ where
             align_items: AlignItems::FlexStart,
             justify_content: JustifyContent::FlexStart,
             align_self: AlignSelf::FlexStart,
+            align_content: AlignContent::FlexStart,
             ..Default::default()
         }
     }
@@ -307,6 +309,11 @@ where
 
     fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget<MSG>>]> {
         Some(&mut self.children)
+    }
+
+    // TODO: use remove_item when it will be stabilized
+    fn take_child(&mut self, index: usize) -> Option<Box<dyn Widget<MSG>>> {
+        Some(self.children.remove(index))
     }
 
     fn child_mut<'a>(
