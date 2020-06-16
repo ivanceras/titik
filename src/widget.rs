@@ -6,7 +6,9 @@ use crate::{
 pub use button::Button;
 pub use checkbox::Checkbox;
 use crossterm::event::Event;
+pub use flex::Flex;
 pub use flex_box::FlexBox;
+pub use group_box::GroupBox;
 pub use image_control::Image;
 pub use radio::Radio;
 use std::{
@@ -27,7 +29,9 @@ pub use text_input::TextInput;
 
 mod button;
 mod checkbox;
+mod flex;
 mod flex_box;
+mod group_box;
 mod image_control;
 mod radio;
 mod svg_image;

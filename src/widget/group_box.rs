@@ -1,5 +1,8 @@
 use crate::{
-    buffer::Buffer,
+    buffer::{
+        Buffer,
+        Cell,
+    },
     symbol::{
         bar,
         line,
@@ -35,7 +38,7 @@ use stretch::{
 };
 
 #[derive(Default, Debug)]
-pub struct FlexBox<MSG> {
+pub struct GroupBox<MSG> {
     pub children: Vec<Box<dyn Widget<MSG>>>,
     pub width: Option<f32>,
     pub height: Option<f32>,
@@ -45,20 +48,22 @@ pub struct FlexBox<MSG> {
     pub has_border: bool,
     pub is_rounded_border: bool,
     pub is_thick_border: bool,
+    pub label: Option<String>,
 }
 
-impl<MSG> FlexBox<MSG> {
+impl<MSG> GroupBox<MSG> {
     pub fn new() -> Self {
-        FlexBox {
+        GroupBox {
             width: None,
             height: None,
             children: vec![],
-            flex_direction: FlexDirection::Row,
+            flex_direction: FlexDirection::Column,
             scroll_top: 0.0,
             id: None,
-            has_border: false,
-            is_rounded_border: false,
+            has_border: true,
+            is_rounded_border: true,
             is_thick_border: false,
+            label: None,
         }
     }
 
@@ -80,18 +85,84 @@ impl<MSG> FlexBox<MSG> {
     pub fn set_scroll_top(&mut self, scroll_top: f32) {
         self.scroll_top = scroll_top;
     }
+
+    pub fn set_label(&mut self, label: &str) {
+        self.label = Some(label.to_string());
+    }
+
+    pub fn draw_label(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+        let layout = layout_tree.layout;
+        let loc_x = layout.location.x.round() as usize;
+        let loc_y = layout.location.y.round() as usize;
+        if let Some(label) = &self.label {
+            for (t, ch) in label.chars().enumerate() {
+                let mut cell = Cell::new(ch);
+                buf.set_cell(loc_x + 3 + t, loc_y, cell);
+            }
+        }
+    }
 }
 
-impl<MSG> Widget<MSG> for FlexBox<MSG>
+impl<MSG> Widget<MSG> for GroupBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
     fn style(&self) -> Style {
-        self.flex_style()
+        Style {
+            flex_direction: self.flex_direction(),
+            size: Size {
+                width: if let Some(width) = self.width() {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Percent(1.0)
+                },
+                height: if let Some(height) = self.height() {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Percent(1.0)
+                },
+            },
+            overflow: Overflow::Scroll,
+            border: Rect {
+                top: Dimension::Points(self.border_top()),
+                bottom: Dimension::Points(self.border_bottom()),
+                start: Dimension::Points(self.border_left()),
+                end: Dimension::Points(self.border_right()),
+            },
+            align_items: AlignItems::FlexStart,
+            justify_content: JustifyContent::FlexStart,
+            align_self: AlignSelf::FlexStart,
+            align_content: AlignContent::FlexStart,
+            flex_shrink: 1.0,
+            flex_grow: 0.0,
+            position: Rect {
+                top: Dimension::Points(0.0),
+                start: Dimension::Points(0.0),
+                bottom: Dimension::Points(0.0),
+                end: Dimension::Points(0.0),
+            },
+            margin: Rect {
+                top: Dimension::Points(0.0),
+                start: Dimension::Points(0.0),
+                bottom: Dimension::Points(0.0),
+                end: Dimension::Points(0.0),
+            },
+            padding: Rect {
+                top: Dimension::Points(1.0),
+                start: Dimension::Points(1.0),
+                bottom: Dimension::Points(0.0),
+                end: Dimension::Points(0.0),
+            },
+            flex_wrap: FlexWrap::NoWrap,
+            position_type: PositionType::Relative,
+            ..Default::default()
+        }
     }
 
     fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        self.draw_flex(buf, layout_tree)
+        let cmds = self.draw_flex(buf, layout_tree);
+        self.draw_label(buf, layout_tree);
+        cmds
     }
 
     fn add_child(&mut self, child: Box<dyn Widget<MSG>>) -> bool {
@@ -141,7 +212,7 @@ where
     }
 }
 
-impl<MSG> Flex<MSG> for FlexBox<MSG>
+impl<MSG> Flex<MSG> for GroupBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
@@ -171,46 +242,5 @@ where
 
     fn scroll_top(&self) -> f32 {
         self.scroll_top
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use crate::*;
-
-    #[test]
-    fn test_mut() {
-        let mut fb = FlexBox::<()>::new();
-        let btn1 = Button::new("Btn1");
-        println!("btn1: {:?}", btn1);
-        fb.add_child(Box::new(btn1));
-
-        let btn1_mut = fb.child_mut(0).expect("must have a child 0");
-        let btn1_cast = btn1_mut
-            .as_any_mut()
-            .downcast_mut::<Button<()>>()
-            .expect("must be a button");
-        btn1_cast.set_size(Some(20.0), Some(10.0));
-        println!("btn1_cast: {:?}", btn1_cast);
-        assert_eq!(Some(20.0), btn1_cast.width);
-        assert_eq!(Some(10.0), btn1_cast.height);
-    }
-
-    #[test]
-    fn test_children_mut() {
-        let mut fb = FlexBox::<()>::new();
-        let btn1 = Button::new("Btn1");
-        println!("btn1: {:?}", btn1);
-        fb.add_child(Box::new(btn1));
-
-        let children = fb.children_mut().expect("must have children");
-        let btn0 = children[0]
-            .as_any_mut()
-            .downcast_mut::<Button<()>>()
-            .expect("must be a button");
-
-        btn0.set_size(Some(40.0), Some(100.0));
-        assert_eq!(Some(40.0), btn0.width);
-        assert_eq!(Some(100.0), btn0.height);
     }
 }

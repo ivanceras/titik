@@ -31,6 +31,7 @@ pub use widget::{
     Button,
     Checkbox,
     FlexBox,
+    GroupBox,
     Image,
     Radio,
     SvgImage,

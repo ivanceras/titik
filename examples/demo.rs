@@ -53,6 +53,7 @@ use titik::{
     Checkbox,
     Cmd,
     FlexBox,
+    GroupBox,
     Image,
     InputBuffer,
     LayoutTree,
@@ -69,9 +70,19 @@ fn build_ui() -> Box<dyn Widget<()>> {
     root_node.set_scroll_top(0.0);
     root_node.vertical();
 
+    let mut gb1 = GroupBox::new();
+    gb1.set_label("Selection");
+
     let cb1 = Checkbox::new("Checkbox1");
     let cb2 = Checkbox::new("Checkbox2");
     let rb1 = Radio::new("Radio1");
+    let rb2 = Radio::new("Radio2");
+
+    gb1.add_child(Box::new(cb1));
+    gb1.add_child(Box::new(cb2));
+    gb1.add_child(Box::new(rb1));
+    gb1.add_child(Box::new(rb2));
+
     let input1 = TextInput::new("Hello world!");
 
     let input2 =
@@ -102,7 +113,6 @@ fn build_ui() -> Box<dyn Widget<()>> {
     );
     //text_area1.set_size(Some(40.0), Some(7.0));
 
-    let rb2 = Radio::new("Radio2");
     let mut btn2: Button<()> = Button::new("Button2");
     btn2.set_rounded(true);
     btn2.set_id("btn2");
@@ -124,11 +134,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     row.add_child(Box::new(img));
     row.add_child(Box::new(svg));
     root_node.add_child(Box::new(row));
-    root_node.add_child(Box::new(cb2));
-    root_node.add_child(Box::new(cb1));
-
-    root_node.add_child(Box::new(rb1));
-    root_node.add_child(Box::new(rb2));
+    root_node.add_child(Box::new(gb1));
     root_node.add_child(Box::new(input1));
     root_node.add_child(Box::new(input2));
     root_node.add_child(Box::new(text_area1));
