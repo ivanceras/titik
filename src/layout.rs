@@ -1,3 +1,4 @@
+use crate::find_node::find_widget;
 use crate::Widget;
 use stretch::{
     geometry::{Point, Size},
@@ -5,7 +6,6 @@ use stretch::{
     number::Number,
     result::Layout,
 };
-use crate::find_node::find_widget;
 
 /// Contains the layout information of all the controls in the tree
 /// This is needed for optimization purposes since recomputing layout is an expensive operation,
@@ -52,7 +52,6 @@ impl LayoutTree {
 // area and position of the layout also determines
 // if the element is hit with a click
 
-
 /// return the widget that is hit at this location
 /// base on the layout tree
 pub fn widget_hit_at<'a, MSG>(
@@ -75,7 +74,6 @@ pub fn widget_node_idx_at<'a>(
 ) -> Option<usize> {
     layout_tree.hit(x, y).pop()
 }
-
 
 pub fn find_layout<'a>(
     node: &'a LayoutTree,

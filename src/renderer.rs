@@ -126,7 +126,7 @@ pub fn render<MSG>(
                 let hit = hits.pop().expect("process only 1 for now");
                 let mut root_node = root_node.borrow_mut();
                 let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                    { find_widget_mut(root_node.as_mut(), hit) };
+                    find_widget_mut(root_node.as_mut(), hit);
 
                 let focused_layout = find_layout(&layout_tree, hit)
                     .expect("must have a layout tree");
