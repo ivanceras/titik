@@ -1,10 +1,22 @@
-use crate::{buffer::Buffer, symbol, Cmd, LayoutTree, Widget};
-use crossterm::event::{Event, MouseEvent};
+use crate::{
+    buffer::Buffer,
+    symbol,
+    Cmd,
+    LayoutTree,
+    Widget,
+};
+use crossterm::event::{
+    Event,
+    MouseEvent,
+};
 use std::any::Any;
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{Dimension, Style},
+    style::{
+        Dimension,
+        Style,
+    },
 };
 
 #[derive(Default, Debug, PartialEq)]
@@ -82,6 +94,7 @@ impl<MSG> Widget<MSG> for Radio {
             _ => vec![],
         }
     }
+
     fn set_id(&mut self, id: &str) {
         self.id = Some(id.to_string());
     }

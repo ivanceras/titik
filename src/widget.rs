@@ -1,13 +1,23 @@
-use crate::{buffer::Buffer, Cmd, LayoutTree};
+use crate::{
+    buffer::Buffer,
+    Cmd,
+    LayoutTree,
+};
 pub use button::Button;
 pub use checkbox::Checkbox;
 use crossterm::event::Event;
 pub use flex_box::FlexBox;
 pub use image_control::Image;
 pub use radio::Radio;
-use std::{any::Any, fmt};
+use std::{
+    any::Any,
+    fmt,
+};
 use stretch::{
-    node::{Node, Stretch},
+    node::{
+        Node,
+        Stretch,
+    },
     result::Layout,
     style::Style,
 };
@@ -89,8 +99,10 @@ mod tests {
     use super::*;
     use crate::*;
     use std::boxed;
-    use stretch::geometry::*;
-    use stretch::number::Number;
+    use stretch::{
+        geometry::*,
+        number::Number,
+    };
 
     #[test]
     fn layout() {

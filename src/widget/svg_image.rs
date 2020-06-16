@@ -1,14 +1,32 @@
 use crate::{
-    buffer::{Buffer, Cell},
+    buffer::{
+        Buffer,
+        Cell,
+    },
     symbol::bar,
-    Cmd, LayoutTree, Widget,
+    Cmd,
+    LayoutTree,
+    Widget,
 };
 use crossterm::style::Color;
-use image::{self, DynamicImage, GenericImageView, ImageBuffer, RgbaImage};
-use std::{any::Any, fmt, marker::PhantomData};
+use image::{
+    self,
+    DynamicImage,
+    GenericImageView,
+    ImageBuffer,
+    RgbaImage,
+};
+use std::{
+    any::Any,
+    fmt,
+    marker::PhantomData,
+};
 use stretch::{
     geometry::Size,
-    style::{Dimension, Style},
+    style::{
+        Dimension,
+        Style,
+    },
 };
 
 pub struct SvgImage<MSG> {
@@ -101,12 +119,12 @@ where
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
             },
             ..Default::default()
@@ -144,6 +162,7 @@ where
             self.create_cells();
         }
     }
+
     fn set_id(&mut self, id: &str) {
         self.id = Some(id.to_string());
     }

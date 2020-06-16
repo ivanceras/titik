@@ -1,15 +1,33 @@
 use crate::{
-    buffer::{Buffer, Cell},
-    symbol::{line, rounded},
-    Cmd, LayoutTree, Widget,
+    buffer::{
+        Buffer,
+        Cell,
+    },
+    symbol::{
+        line,
+        rounded,
+    },
+    Cmd,
+    LayoutTree,
+    Widget,
 };
-use crossterm::event::{Event, MouseEvent};
+use crossterm::event::{
+    Event,
+    MouseEvent,
+};
 use sauron_vdom::Callback;
-use std::{any::Any, fmt, fmt::Debug};
+use std::{
+    any::Any,
+    fmt,
+    fmt::Debug,
+};
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{Dimension, Style},
+    style::{
+        Dimension,
+        Style,
+    },
 };
 
 #[derive(PartialEq, Clone)]
@@ -83,8 +101,19 @@ where
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    //Dimension::Points((self.label.len() + 1) as f32)
                     Dimension::Percent(1.0)
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Points(3.0)
+                },
+            },
+            min_size: Size {
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Points(5.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)

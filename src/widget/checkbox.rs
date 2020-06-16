@@ -1,20 +1,49 @@
-use crate::{buffer::Buffer, symbol, Cmd, LayoutTree, Widget};
-use crossterm::event::{Event, MouseEvent};
-use std::any::Any;
+use crate::{
+    buffer::Buffer,
+    symbol,
+    Cmd,
+    LayoutTree,
+    Widget,
+};
+use crossterm::event::{
+    Event,
+    MouseEvent,
+};
+use sauron_vdom::Callback;
+use std::{
+    any::Any,
+    fmt,
+    fmt::Debug,
+};
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{Dimension, Style},
+    style::{
+        Dimension,
+        Style,
+    },
 };
 
-#[derive(Default, Debug, PartialEq)]
-pub struct Checkbox {
+#[derive(PartialEq)]
+pub struct Checkbox<MSG> {
     pub label: String,
     pub is_checked: bool,
     pub id: Option<String>,
+    pub on_click: Vec<Callback<sauron_vdom::Event, MSG>>,
 }
 
-impl Checkbox {
+impl<MSG> Default for Checkbox<MSG> {
+    fn default() -> Self {
+        Checkbox {
+            label: String::new(),
+            is_checked: false,
+            id: None,
+            on_click: vec![],
+        }
+    }
+}
+
+impl<MSG> Checkbox<MSG> {
     pub fn new<S>(label: S) -> Self
     where
         S: ToString,
@@ -34,7 +63,7 @@ impl Checkbox {
     }
 }
 
-impl<MSG> Widget<MSG> for Checkbox {
+impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -75,18 +104,34 @@ impl<MSG> Widget<MSG> for Checkbox {
 
     fn process_event(&mut self, event: Event, _layout: &Layout) -> Vec<MSG> {
         match event {
-            Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
+            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
                 self.is_checked = !self.is_checked;
-                vec![]
+                let s_event: sauron_vdom::Event =
+                    sauron_vdom::event::MouseEvent::click(x as i32, y as i32)
+                        .into();
+                self.on_click
+                    .iter()
+                    .map(|cb| cb.emit(s_event.clone()))
+                    .collect()
             }
             _ => vec![],
         }
     }
+
     fn set_id(&mut self, id: &str) {
         self.id = Some(id.to_string());
     }
 
     fn get_id(&self) -> &Option<String> {
         &self.id
+    }
+}
+
+impl<MSG> Debug for Checkbox<MSG> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("Checkbox")
+            .field("label", &self.label)
+            .field("id", &self.id)
+            .finish()
     }
 }

@@ -1,15 +1,35 @@
 use crate::{
     buffer::Buffer,
-    symbol::{bar, line, rounded, thick_line},
-    AreaBuffer, Cmd, LayoutTree, Widget,
+    symbol::{
+        bar,
+        line,
+        rounded,
+        thick_line,
+    },
+    AreaBuffer,
+    Cmd,
+    LayoutTree,
+    Widget,
 };
-use crossterm::event::{Event, KeyEvent, KeyModifiers, MouseEvent};
+use crossterm::event::{
+    Event,
+    KeyEvent,
+    KeyModifiers,
+    MouseEvent,
+};
 use sauron_vdom::Callback;
-use std::{any::Any, fmt, marker::PhantomData};
+use std::{
+    any::Any,
+    fmt,
+    marker::PhantomData,
+};
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{Dimension, Style},
+    style::{
+        Dimension,
+        Style,
+    },
 };
 
 //TODO: make the widget scroll to the cursor location when cursor is not visible
@@ -211,7 +231,19 @@ where
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Percent(1.0)
+                    Dimension::Points(3.0)
+                },
+            },
+            min_size: Size {
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Points(5.0)
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Points(3.0)
                 },
             },
             ..Default::default()
@@ -411,6 +443,7 @@ where
             _ => vec![],
         }
     }
+
     fn set_id(&mut self, id: &str) {
         self.id = Some(id.to_string());
     }

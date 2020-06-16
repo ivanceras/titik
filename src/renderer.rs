@@ -1,20 +1,48 @@
 use crate::{
-    command, compute_layout, find_layout, find_widget_mut, set_focused_node,
-    widget_node_idx_at, Buffer, LayoutTree, Widget,
+    command,
+    compute_layout,
+    find_layout,
+    find_widget_mut,
+    set_focused_node,
+    widget_node_idx_at,
+    Buffer,
+    LayoutTree,
+    Widget,
 };
 pub use crossterm::{
     cursor,
-    event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
-    execute, queue, style,
-    style::{Attribute, Attributes, Color, ContentStyle},
-    terminal::{self, ClearType},
-    Command, Result,
+    event::{
+        self,
+        Event,
+        KeyCode,
+        KeyEvent,
+        KeyModifiers,
+        MouseEvent,
+    },
+    execute,
+    queue,
+    style,
+    style::{
+        Attribute,
+        Attributes,
+        Color,
+        ContentStyle,
+    },
+    terminal::{
+        self,
+        ClearType,
+    },
+    Command,
+    Result,
 };
-use std::cell::RefCell;
-use std::io::Write;
-use std::marker::PhantomData;
-use std::rc::Rc;
-use stretch::{geometry::Size, number::Number};
+use std::{
+    io::Write,
+    marker::PhantomData,
+};
+use stretch::{
+    geometry::Size,
+    number::Number,
+};
 
 pub trait Dispatch<MSG> {
     fn dispatch(&self, msg: MSG, root_node: &mut dyn Widget<MSG>);
@@ -23,20 +51,17 @@ pub trait Dispatch<MSG> {
 pub fn render<MSG>(
     write: &mut dyn Write,
     program: Option<&dyn Dispatch<MSG>>,
-    root_node: Rc<RefCell<Box<Widget<MSG>>>>,
+    root_node: &mut dyn Widget<MSG>,
 ) -> Result<()> {
     let mut focused_widget_idx: Option<usize> = None;
     command::init(write)?;
     command::reset_top(write)?;
     let (width, height) = terminal::size().expect("must get the terminal size");
     {
-        root_node
-            .borrow_mut()
-            .as_mut()
-            .set_size(Some((width) as f32), Some(height as f32));
+        root_node.set_size(Some((width) as f32), Some(height as f32));
     }
     let layout_tree = compute_layout(
-        root_node.borrow_mut().as_mut(),
+        root_node,
         Size {
             width: Number::Defined(width as f32),
             height: Number::Defined(height as f32),
@@ -47,8 +72,7 @@ pub fn render<MSG>(
         let mut buf = Buffer::new(width as usize, height as usize);
         buf.reset();
         {
-            let cmds =
-                root_node.borrow_mut().as_mut().draw(&mut buf, &layout_tree);
+            let cmds = root_node.draw(&mut buf, &layout_tree);
             buf.render(write)?;
             cmds.iter()
                 .for_each(|cmd| cmd.execute(write).expect("must execute"));
@@ -65,20 +89,21 @@ pub fn render<MSG>(
                     //  - CTRL-z
                     if key_event.modifiers.contains(KeyModifiers::CONTROL) {
                         match key_event.code {
-                            KeyCode::Char(c) => match c {
-                                'c' | 'q' | 'd' | 'z' => {
-                                    break;
+                            KeyCode::Char(c) => {
+                                match c {
+                                    'c' | 'q' | 'd' | 'z' => {
+                                        break;
+                                    }
+                                    _ => (),
                                 }
-                                _ => (),
-                            },
+                            }
                             _ => (),
                         }
                     } else {
                         // send the keypresses to the focused widget
                         if let Some(idx) = focused_widget_idx.as_ref() {
-                            let mut root_node = root_node.borrow_mut();
                             let active_widget: Option<&mut dyn Widget<MSG>> =
-                                find_widget_mut(root_node.as_mut(), *idx);
+                                find_widget_mut(root_node, *idx);
                             let focused_layout =
                                 find_layout(&layout_tree, *idx)
                                     .expect("must have a layout tree");
@@ -90,8 +115,7 @@ pub fn render<MSG>(
                                 if let Some(program) = program {
                                     for msg in msgs {
                                         eprintln!("dispatching msg");
-                                        program
-                                            .dispatch(msg, root_node.as_mut());
+                                        program.dispatch(msg, root_node);
                                     }
                                 }
                             }
@@ -104,12 +128,12 @@ pub fn render<MSG>(
                         widget_node_idx_at(&layout_tree, x as f32, y as f32);
 
                     if let Some(idx) = focused_widget_idx.as_ref() {
-                        set_focused_node(root_node.borrow_mut().as_mut(), *idx);
+                        set_focused_node(root_node, *idx);
                     }
                 }
                 Event::Resize(width, height) => {
                     compute_layout(
-                        root_node.borrow_mut().as_mut(),
+                        root_node,
                         Size {
                             width: Number::Defined(width as f32),
                             height: Number::Defined(height as f32),
@@ -124,9 +148,8 @@ pub fn render<MSG>(
             if let Some((x, y)) = extract_location(&event) {
                 let mut hits = layout_tree.hit(x as f32, y as f32);
                 let hit = hits.pop().expect("process only 1 for now");
-                let mut root_node = root_node.borrow_mut();
                 let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                    find_widget_mut(root_node.as_mut(), hit);
+                    { find_widget_mut(root_node, hit) };
 
                 let focused_layout = find_layout(&layout_tree, hit)
                     .expect("must have a layout tree");
@@ -137,7 +160,7 @@ pub fn render<MSG>(
                     if let Some(program) = program {
                         for msg in msgs {
                             eprintln!("dispatching msg");
-                            program.dispatch(msg, root_node.as_mut());
+                            program.dispatch(msg, root_node);
                         }
                     }
                 }

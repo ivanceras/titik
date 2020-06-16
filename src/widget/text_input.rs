@@ -1,14 +1,28 @@
 use crate::{
     buffer::Buffer,
-    symbol::{line, rounded, thick_line},
-    Cmd, InputBuffer, LayoutTree, Widget,
+    symbol::{
+        line,
+        rounded,
+        thick_line,
+    },
+    Cmd,
+    InputBuffer,
+    LayoutTree,
+    Widget,
 };
-use crossterm::event::{Event, KeyEvent, MouseEvent};
+use crossterm::event::{
+    Event,
+    KeyEvent,
+    MouseEvent,
+};
 use std::any::Any;
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{Dimension, Style},
+    style::{
+        Dimension,
+        Style,
+    },
 };
 
 #[derive(Default, Debug, PartialEq)]
@@ -221,6 +235,7 @@ impl<MSG> Widget<MSG> for TextInput {
             _ => vec![],
         }
     }
+
     fn set_id(&mut self, id: &str) {
         self.id = Some(id.to_string());
     }
