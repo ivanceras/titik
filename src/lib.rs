@@ -60,6 +60,7 @@ pub use widget::{
     Image,
     Radio,
     SvgImage,
+    TabBox,
     TextArea,
     TextInput,
     Widget,

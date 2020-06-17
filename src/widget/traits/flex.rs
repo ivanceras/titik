@@ -127,13 +127,19 @@ pub trait Flex<MSG>: Widget<MSG> {
         )
     }
 
-    fn draw_border(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw_border(
+        &self,
+        buf: &mut Buffer,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) {
         if self.has_border() {
-            let layout = layout_tree.layout;
-            let loc_x = layout.location.x.round();
-            let loc_y = layout.location.y.round();
-            let width = layout.size.width.round();
-            let height = layout.size.height.round();
+            let loc_x = x.round();
+            let loc_y = y.round();
+            let width = width.round();
+            let height = height.round();
 
             let (
                 top_left_symbol,
@@ -285,7 +291,7 @@ pub trait Flex<MSG>: Widget<MSG> {
                 }
             }
         }
-        self.draw_border(buf, layout_tree);
+        self.draw_border(buf, loc_x, loc_y, width, height);
         cmds
     }
 }

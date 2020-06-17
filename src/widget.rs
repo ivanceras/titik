@@ -23,6 +23,7 @@ use stretch::{
     style::Style,
 };
 pub use svg_image::SvgImage;
+pub use tab_box::TabBox;
 pub use text_area::TextArea;
 pub use text_input::TextInput;
 pub use traits::{
@@ -37,6 +38,7 @@ mod group_box;
 mod image_control;
 mod radio;
 mod svg_image;
+mod tab_box;
 mod text_area;
 mod text_input;
 mod traits;

@@ -59,6 +59,7 @@ use titik::{
     LayoutTree,
     Radio,
     SvgImage,
+    TabBox,
     TextArea,
     TextInput,
     Widget,
@@ -69,6 +70,9 @@ fn build_ui() -> Box<dyn Widget<()>> {
     let mut root_node = FlexBox::new();
     root_node.set_scroll_top(0.0);
     root_node.vertical();
+
+    let mut tab1 = TabBox::new();
+    tab1.tab_labels = vec!["Tab1".into(), "Tab2".into(), "Tab3".into()];
 
     let mut gb1 = GroupBox::new();
     gb1.set_label("Selection");
@@ -138,6 +142,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     row.add_child(Box::new(img));
     row.add_child(Box::new(svg));
     root_node.add_child(Box::new(row));
+    root_node.add_child(Box::new(tab1));
     root_node.add_child(Box::new(gb1));
     root_node.add_child(Box::new(input1));
     root_node.add_child(Box::new(input2));
