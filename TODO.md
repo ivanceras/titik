@@ -19,7 +19,7 @@
     - [ ] scrollbar dynamic to the relative content size
     - [ ] scrollbar can be dragged
     - [ ] scrollbar moves relative to the scroll location
-- [ ] groupbox
+- [X] groupbox
     - [ ] ganged radio button in the same group
 - [ ] combobox, dropdown box
 
