@@ -40,15 +40,15 @@ use stretch::{
 /// A Tab box contains multiple box which
 /// can only be shown one at a time
 ///```ignore
-///        ╭──────╮
-///        │ tab1 ├─tab2─┬─tab2─╮
-///     ┌──┘      └──────┴──────┴────────┐
-///     │                                │
-///     │                                │
-///     │                                │
-///     │                                │
-///     │                                │
-///     └────────────────────────────────┘
+///     ╭──────╮──────┬──────╮
+///     │ tab1 │ tab2 │ tab2 │
+///  ┌──┘      └──────┴──────┴────────┐
+///  │                                │
+///  │                                │
+///  │                                │
+///  │                                │
+///  │                                │
+///  └────────────────────────────────┘
 /// ```
 
 #[derive(Default, Debug)]
@@ -104,6 +104,9 @@ impl<MSG> TabBox<MSG> {
         self.scroll_top = scroll_top;
     }
 
+    ///  ╭──────╮──────┬──────╮
+    ///  │ tab1 │ tab2 │ tab2 │
+    ///  └──────┴──────┴──────┴
     pub fn draw_labels(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
         //Issue: can not call of get_symbol since draw_labels is not part of Flex trait
         let horizontal_symbol = line::HORIZONTAL;

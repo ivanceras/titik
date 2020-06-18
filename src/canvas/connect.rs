@@ -19,14 +19,14 @@ lazy_static! {
         BTreeMap::from_iter(Connect::all_connect_property());
 
     /// A lookup for getting the character from a connect property
-    static ref CONNECT_CHAR_PROPERTIES: BTreeMap<Connect, char> =
+    pub(crate) static ref CONNECT_CHAR_PROPERTIES: BTreeMap<Connect, char> =
         BTreeMap::from_iter(Connect::all_connect_property()
             .into_iter()
             .map(|(ch, connect)| (connect, ch)));
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-struct Connect {
+pub(crate) struct Connect {
     top: bool,
     bottom: bool,
     left: bool,
@@ -34,7 +34,7 @@ struct Connect {
 }
 
 impl Connect {
-    fn from_char(ch: char) -> Self {
+    pub(crate) fn from_char(ch: char) -> Self {
         let mut top = false;
         let mut bottom = false;
         let mut left = false;
@@ -126,7 +126,7 @@ impl Connect {
     }
 
     /// get the intersection of this connect property
-    fn intersect(&self, other: &Self) -> Self {
+    pub(crate) fn intersect(&self, other: &Self) -> Self {
         let mut this = self.clone();
         this.top |= other.top;
         this.bottom |= other.bottom;

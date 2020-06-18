@@ -4,6 +4,10 @@ use crate::symbol::{
     rounded,
     thick_line,
 };
+use connect::{
+    Connect,
+    CONNECT_CHAR_PROPERTIES,
+};
 use lazy_static::lazy_static;
 use std::{
     collections::{
@@ -23,11 +27,11 @@ mod connect;
 /// if all the chars one cells can be merge and resolve to a one
 /// character then that char will be used, otherwise, the last inserted
 /// char will be used
-pub struct Canvas {
+pub(crate) struct Canvas {
     cells: HashMap<(usize, usize), Vec<char>>,
 }
 
-pub struct Border {
+pub(crate) struct Border {
     use_thick_border: bool,
 
     has_top: bool,
@@ -42,50 +46,70 @@ pub struct Border {
 }
 
 impl Border {
-    fn get_symbols(&self) -> (char, char, char, char, char, char) {
-        let mut top_left_symbol = if self.is_top_left_rounded {
+    fn horizontal_symbol(&self) -> char {
+        if self.use_thick_border {
+            thick_line::HORIZONTAL
+        } else {
+            line::HORIZONTAL
+        }
+    }
+
+    fn vertical_symbol(&self) -> char {
+        if self.use_thick_border {
+            thick_line::VERTICAL
+        } else {
+            line::VERTICAL
+        }
+    }
+
+    fn top_left_symbol(&self) -> char {
+        if self.use_thick_border {
+            thick_line::TOP_LEFT
+        } else if self.is_top_left_rounded {
             rounded::TOP_LEFT
         } else {
             line::TOP_LEFT
-        };
+        }
+    }
 
-        let mut top_right_symbol = if self.is_top_right_rounded {
+    fn top_right_symbol(&self) -> char {
+        if self.use_thick_border {
+            thick_line::TOP_RIGHT
+        } else if self.is_top_right_rounded {
             rounded::TOP_RIGHT
         } else {
             line::TOP_RIGHT
-        };
-        let mut bottom_left_symbol = if self.is_bottom_left_rounded {
+        }
+    }
+
+    fn bottom_left_symbol(&self) -> char {
+        if self.use_thick_border {
+            thick_line::BOTTOM_LEFT
+        } else if self.is_bottom_left_rounded {
             rounded::BOTTOM_LEFT
         } else {
             line::BOTTOM_LEFT
-        };
-        let mut bottom_right_symbol = if self.is_bottom_right_rounded {
+        }
+    }
+
+    fn bottom_right_symbol(&self) -> char {
+        if self.use_thick_border {
+            thick_line::BOTTOM_RIGHT
+        } else if self.is_bottom_right_rounded {
             rounded::BOTTOM_RIGHT
         } else {
             line::BOTTOM_RIGHT
-        };
-
-        let mut horizontal_symbol = line::HORIZONTAL;
-        let mut vertical_symbol = line::VERTICAL;
-
-        // Note: the rounded border is override with square thick line since there is no thick
-        // rounded corner
-        if self.use_thick_border {
-            top_left_symbol = thick_line::TOP_LEFT;
-            top_right_symbol = thick_line::TOP_RIGHT;
-            bottom_left_symbol = thick_line::BOTTOM_LEFT;
-            bottom_right_symbol = thick_line::BOTTOM_RIGHT;
-            horizontal_symbol = thick_line::HORIZONTAL;
-            vertical_symbol = thick_line::VERTICAL;
         }
+    }
 
+    fn get_symbols(&self) -> (char, char, char, char, char, char) {
         (
-            top_left_symbol,
-            top_right_symbol,
-            bottom_left_symbol,
-            bottom_right_symbol,
-            horizontal_symbol,
-            vertical_symbol,
+            self.top_left_symbol(),
+            self.top_right_symbol(),
+            self.bottom_left_symbol(),
+            self.bottom_right_symbol(),
+            self.horizontal_symbol(),
+            self.vertical_symbol(),
         )
     }
 }
@@ -107,7 +131,7 @@ impl Default for Border {
 }
 
 impl Canvas {
-    fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Canvas {
             cells: HashMap::new(),
         }
@@ -121,7 +145,45 @@ impl Canvas {
         }
     }
 
-    fn draw_rect(
+    pub(crate) fn draw_horizontal_line(
+        &mut self,
+        start: (usize, usize),
+        end: (usize, usize),
+        horizontal_symbol: char,
+    ) {
+        let (x1, y1) = start;
+        let (x2, y2) = end;
+        assert_eq!(
+            y1, y2,
+            "horizontal line must have the same start.y and end.y"
+        );
+        let width = x2 - x1;
+        for i in 0..width {
+            // horizontal line at the top
+            self.add_char(x1 + i, y1, horizontal_symbol);
+        }
+    }
+
+    pub(crate) fn draw_vertical_line(
+        &mut self,
+        start: (usize, usize),
+        end: (usize, usize),
+        vertical_symbol: char,
+    ) {
+        let (x1, y1) = start;
+        let (x2, y2) = end;
+        assert_eq!(
+            x1, x2,
+            "vertical line must have the same start.x and end.x"
+        );
+        let height = y2 - y1;
+        for j in 0..height {
+            // vertical line at the left side
+            self.add_char(x1, y1 + j, vertical_symbol);
+        }
+    }
+
+    pub(crate) fn draw_rect(
         &mut self,
         start: (f32, f32),
         end: (f32, f32),
@@ -133,8 +195,6 @@ impl Canvas {
         let (x1, y1) = (x1.round() as usize, y1.round() as usize);
         let (x2, y2) = (x2.round() as usize, y2.round() as usize);
 
-        let width = x2 - x1;
-        let height = y2 - y1;
         let left = x1;
         let top = y1;
         let right = x2;
@@ -149,23 +209,30 @@ impl Canvas {
             vertical_symbol,
         ) = border.get_symbols();
 
+        // draw the top border;
+        self.draw_horizontal_line(
+            (left + 1, top),
+            (right, top),
+            horizontal_symbol,
+        );
+
         // draw the top and bottom border;
-        for i in 1..width {
-            // horizontal line at the top
-            self.add_char(left + i, top, horizontal_symbol);
+        self.draw_horizontal_line(
+            (left + 1, bottom),
+            (right, bottom),
+            horizontal_symbol,
+        );
 
-            // horizontal line at the bottom
-            self.add_char(left + i, bottom, horizontal_symbol);
-        }
-
-        // draw the left and right border
-        for j in 1..height {
-            // vertical line at the left side
-            self.add_char(left, top + j, vertical_symbol);
-
-            // vertical line at the right side
-            self.add_char(right, top + j, vertical_symbol);
-        }
+        self.draw_vertical_line(
+            (left, top + 1),
+            (left, bottom),
+            vertical_symbol,
+        );
+        self.draw_vertical_line(
+            (right, top + 1),
+            (right, bottom),
+            vertical_symbol,
+        );
 
         // draw the corners
         self.add_char(left, top, top_left_symbol);
@@ -188,15 +255,17 @@ impl Canvas {
         if chars.len() == 1 {
             Some(chars[0])
         } else {
-            let len = chars.len();
-            println!("multiple chars {}", len);
-            chars.get(len - 1).map(|c| *c);
-            todo!();
+            let mut base_connect = Connect::from_char(chars[0]);
+            for ch in chars.iter().skip(1) {
+                let ch_connect = Connect::from_char(*ch);
+                base_connect = base_connect.intersect(&ch_connect);
+            }
+            CONNECT_CHAR_PROPERTIES.get(&base_connect).map(|c| *c)
         }
     }
 
     /// resolve each group of characters in the cells and return an iterator
-    pub fn get_cells<'a>(
+    pub(crate) fn get_cells<'a>(
         &'a self,
     ) -> Box<dyn Iterator<Item = (usize, usize, char)> + 'a> {
         Box::new(self.cells.iter().flat_map(|((i, j), chars)| {
