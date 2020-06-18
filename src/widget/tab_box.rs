@@ -3,6 +3,10 @@ use crate::{
         Buffer,
         Cell,
     },
+    canvas::{
+        Border,
+        Canvas,
+    },
     symbol::{
         bar,
         line,
@@ -108,57 +112,42 @@ impl<MSG> TabBox<MSG> {
     ///  │ tab1 │ tab2 │ tab2 │
     ///  └──────┴──────┴──────┴
     pub fn draw_labels(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
-        //Issue: can not call of get_symbol since draw_labels is not part of Flex trait
-        let horizontal_symbol = line::HORIZONTAL;
-        let vertical_symbol = line::VERTICAL;
-        let top_left_symbol = rounded::TOP_LEFT;
-        let top_right_symbol = rounded::TOP_RIGHT;
-        let bottom_left_symbol = line::BOTTOM_RIGHT;
-        let bottom_right_symbol = line::BOTTOM_LEFT;
-
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let left_pad = 3;
         let mut left = loc_x + left_pad;
+        let mut canvas = Canvas::new();
+
         for (tab_index, label) in self.tab_labels.iter().enumerate() {
             let label_width = label.len() + 3;
-            left += label_width;
             let right = left + label_width;
             let top = loc_y;
-            let bottom = top + 2;
+            let height = 2;
+            let bottom = top + height;
+            buf.write_str(left + 2, top + 1, label);
+            canvas.draw_rect(
+                (left, top),
+                (right, bottom),
+                Border {
+                    use_thick_border: false,
+                    has_top: true,
+                    has_bottom: true,
+                    has_left: true,
+                    has_right: true,
 
-            for (t, ch) in label.chars().enumerate() {
-                let mut cell = Cell::new(ch);
-                // draw the label
-                buf.set_cell(left + 2 + t, top + 1, cell);
-            }
-
-            // draw the horizontal lines
-            for i in 0..label_width {
-                // draw line at the top of the label
-                buf.set_symbol(left + i, loc_y, horizontal_symbol);
-                // erase the flex border with empty cell
-                //if tab_index == self.active_tab {
-                //buf.set_cell(left + i, bottom, Cell::empty());
-                //}
-            }
-            // draw the vertical lines on both sides
-            for j in 0..3 {
-                // draw line at the top of the label
-                buf.set_symbol(left, loc_y + j, vertical_symbol);
-                buf.set_symbol(right, loc_y + j, vertical_symbol);
-            }
-
-            //draw only the left curves at the first tabs
-            buf.set_symbol(left as usize, top as usize, top_left_symbol);
-            buf.set_symbol(left as usize, bottom as usize, bottom_left_symbol);
-            buf.set_symbol(right as usize, top as usize, top_right_symbol);
-            buf.set_symbol(
-                right as usize,
-                bottom as usize,
-                bottom_right_symbol,
+                    is_top_left_rounded: true,
+                    is_top_right_rounded: true,
+                    is_bottom_left_rounded: false,
+                    is_bottom_right_rounded: false,
+                },
             );
+
+            left += label_width;
+        }
+        let cells: Vec<(usize, usize, char)> = canvas.get_cells().collect();
+        for (x, y, ch) in cells {
+            buf.set_symbol(x, y, ch);
         }
     }
 }

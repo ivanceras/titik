@@ -32,17 +32,17 @@ pub(crate) struct Canvas {
 }
 
 pub(crate) struct Border {
-    use_thick_border: bool,
+    pub(crate) use_thick_border: bool,
 
-    has_top: bool,
-    has_bottom: bool,
-    has_left: bool,
-    has_right: bool,
+    pub(crate) has_top: bool,
+    pub(crate) has_bottom: bool,
+    pub(crate) has_left: bool,
+    pub(crate) has_right: bool,
 
-    is_top_left_rounded: bool,
-    is_top_right_rounded: bool,
-    is_bottom_left_rounded: bool,
-    is_bottom_right_rounded: bool,
+    pub(crate) is_top_left_rounded: bool,
+    pub(crate) is_top_right_rounded: bool,
+    pub(crate) is_bottom_left_rounded: bool,
+    pub(crate) is_bottom_right_rounded: bool,
 }
 
 impl Border {
@@ -185,15 +185,12 @@ impl Canvas {
 
     pub(crate) fn draw_rect(
         &mut self,
-        start: (f32, f32),
-        end: (f32, f32),
+        start: (usize, usize),
+        end: (usize, usize),
         border: Border,
     ) {
         let (x1, y1) = start;
         let (x2, y2) = end;
-
-        let (x1, y1) = (x1.round() as usize, y1.round() as usize);
-        let (x2, y2) = (x2.round() as usize, y2.round() as usize);
 
         let left = x1;
         let top = y1;

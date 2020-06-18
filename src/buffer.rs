@@ -104,6 +104,12 @@ impl Buffer {
         self.set_cell(x, y, Cell::new(symbol));
     }
 
+    pub fn write_str<S: ToString>(&mut self, x: usize, y: usize, s: S) {
+        for (i, ch) in s.to_string().chars().enumerate() {
+            self.set_cell(x + i, y, Cell::new(ch));
+        }
+    }
+
     pub fn set_cell(&mut self, x: usize, y: usize, new_cell: Cell) {
         if let Some(line) = self.cells.get_mut(y) {
             if let Some(cell) = line.get_mut(x) {
