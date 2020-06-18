@@ -1,4 +1,19 @@
-use std::collections::HashMap;
+use crate::symbol::{
+    bar,
+    line,
+    rounded,
+    thick_line,
+};
+use lazy_static::lazy_static;
+use std::{
+    collections::{
+        BTreeMap,
+        HashMap,
+    },
+    iter::FromIterator,
+};
+
+mod connect;
 
 /// canvas which only draws rectangluar shapes intended to be used
 /// mainly in drawing borders of a widget
@@ -8,13 +23,6 @@ use std::collections::HashMap;
 /// if all the chars one cells can be merge and resolve to a one
 /// character then that char will be used, otherwise, the last inserted
 /// char will be used
-use crate::symbol::{
-    bar,
-    line,
-    rounded,
-    thick_line,
-};
-
 pub struct Canvas {
     cells: HashMap<(usize, usize), Vec<char>>,
 }
@@ -82,6 +90,22 @@ impl Border {
     }
 }
 
+impl Default for Border {
+    fn default() -> Self {
+        Border {
+            use_thick_border: false,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: false,
+            is_top_right_rounded: false,
+            is_bottom_left_rounded: false,
+            is_bottom_right_rounded: false,
+        }
+    }
+}
+
 impl Canvas {
     fn new() -> Self {
         Canvas {
@@ -126,7 +150,7 @@ impl Canvas {
         ) = border.get_symbols();
 
         // draw the top and bottom border;
-        for i in 0..width {
+        for i in 1..width {
             // horizontal line at the top
             self.add_char(left + i, top, horizontal_symbol);
 
@@ -135,7 +159,7 @@ impl Canvas {
         }
 
         // draw the left and right border
-        for j in 0..height {
+        for j in 1..height {
             // vertical line at the left side
             self.add_char(left, top + j, vertical_symbol);
 
@@ -151,11 +175,23 @@ impl Canvas {
     }
 
     /// resolve the chars in this cell
+    ///
+    ///  ['└',  '─'] will be resolve as '┴'
+    ///  ['┘',  '─'] will be resolve as '┴'
+    ///
+    ///  ['│',  '─'] will be resolve as '┼'
+    ///
+    ///  ['┘',  '┌'] will be resolve as '┼'
+    ///
+    ///  ['└',  '│'] will be resolve as '┤'
     fn resolve(chars: &[char]) -> Option<char> {
         if chars.len() == 1 {
             Some(chars[0])
         } else {
-            todo!()
+            let len = chars.len();
+            println!("multiple chars {}", len);
+            chars.get(len - 1).map(|c| *c);
+            todo!();
         }
     }
 
@@ -171,7 +207,28 @@ impl Canvas {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
-    fn test1() {}
+    fn test1() {
+        let mut canvas = Canvas::new();
+
+        canvas.draw_rect((0.0, 0.0), (2.0, 2.0), Border::default());
+        let mut chars: Vec<(usize, usize, char)> = canvas.get_cells().collect();
+        chars.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
+        println!("chars: {:?}", chars);
+        assert_eq!(
+            chars,
+            [
+                (0, 0, '┌'),
+                (0, 1, '│'),
+                (0, 2, '└'),
+                (1, 0, '─'),
+                (1, 2, '─'),
+                (2, 0, '┐'),
+                (2, 1, '│'),
+                (2, 2, '┘')
+            ]
+        );
+    }
 }
