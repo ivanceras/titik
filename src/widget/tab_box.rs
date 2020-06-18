@@ -55,6 +55,7 @@ use stretch::{
 pub struct TabBox<MSG> {
     /// The labels for each of the tabs for each corresponding children
     pub tab_labels: Vec<String>,
+    pub active_tab: usize,
     /// The children could be flexbox, group_box,
     pub children: Vec<Box<dyn Widget<MSG>>>,
     pub width: Option<f32>,
@@ -73,6 +74,7 @@ impl<MSG> TabBox<MSG> {
             width: None,
             height: None,
             tab_labels: vec![],
+            active_tab: 0,
             children: vec![],
             flex_direction: FlexDirection::Column,
             scroll_top: 0.0,
@@ -134,28 +136,20 @@ impl<MSG> TabBox<MSG> {
                 // draw line at the top of the label
                 buf.set_symbol(left + i, loc_y, horizontal_symbol);
                 // erase the flex border with empty cell
-                if tab_index == 0 {
-                    buf.set_cell(left + i, bottom, Cell::empty());
-                }
+                //if tab_index == self.active_tab {
+                //buf.set_cell(left + i, bottom, Cell::empty());
+                //}
             }
             // draw the vertical lines on both sides
             for j in 0..3 {
                 // draw line at the top of the label
-                if tab_index == 0 {
-                    buf.set_symbol(left, loc_y + j, vertical_symbol);
-                }
+                buf.set_symbol(left, loc_y + j, vertical_symbol);
                 buf.set_symbol(right, loc_y + j, vertical_symbol);
             }
 
             //draw only the left curves at the first tabs
-            if tab_index == 0 {
-                buf.set_symbol(left as usize, top as usize, top_left_symbol);
-                buf.set_symbol(
-                    left as usize,
-                    bottom as usize,
-                    bottom_left_symbol,
-                );
-            }
+            buf.set_symbol(left as usize, top as usize, top_left_symbol);
+            buf.set_symbol(left as usize, bottom as usize, bottom_left_symbol);
             buf.set_symbol(right as usize, top as usize, top_right_symbol);
             buf.set_symbol(
                 right as usize,

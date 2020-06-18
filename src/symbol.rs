@@ -1,61 +1,61 @@
 pub mod block {
-    pub const FULL: &str = "█";
-    pub const SEVEN_EIGHTHS: &str = "▉";
-    pub const THREE_QUATERS: &str = "▊";
-    pub const FIVE_EIGHTHS: &str = "▋";
-    pub const HALF: &str = "▌";
-    pub const THREE_EIGHTHS: &str = "▍";
-    pub const ONE_QUATER: &str = "▎";
-    pub const ONE_EIGHTH: &str = "▏";
+    pub const FULL: char = '█';
+    pub const SEVEN_EIGHTHS: char = '▉';
+    pub const THREE_QUATERS: char = '▊';
+    pub const FIVE_EIGHTHS: char = '▋';
+    pub const HALF: char = '▌';
+    pub const THREE_EIGHTHS: char = '▍';
+    pub const ONE_QUATER: char = '▎';
+    pub const ONE_EIGHTH: char = '▏';
 }
 
 pub mod bar {
-    pub const FULL: &str = "█";
-    pub const SEVEN_EIGHTHS: &str = "▇";
-    pub const THREE_QUATERS: &str = "▆";
-    pub const FIVE_EIGHTHS: &str = "▅";
-    pub const HALF: &str = "▄";
-    pub const THREE_EIGHTHS: &str = "▃";
-    pub const ONE_QUATER: &str = "▂";
-    pub const ONE_EIGHTH: &str = "▁";
+    pub const FULL: char = '█';
+    pub const SEVEN_EIGHTHS: char = '▇';
+    pub const THREE_QUATERS: char = '▆';
+    pub const FIVE_EIGHTHS: char = '▅';
+    pub const HALF: char = '▄';
+    pub const THREE_EIGHTHS: char = '▃';
+    pub const ONE_QUATER: char = '▂';
+    pub const ONE_EIGHTH: char = '▁';
 }
 
 pub mod line {
-    pub const TOP_RIGHT: &str = "┐";
-    pub const VERTICAL: &str = "│";
-    pub const HORIZONTAL: &str = "─";
-    pub const TOP_LEFT: &str = "┌";
-    pub const BOTTOM_RIGHT: &str = "┘";
-    pub const BOTTOM_LEFT: &str = "└";
-    pub const VERTICAL_LEFT: &str = "┤";
-    pub const VERTICAL_RIGHT: &str = "├";
-    pub const HORIZONTAL_DOWN: &str = "┬";
-    pub const HORIZONTAL_UP: &str = "┴";
+    pub const TOP_RIGHT: char = '┐';
+    pub const VERTICAL: char = '│';
+    pub const HORIZONTAL: char = '─';
+    pub const TOP_LEFT: char = '┌';
+    pub const BOTTOM_RIGHT: char = '┘';
+    pub const BOTTOM_LEFT: char = '└';
+    pub const VERTICAL_LEFT: char = '┤';
+    pub const VERTICAL_RIGHT: char = '├';
+    pub const HORIZONTAL_DOWN: char = '┬';
+    pub const HORIZONTAL_UP: char = '┴';
 }
 
 pub mod thick_line {
-    pub const TOP_RIGHT: &str = "┓";
-    pub const VERTICAL: &str = "┃";
-    pub const HORIZONTAL: &str = "━";
-    pub const TOP_LEFT: &str = "┏";
-    pub const BOTTOM_RIGHT: &str = "┛";
-    pub const BOTTOM_LEFT: &str = "┗";
-    pub const VERTICAL_LEFT: &str = "┫";
-    pub const VERTICAL_RIGHT: &str = "┣";
-    pub const HORIZONTAL_DOWN: &str = "┳";
-    pub const HORIZONTAL_UP: &str = "┻";
+    pub const TOP_RIGHT: char = '┓';
+    pub const VERTICAL: char = '┃';
+    pub const HORIZONTAL: char = '━';
+    pub const TOP_LEFT: char = '┏';
+    pub const BOTTOM_RIGHT: char = '┛';
+    pub const BOTTOM_LEFT: char = '┗';
+    pub const VERTICAL_LEFT: char = '┫';
+    pub const VERTICAL_RIGHT: char = '┣';
+    pub const HORIZONTAL_DOWN: char = '┳';
+    pub const HORIZONTAL_UP: char = '┻';
 }
 
 pub mod rounded {
-    pub const TOP_LEFT: &str = "╭";
-    pub const TOP_RIGHT: &str = "╮";
-    pub const BOTTOM_LEFT: &str = "╰";
-    pub const BOTTOM_RIGHT: &str = "╯";
+    pub const TOP_LEFT: char = '╭';
+    pub const TOP_RIGHT: char = '╮';
+    pub const BOTTOM_LEFT: char = '╰';
+    pub const BOTTOM_RIGHT: char = '╯';
 }
 
-pub const BOX_UNCHECKED: &str = "☐";
-pub const BOX_CHECKED: &str = "☑";
-pub const BOX_XMARKED: &str = "☒";
+pub const BOX_UNCHECKED: char = '☐';
+pub const BOX_CHECKED: char = '☑';
+pub const BOX_XMARKED: char = '☒';
 
-pub const RADIO_CHECKED: &str = "⦿";
-pub const RADIO_UNCHECKED: &str = "〇";
+pub const RADIO_CHECKED: char = '⦿';
+pub const RADIO_UNCHECKED: char = '〇';

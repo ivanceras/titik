@@ -80,7 +80,7 @@ pub trait Flex<MSG>: Widget<MSG> {
         }
     }
 
-    fn get_symbols(&self) -> (&str, &str, &str, &str, &str, &str) {
+    fn get_symbols(&self) -> (char, char, char, char, char, char) {
         let mut top_left_symbol = if self.is_rounded_border() {
             rounded::TOP_LEFT
         } else {
