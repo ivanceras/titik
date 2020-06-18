@@ -119,6 +119,15 @@ impl<MSG> TabBox<MSG> {
         let mut left = loc_x + left_pad;
         let mut canvas = Canvas::new();
 
+        let total_tab_label_width = self
+            .tab_labels
+            .iter()
+            .fold(0, |acc, label| acc + label.len() + 3);
+
+        for i in 0..total_tab_label_width {
+            buf.set_cell(left + i, loc_y + 2, Cell::empty());
+        }
+
         for (tab_index, label) in self.tab_labels.iter().enumerate() {
             let label_width = label.len() + 3;
             let right = left + label_width;
@@ -132,7 +141,7 @@ impl<MSG> TabBox<MSG> {
                 Border {
                     use_thick_border: false,
                     has_top: true,
-                    has_bottom: true,
+                    has_bottom: tab_index != self.active_tab,
                     has_left: true,
                     has_right: true,
 
@@ -145,10 +154,7 @@ impl<MSG> TabBox<MSG> {
 
             left += label_width;
         }
-        let cells: Vec<(usize, usize, char)> = canvas.get_cells().collect();
-        for (x, y, ch) in cells {
-            buf.set_symbol(x, y, ch);
-        }
+        buf.write_canvas(canvas);
     }
 }
 

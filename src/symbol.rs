@@ -59,3 +59,5 @@ pub const BOX_XMARKED: char = '☒';
 
 pub const RADIO_CHECKED: char = '⦿';
 pub const RADIO_UNCHECKED: char = '〇';
+
+pub const EMPTY: char = ' ';

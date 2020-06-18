@@ -73,7 +73,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
 
     let mut tab1 = TabBox::new();
     tab1.tab_labels = vec!["Tab1".into(), "Tab2".into(), "Tab3".into()];
-    tab1.active_tab = 2;
+    tab1.active_tab = 0;
 
     let mut gb1 = GroupBox::new();
     gb1.set_label("Selection");

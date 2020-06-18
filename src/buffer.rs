@@ -1,3 +1,7 @@
+use crate::{
+    canvas::Canvas,
+    symbol,
+};
 use crossterm::{
     cursor,
     queue,
@@ -52,7 +56,7 @@ impl Cell {
 
     pub fn empty() -> Self {
         Cell {
-            symbol: " ".to_string(),
+            symbol: symbol::EMPTY.to_string(),
             ..Default::default()
         }
     }
@@ -108,6 +112,13 @@ impl Buffer {
         for (i, ch) in s.to_string().chars().enumerate() {
             self.set_cell(x + i, y, Cell::new(ch));
         }
+    }
+
+    // commits a canvas into the buffer
+    pub(crate) fn write_canvas(&mut self, canvas: Canvas) {
+        canvas
+            .get_cells()
+            .for_each(|(x, y, ch)| self.set_symbol(x, y, ch))
     }
 
     pub fn set_cell(&mut self, x: usize, y: usize, new_cell: Cell) {

@@ -1,8 +1,11 @@
-use crate::symbol::{
-    bar,
-    line,
-    rounded,
-    thick_line,
+use crate::{
+    symbol,
+    symbol::{
+        bar,
+        line,
+        rounded,
+        thick_line,
+    },
 };
 use connect::{
     Connect,
@@ -54,11 +57,43 @@ impl Border {
         }
     }
 
+    fn top_symbol(&self) -> char {
+        if self.has_top {
+            self.horizontal_symbol()
+        } else {
+            symbol::EMPTY
+        }
+    }
+
+    fn bottom_symbol(&self) -> char {
+        if self.has_bottom {
+            self.horizontal_symbol()
+        } else {
+            symbol::EMPTY
+        }
+    }
+
     fn vertical_symbol(&self) -> char {
         if self.use_thick_border {
             thick_line::VERTICAL
         } else {
             line::VERTICAL
+        }
+    }
+
+    fn left_symbol(&self) -> char {
+        if self.has_left {
+            self.vertical_symbol()
+        } else {
+            symbol::EMPTY
+        }
+    }
+
+    fn right_symbol(&self) -> char {
+        if self.has_right {
+            self.vertical_symbol()
+        } else {
+            symbol::EMPTY
         }
     }
 
@@ -102,14 +137,16 @@ impl Border {
         }
     }
 
-    fn get_symbols(&self) -> (char, char, char, char, char, char) {
+    fn get_symbols(&self) -> (char, char, char, char, char, char, char, char) {
         (
             self.top_left_symbol(),
+            self.top_symbol(),
             self.top_right_symbol(),
-            self.bottom_left_symbol(),
+            self.right_symbol(),
             self.bottom_right_symbol(),
-            self.horizontal_symbol(),
-            self.vertical_symbol(),
+            self.bottom_symbol(),
+            self.bottom_left_symbol(),
+            self.left_symbol(),
         )
     }
 }
@@ -199,36 +236,33 @@ impl Canvas {
 
         let (
             top_left_symbol,
+            top_symbol,
             top_right_symbol,
-            bottom_left_symbol,
+            right_symbol,
             bottom_right_symbol,
-            horizontal_symbol,
-            vertical_symbol,
+            bottom_symbol,
+            bottom_left_symbol,
+            left_symbol,
         ) = border.get_symbols();
 
         // draw the top border;
-        self.draw_horizontal_line(
-            (left + 1, top),
-            (right, top),
-            horizontal_symbol,
-        );
+        self.draw_horizontal_line((left + 1, top), (right, top), top_symbol);
 
-        // draw the top and bottom border;
+        // draw the bottom border;
         self.draw_horizontal_line(
             (left + 1, bottom),
             (right, bottom),
-            horizontal_symbol,
+            bottom_symbol,
         );
 
-        self.draw_vertical_line(
-            (left, top + 1),
-            (left, bottom),
-            vertical_symbol,
-        );
+        // left border
+        self.draw_vertical_line((left, top + 1), (left, bottom), left_symbol);
+
+        // right border
         self.draw_vertical_line(
             (right, top + 1),
             (right, bottom),
-            vertical_symbol,
+            right_symbol,
         );
 
         // draw the corners
