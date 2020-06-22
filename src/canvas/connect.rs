@@ -25,6 +25,70 @@ lazy_static! {
             .map(|(ch, connect)| (connect, ch)));
 }
 
+///```ignore
+///          C
+///     A┌───┬───┐E
+///      │   │   │
+///      │   │   │
+///      │   │   │
+///     K├───M───┤O
+///      │   │   │
+///      │   │   │
+///      │   │   │
+///     U└───┴───┘Y
+///          W
+///```
+
+pub(crate) enum Cell {
+    A,
+    C,
+    K,
+    M,
+    O,
+    U,
+    W,
+    Y,
+}
+
+pub(crate) enum Fragment {
+    Line(Line),
+    Arc(Arc),
+}
+
+pub struct Line {
+    start: Cell,
+    end: Cell,
+    is_thick: bool,
+}
+
+pub(crate) fn thick_line(start: Cell, end: Cell) -> Fragment {
+    let line = Line {
+        start,
+        end,
+        is_thick: true,
+    };
+    Fragment::Line(line)
+}
+
+pub(crate) fn line(start: Cell, end: Cell) -> Fragment {
+    let line = Line {
+        start,
+        end,
+        is_thick: false,
+    };
+    Fragment::Line(line)
+}
+
+pub(crate) fn arc(start: Cell, end: Cell) -> Fragment {
+    let arc = Arc { start, end };
+    Fragment::Arc(arc)
+}
+
+pub struct Arc {
+    start: Cell,
+    end: Cell,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Connect {
     top: bool,
@@ -41,6 +105,18 @@ impl Connect {
         let mut right = false;
 
         match ch {
+            '╴' => {
+                left = true;
+            }
+            '╵' => {
+                top = true;
+            }
+            '╶' => {
+                right = true;
+            }
+            '╷' => {
+                bottom = true;
+            }
             '─' => {
                 left = true;
                 right = true;
@@ -118,10 +194,10 @@ impl Connect {
         }
     }
 
-    fn all_char() -> [char; 15] {
+    fn all_char() -> [char; 19] {
         [
-            '─', '│', '┌', '┐', '└', '┘', '┬', '┴', '├', '┤', '┼', '╭', '╮',
-            '╰', '╯',
+            '╴', '╵', '╶', '╷', '─', '│', '┌', '┐', '└', '┘', '┬', '┴', '├',
+            '┤', '┼', '╭', '╮', '╰', '╯',
         ]
     }
 
@@ -170,6 +246,7 @@ mod tests {
         let bottom_left = Connect::from_char('└');
         let top_right = Connect::from_char('┐');
         let intersection = bottom_left.intersect(&top_right);
+        assert_eq!(cross, intersection);
     }
 
     #[test]
@@ -178,5 +255,16 @@ mod tests {
         let vertical = Connect::from_char('│');
         let horizontal = Connect::from_char('─');
         let intersection = vertical.intersect(&horizontal);
+        assert_eq!(cross, intersection);
+    }
+
+    #[test]
+    fn test_assembled_halflings() {
+        let bottom_left = Connect::from_char('└');
+        let top = Connect::from_char('╵');
+        let right = Connect::from_char('╶');
+        let mut intersection = bottom_left.intersect(&top);
+        intersection = intersection.intersect(&right);
+        assert_eq!(bottom_left, intersection);
     }
 }

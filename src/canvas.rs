@@ -313,7 +313,7 @@ mod tests {
     fn test1() {
         let mut canvas = Canvas::new();
 
-        canvas.draw_rect((0.0, 0.0), (2.0, 2.0), Border::default());
+        canvas.draw_rect((0, 0), (2, 2), Border::default());
         let mut chars: Vec<(usize, usize, char)> = canvas.get_cells().collect();
         chars.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
         println!("chars: {:?}", chars);
