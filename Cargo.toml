@@ -19,3 +19,4 @@ sauron_vdom = { version = "0.25.0"}
 itertools = "0.9.0"
 resvg = { version = "0.9.0", features = ["raqote-backend"] }
 lazy_static = "1.4.0"
+ito-canvas = { path = "../ito-canvas"}

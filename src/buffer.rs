@@ -1,7 +1,4 @@
-use crate::{
-    canvas::Canvas,
-    symbol,
-};
+use crate::symbol;
 use crossterm::{
     cursor,
     queue,
@@ -16,6 +13,7 @@ use crossterm::{
         SetForegroundColor,
     },
 };
+use ito_canvas::unicode_canvas::Canvas;
 use std::{
     fmt,
     io::Write,

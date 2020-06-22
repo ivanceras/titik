@@ -68,7 +68,6 @@ pub use widget::{
 
 mod area_buffer;
 mod buffer;
-mod canvas;
 mod cmd;
 pub mod command;
 mod find_node;

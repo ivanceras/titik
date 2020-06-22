@@ -10,6 +10,10 @@ use crate::{
     LayoutTree,
     Widget,
 };
+use ito_canvas::unicode_canvas::{
+    Border,
+    Canvas,
+};
 use std::{
     any::Any,
     fmt,
@@ -136,58 +140,31 @@ pub trait Flex<MSG>: Widget<MSG> {
         height: f32,
     ) {
         if self.has_border() {
+            let border = Border {
+                use_thick_border: self.is_expand_width(),
+                has_top: true,
+                has_bottom: true,
+                has_left: true,
+                has_right: true,
+                is_top_left_rounded: self.is_rounded_border(),
+                is_top_right_rounded: self.is_rounded_border(),
+                is_bottom_left_rounded: self.is_rounded_border(),
+                is_bottom_right_rounded: self.is_rounded_border(),
+            };
             let loc_x = x.round();
             let loc_y = y.round();
             let width = width.round();
             let height = height.round();
 
-            let (
-                top_left_symbol,
-                top_right_symbol,
-                bottom_left_symbol,
-                bottom_right_symbol,
-                horizontal_symbol,
-                vertical_symbol,
-            ) = self.get_symbols();
-
-            let bottom = loc_y + height - 1.0;
-            let right = loc_x + width - 1.0;
-            // draw the horizontal border
-            for i in 0..width as usize {
-                buf.set_symbol(
-                    loc_x as usize + i,
-                    loc_y as usize,
-                    horizontal_symbol,
-                );
-                buf.set_symbol(
-                    loc_x as usize + i,
-                    bottom as usize,
-                    horizontal_symbol,
-                );
+            let left = loc_x as usize;
+            let top = loc_y as usize;
+            let bottom = (loc_y + height - 1.0) as usize;
+            let right = (loc_x + width - 1.0) as usize;
+            let mut canvas = Canvas::new();
+            canvas.draw_rect((left, top), (right, bottom), border);
+            for (i, j, ch) in canvas.get_cells() {
+                buf.set_symbol(i, j, ch);
             }
-
-            // draw the vertical border
-            for j in 0..height as usize {
-                buf.set_symbol(
-                    loc_x as usize,
-                    loc_y as usize + j,
-                    vertical_symbol,
-                );
-                buf.set_symbol(
-                    right as usize,
-                    loc_y as usize + j,
-                    vertical_symbol,
-                );
-            }
-
-            buf.set_symbol(loc_x as usize, loc_y as usize, top_left_symbol);
-            buf.set_symbol(loc_x as usize, bottom as usize, bottom_left_symbol);
-            buf.set_symbol(right as usize, loc_y as usize, top_right_symbol);
-            buf.set_symbol(
-                right as usize,
-                bottom as usize,
-                bottom_right_symbol,
-            );
         }
     }
 

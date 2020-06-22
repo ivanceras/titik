@@ -3,10 +3,6 @@ use crate::{
         Buffer,
         Cell,
     },
-    canvas::{
-        Border,
-        Canvas,
-    },
     symbol::{
         bar,
         line,
@@ -17,6 +13,10 @@ use crate::{
     Cmd,
     LayoutTree,
     Widget,
+};
+use ito_canvas::unicode_canvas::{
+    Border,
+    Canvas,
 };
 use std::{
     any::Any,
@@ -111,20 +111,25 @@ impl<MSG> TabBox<MSG> {
     ///  ╭──────╮──────┬──────╮
     ///  │ tab1 │ tab2 │ tab2 │
     ///  └──────┴──────┴──────┴
-    pub fn draw_labels(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    pub fn draw_labels(
+        &self,
+        buf: &mut Buffer,
+        canvas: &mut Canvas,
+        layout_tree: &LayoutTree,
+    ) {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let left_pad = 3;
         let mut left = loc_x + left_pad;
-        let mut canvas = Canvas::new();
+        let top = loc_y;
+        let width = layout.size.width.round() as usize;
+        let height = 2;
+        let bottom = top + height;
 
         for (tab_index, label) in self.tab_labels.iter().enumerate() {
             let label_width = label.len() + 3;
             let right = left + label_width;
-            let top = loc_y;
-            let height = 2;
-            let bottom = top + height;
             buf.write_str(left + 2, top + 1, label);
             canvas.draw_rect(
                 (left, top),
@@ -145,7 +150,13 @@ impl<MSG> TabBox<MSG> {
 
             left += label_width;
         }
-        buf.write_canvas(canvas);
+        // draw a line to the rest of the width
+        canvas.draw_horizontal_line(
+            (left, bottom),
+            (loc_x + width - left, bottom),
+            false,
+        );
+        canvas.draw_horizontal_line((loc_x, bottom), (left_pad, bottom), false);
     }
 }
 
@@ -212,8 +223,26 @@ where
         let loc_y = layout.location.y.round();
         let width = layout.size.width.round();
         let height = layout.size.height.round();
-        self.draw_border(buf, loc_x, loc_y + 2.0, width, height - 2.0);
-        self.draw_labels(buf, layout_tree);
+        let mut canvas = Canvas::new();
+        let left = loc_x as usize;
+        let right = left + width as usize;
+        let top = (loc_y + 2.0) as usize;
+        let bottom = top + height as usize - 2;
+        let border = Border {
+            use_thick_border: self.is_expand_width(),
+            has_top: false,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: self.is_rounded_border(),
+            is_top_right_rounded: self.is_rounded_border(),
+            is_bottom_left_rounded: self.is_rounded_border(),
+            is_bottom_right_rounded: self.is_rounded_border(),
+        };
+
+        self.draw_labels(buf, &mut canvas, layout_tree);
+        canvas.draw_rect((left, top), (right, bottom), border);
+        buf.write_canvas(canvas);
         vec![]
     }
 
