@@ -186,6 +186,41 @@ impl<MSG> TabBox<MSG> {
         );
         canvas.draw_horizontal_line((loc_x, bottom), (left_pad, bottom), false);
     }
+
+    fn draw_children(
+        &mut self,
+        buf: &mut Buffer,
+        layout_tree: &LayoutTree,
+    ) -> Vec<Cmd> {
+        let layout = layout_tree.layout;
+        let loc_x = layout.location.x.round();
+        let loc_y = layout.location.y.round();
+        let width = layout.size.width.round();
+        let height = layout.size.height.round();
+
+        let mut inner_buf =
+            Buffer::new(width as usize - 2, height as usize - 2);
+
+        let cmds = self
+            .children
+            .iter_mut()
+            .zip(layout_tree.children_layout.iter())
+            .flat_map(|(child, child_layout)| {
+                child.draw(&mut inner_buf, child_layout)
+            })
+            .collect();
+
+        for (j, line) in inner_buf.cells.iter().enumerate() {
+            for (i, cell) in line.iter().enumerate() {
+                buf.set_cell(
+                    loc_x as usize + i + 1,
+                    loc_y as usize + 3,
+                    cell.clone(),
+                )
+            }
+        }
+        cmds
+    }
 }
 
 impl<MSG> Widget<MSG> for TabBox<MSG>
@@ -271,6 +306,7 @@ where
         self.draw_labels(buf, &mut canvas, layout_tree);
         canvas.draw_rect((left, top), (right, bottom), border);
         buf.write_canvas(canvas);
+        self.draw_children(buf, layout_tree);
         vec![]
     }
 
