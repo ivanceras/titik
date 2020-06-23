@@ -76,9 +76,12 @@ fn build_ui() -> Box<dyn Widget<()>> {
         "Tab1".into(),
         "Tab2".into(),
         "Tab3".into(),
+        "Tab4".into(),
+        "Tab5".into(),
         "And more tabs..".into(),
     ];
     tab1.active_tab = 1;
+    tab1.set_size(None, Some(10.0));
 
     let mut gb1 = GroupBox::new();
     gb1.set_label("Selection");

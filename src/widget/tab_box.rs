@@ -8,6 +8,12 @@ use crate::{
     LayoutTree,
     Widget,
 };
+use crossterm::event::{
+    Event,
+    KeyEvent,
+    KeyModifiers,
+    MouseEvent,
+};
 use ito_canvas::unicode_canvas::{
     Border,
     Canvas,
@@ -21,6 +27,7 @@ use stretch::{
         Rect,
         Size,
     },
+    result::Layout,
     style::{
         AlignContent,
         AlignItems,
@@ -49,7 +56,7 @@ use stretch::{
 ///  └────────────────────────────────┘
 /// ```
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct TabBox<MSG> {
     /// The labels for each of the tabs for each corresponding children
     pub tab_labels: Vec<String>,
@@ -64,6 +71,7 @@ pub struct TabBox<MSG> {
     pub has_border: bool,
     pub is_rounded_border: bool,
     pub is_thick_border: bool,
+    layout: Option<Layout>,
 }
 
 impl<MSG> TabBox<MSG> {
@@ -80,6 +88,7 @@ impl<MSG> TabBox<MSG> {
             has_border: true,
             is_rounded_border: true,
             is_thick_border: false,
+            layout: None,
         }
     }
 
@@ -102,6 +111,40 @@ impl<MSG> TabBox<MSG> {
         self.scroll_top = scroll_top;
     }
 
+    /// return the calculation of tab_level
+    fn tab_label_rects(&self) -> Vec<((usize, usize), (usize, usize))> {
+        let layout = self.layout.expect("must have a layout");
+        let loc_x = layout.location.x.round() as usize;
+        let loc_y = layout.location.y.round() as usize;
+        let left_pad = 3;
+        let mut left = loc_x + left_pad;
+        let top = loc_y;
+        let width = layout.size.width.round() as usize;
+        let height = 2;
+        let bottom = top + height;
+        let mut tab_rects: Vec<((usize, usize), (usize, usize))> = vec![];
+        for (tab_index, label) in self.tab_labels.iter().enumerate() {
+            let label_width = label.len() + 3;
+            let right = left + label_width;
+            tab_rects.push(((left, top), (right, bottom)));
+            left += label_width;
+        }
+        tab_rects
+    }
+
+    fn hit_tab_label(&self, x: usize, y: usize) -> Option<usize> {
+        eprintln!("cursor: ({},{})", x, y);
+        let tab_rects = self.tab_label_rects();
+        for (tab_index, ((left, top), (right, bottom))) in
+            tab_rects.iter().enumerate()
+        {
+            if x >= *left && x <= *right && y >= *top && y <= *bottom {
+                return Some(tab_index);
+            }
+        }
+        None
+    }
+
     ///  ╭──────╮──────┬──────╮
     ///  │ tab1 │ tab2 │ tab2 │
     ///  └──────┴──────┴──────┴
@@ -115,20 +158,12 @@ impl<MSG> TabBox<MSG> {
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let left_pad = 3;
-        let mut left = loc_x + left_pad;
         let top = loc_y;
         let width = layout.size.width.round() as usize;
         let height = 2;
         let bottom = top + height;
 
-        // (left, top), (right, bottom)
-        let mut tab_rects: Vec<((usize, usize), (usize, usize))> = vec![];
-        for (tab_index, label) in self.tab_labels.iter().enumerate() {
-            let label_width = label.len() + 3;
-            let right = left + label_width;
-            tab_rects.push(((left, top), (right, bottom)));
-            left += label_width;
-        }
+        let tab_rects = self.tab_label_rects();
 
         // draw the tabs
         for (tab_index, ((left, top), (right, bottom))) in
@@ -173,8 +208,9 @@ impl<MSG> TabBox<MSG> {
         );
 
         // draw a line to the rest of the width
+        let ((_, _), (right, _)) = tab_rects[tab_rects.len() - 1];
         canvas.draw_horizontal_line(
-            (left, bottom),
+            (right, bottom),
             (loc_x + width, bottom),
             false,
         );
@@ -276,6 +312,8 @@ where
     fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         // offset the position of the top_border
         let layout = layout_tree.layout;
+        let layout = layout_tree.layout;
+        self.layout = Some(layout.clone());
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
         let width = layout.size.width.round();
@@ -291,10 +329,10 @@ where
             has_bottom: true,
             has_left: true,
             has_right: true,
-            is_top_left_rounded: self.is_rounded_border(),
-            is_top_right_rounded: self.is_rounded_border(),
-            is_bottom_left_rounded: self.is_rounded_border(),
-            is_bottom_right_rounded: self.is_rounded_border(),
+            is_top_left_rounded: true,
+            is_top_right_rounded: true,
+            is_bottom_left_rounded: true,
+            is_bottom_right_rounded: true,
         };
 
         self.draw_labels(buf, &mut canvas, layout_tree);
@@ -348,6 +386,21 @@ where
 
     fn get_id(&self) -> &Option<String> {
         &self.id
+    }
+
+    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+        match event {
+            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
+                if let Some(active_tab) =
+                    self.hit_tab_label(x as usize, y as usize)
+                {
+                    eprintln!("active_tab: {:?}", active_tab);
+                    self.active_tab = active_tab;
+                }
+                vec![]
+            }
+            _ => vec![],
+        }
     }
 }
 
