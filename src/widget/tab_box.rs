@@ -127,13 +127,23 @@ impl<MSG> TabBox<MSG> {
         let height = 2;
         let bottom = top + height;
 
+        // (left, top), (right, bottom)
+        let mut tab_rects: Vec<((usize, usize), (usize, usize))> = vec![];
         for (tab_index, label) in self.tab_labels.iter().enumerate() {
             let label_width = label.len() + 3;
             let right = left + label_width;
-            buf.write_str(left + 2, top + 1, label);
+            tab_rects.push(((left, top), (right, bottom)));
+            left += label_width;
+        }
+
+        // draw the tabs
+        for (tab_index, ((left, top), (right, bottom))) in
+            tab_rects.iter().enumerate()
+        {
+            buf.write_str(left + 2, top + 1, &self.tab_labels[tab_index]);
             canvas.draw_rect(
-                (left, top),
-                (right, bottom),
+                (*left, *top),
+                (*right, *bottom),
                 Border {
                     use_thick_border: false,
                     has_top: true,
@@ -147,13 +157,31 @@ impl<MSG> TabBox<MSG> {
                     is_bottom_right_rounded: false,
                 },
             );
-
-            left += label_width;
         }
+        // redraw the active tab
+        let ((active_left, active_top), (active_right, active_bottom)) =
+            &tab_rects[self.active_tab];
+        canvas.draw_rect(
+            (*active_left, *active_top),
+            (*active_right, *active_bottom),
+            Border {
+                use_thick_border: false,
+                has_top: true,
+                has_bottom: false,
+                has_left: true,
+                has_right: true,
+
+                is_top_left_rounded: true,
+                is_top_right_rounded: true,
+                is_bottom_left_rounded: false,
+                is_bottom_right_rounded: false,
+            },
+        );
+
         // draw a line to the rest of the width
         canvas.draw_horizontal_line(
             (left, bottom),
-            (loc_x + width - left, bottom),
+            (loc_x + width, bottom),
             false,
         );
         canvas.draw_horizontal_line((loc_x, bottom), (left_pad, bottom), false);
@@ -225,9 +253,9 @@ where
         let height = layout.size.height.round();
         let mut canvas = Canvas::new();
         let left = loc_x as usize;
-        let right = left + width as usize;
+        let right = left + width as usize - 1;
         let top = (loc_y + 2.0) as usize;
-        let bottom = top + height as usize - 2;
+        let bottom = top + height as usize - 3;
         let border = Border {
             use_thick_border: self.is_expand_width(),
             has_top: false,

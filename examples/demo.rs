@@ -72,7 +72,12 @@ fn build_ui() -> Box<dyn Widget<()>> {
     root_node.vertical();
 
     let mut tab1 = TabBox::new();
-    tab1.tab_labels = vec!["Tab1".into(), "Tab2".into(), "Tab3".into()];
+    tab1.tab_labels = vec![
+        "Tab1".into(),
+        "Tab2".into(),
+        "Tab3".into(),
+        "And more tabs..".into(),
+    ];
     tab1.active_tab = 1;
 
     let mut gb1 = GroupBox::new();
