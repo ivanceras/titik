@@ -1,11 +1,5 @@
 use crate::{
     buffer::Buffer,
-    symbol::{
-        bar,
-        line,
-        rounded,
-        thick_line,
-    },
     Cmd,
     LayoutTree,
     Widget,
@@ -84,53 +78,6 @@ pub trait Flex<MSG>: Widget<MSG> {
         }
     }
 
-    fn get_symbols(&self) -> (char, char, char, char, char, char) {
-        let mut top_left_symbol = if self.is_rounded_border() {
-            rounded::TOP_LEFT
-        } else {
-            line::TOP_LEFT
-        };
-
-        let mut top_right_symbol = if self.is_rounded_border() {
-            rounded::TOP_RIGHT
-        } else {
-            line::TOP_RIGHT
-        };
-        let mut bottom_left_symbol = if self.is_rounded_border() {
-            rounded::BOTTOM_LEFT
-        } else {
-            line::BOTTOM_LEFT
-        };
-        let mut bottom_right_symbol = if self.is_rounded_border() {
-            rounded::BOTTOM_RIGHT
-        } else {
-            line::BOTTOM_RIGHT
-        };
-
-        let mut horizontal_symbol = line::HORIZONTAL;
-        let mut vertical_symbol = line::VERTICAL;
-
-        // Note: the rounded border is override with square thick line since there is no thick
-        // rounded corner
-        if self.is_thick_border() {
-            top_left_symbol = thick_line::TOP_LEFT;
-            top_right_symbol = thick_line::TOP_RIGHT;
-            bottom_left_symbol = thick_line::BOTTOM_LEFT;
-            bottom_right_symbol = thick_line::BOTTOM_RIGHT;
-            horizontal_symbol = thick_line::HORIZONTAL;
-            vertical_symbol = thick_line::VERTICAL;
-        }
-
-        (
-            top_left_symbol,
-            top_right_symbol,
-            bottom_left_symbol,
-            bottom_right_symbol,
-            horizontal_symbol,
-            vertical_symbol,
-        )
-    }
-
     fn draw_border(
         &self,
         buf: &mut Buffer,
@@ -141,7 +88,7 @@ pub trait Flex<MSG>: Widget<MSG> {
     ) {
         if self.has_border() {
             let border = Border {
-                use_thick_border: self.is_expand_width(),
+                use_thick_border: self.is_thick_border(),
                 has_top: true,
                 has_bottom: true,
                 has_left: true,

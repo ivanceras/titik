@@ -3,12 +3,6 @@ use crate::{
         Buffer,
         Cell,
     },
-    symbol::{
-        bar,
-        line,
-        rounded,
-        thick_line,
-    },
     widget::Flex,
     Cmd,
     LayoutTree,

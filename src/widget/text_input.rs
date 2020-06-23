@@ -1,10 +1,5 @@
 use crate::{
     buffer::Buffer,
-    symbol::{
-        line,
-        rounded,
-        thick_line,
-    },
     Cmd,
     InputBuffer,
     LayoutTree,
@@ -14,6 +9,10 @@ use crossterm::event::{
     Event,
     KeyEvent,
     MouseEvent,
+};
+use ito_canvas::unicode_canvas::{
+    Border,
+    Canvas,
 };
 use std::any::Any;
 use stretch::{
@@ -146,53 +145,25 @@ impl<MSG> Widget<MSG> for TextInput {
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
 
-        let bottom = loc_y as i32 + height as i32 - 1;
-        let right = loc_x as i32 + width as i32 - 1;
+        let left = loc_x;
+        let top = loc_y;
+        let bottom = top + height - 1;
+        let right = left + width - 1;
 
-        let mut top_left_symbol = if self.is_rounded {
-            rounded::TOP_LEFT
-        } else {
-            line::TOP_LEFT
+        let border = Border {
+            use_thick_border: self.focused,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: self.is_rounded,
+            is_top_right_rounded: self.is_rounded,
+            is_bottom_left_rounded: self.is_rounded,
+            is_bottom_right_rounded: self.is_rounded,
         };
-
-        let mut top_right_symbol = if self.is_rounded {
-            rounded::TOP_RIGHT
-        } else {
-            line::TOP_RIGHT
-        };
-        let mut bottom_left_symbol = if self.is_rounded {
-            rounded::BOTTOM_LEFT
-        } else {
-            line::BOTTOM_LEFT
-        };
-        let mut bottom_right_symbol = if self.is_rounded {
-            rounded::BOTTOM_RIGHT
-        } else {
-            line::BOTTOM_RIGHT
-        };
-
-        let mut horizontal = line::HORIZONTAL;
-        let mut vertical = line::VERTICAL;
-
-        // Note: the rounded border is override with square thick line since there is no thick
-        // rounded corner
-        if self.focused {
-            top_left_symbol = thick_line::TOP_LEFT;
-            top_right_symbol = thick_line::TOP_RIGHT;
-            bottom_left_symbol = thick_line::BOTTOM_LEFT;
-            bottom_right_symbol = thick_line::BOTTOM_RIGHT;
-            horizontal = thick_line::HORIZONTAL;
-            vertical = thick_line::VERTICAL;
-        }
-
-        for i in 0..width {
-            buf.set_symbol(loc_x + i, loc_y, horizontal);
-            buf.set_symbol(loc_x + i, bottom as usize, horizontal);
-        }
-        for j in 0..height {
-            buf.set_symbol(loc_x, loc_y + j, vertical);
-            buf.set_symbol(right as usize, loc_y + j, vertical);
-        }
+        let mut canvas = Canvas::new();
+        canvas.draw_rect((left, top), (right, bottom), border);
+        buf.write_canvas(canvas);
 
         let inner_width = self.inner_width(&layout_tree.layout);
         for (t, ch) in self.get_value().chars().enumerate() {
@@ -200,11 +171,6 @@ impl<MSG> Widget<MSG> for TextInput {
                 buf.set_symbol(loc_x + 1 + t, loc_y + 1, ch);
             }
         }
-
-        buf.set_symbol(loc_x, loc_y, top_left_symbol);
-        buf.set_symbol(loc_x, bottom as usize, bottom_left_symbol);
-        buf.set_symbol(right as usize, loc_y, top_right_symbol);
-        buf.set_symbol(right as usize, bottom as usize, bottom_right_symbol);
 
         let cursor_loc_x = self.input_buffer.get_cursor_location();
         if self.focused {

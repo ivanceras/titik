@@ -20,39 +20,6 @@ pub mod bar {
     pub const ONE_EIGHTH: char = '▁';
 }
 
-pub mod line {
-    pub const TOP_RIGHT: char = '┐';
-    pub const VERTICAL: char = '│';
-    pub const HORIZONTAL: char = '─';
-    pub const TOP_LEFT: char = '┌';
-    pub const BOTTOM_RIGHT: char = '┘';
-    pub const BOTTOM_LEFT: char = '└';
-    pub const VERTICAL_LEFT: char = '┤';
-    pub const VERTICAL_RIGHT: char = '├';
-    pub const HORIZONTAL_DOWN: char = '┬';
-    pub const HORIZONTAL_UP: char = '┴';
-}
-
-pub mod thick_line {
-    pub const TOP_RIGHT: char = '┓';
-    pub const VERTICAL: char = '┃';
-    pub const HORIZONTAL: char = '━';
-    pub const TOP_LEFT: char = '┏';
-    pub const BOTTOM_RIGHT: char = '┛';
-    pub const BOTTOM_LEFT: char = '┗';
-    pub const VERTICAL_LEFT: char = '┫';
-    pub const VERTICAL_RIGHT: char = '┣';
-    pub const HORIZONTAL_DOWN: char = '┳';
-    pub const HORIZONTAL_UP: char = '┻';
-}
-
-pub mod rounded {
-    pub const TOP_LEFT: char = '╭';
-    pub const TOP_RIGHT: char = '╮';
-    pub const BOTTOM_LEFT: char = '╰';
-    pub const BOTTOM_RIGHT: char = '╯';
-}
-
 pub const BOX_UNCHECKED: char = '☐';
 pub const BOX_CHECKED: char = '☑';
 pub const BOX_XMARKED: char = '☒';

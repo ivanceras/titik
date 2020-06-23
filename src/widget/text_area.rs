@@ -1,11 +1,6 @@
 use crate::{
     buffer::Buffer,
-    symbol::{
-        bar,
-        line,
-        rounded,
-        thick_line,
-    },
+    symbol::bar,
     AreaBuffer,
     Cmd,
     LayoutTree,
@@ -16,6 +11,10 @@ use crossterm::event::{
     KeyEvent,
     KeyModifiers,
     MouseEvent,
+};
+use ito_canvas::unicode_canvas::{
+    Border,
+    Canvas,
 };
 use sauron_vdom::Callback;
 use std::{
@@ -144,53 +143,6 @@ impl<MSG> TextArea<MSG> {
         }
     }
 
-    fn get_symbols(&self) -> (char, char, char, char, char, char) {
-        let mut top_left_symbol = if self.is_rounded_border {
-            rounded::TOP_LEFT
-        } else {
-            line::TOP_LEFT
-        };
-
-        let mut top_right_symbol = if self.is_rounded_border {
-            rounded::TOP_RIGHT
-        } else {
-            line::TOP_RIGHT
-        };
-        let mut bottom_left_symbol = if self.is_rounded_border {
-            rounded::BOTTOM_LEFT
-        } else {
-            line::BOTTOM_LEFT
-        };
-        let mut bottom_right_symbol = if self.is_rounded_border {
-            rounded::BOTTOM_RIGHT
-        } else {
-            line::BOTTOM_RIGHT
-        };
-
-        let mut horizontal_symbol = line::HORIZONTAL;
-        let mut vertical_symbol = line::VERTICAL;
-
-        // Note: the rounded border is override with square thick line since there is no thick
-        // rounded corner
-        if self.focused || self.is_thick_border {
-            top_left_symbol = thick_line::TOP_LEFT;
-            top_right_symbol = thick_line::TOP_RIGHT;
-            bottom_left_symbol = thick_line::BOTTOM_LEFT;
-            bottom_right_symbol = thick_line::BOTTOM_RIGHT;
-            horizontal_symbol = thick_line::HORIZONTAL;
-            vertical_symbol = thick_line::VERTICAL;
-        }
-
-        (
-            top_left_symbol,
-            top_right_symbol,
-            bottom_left_symbol,
-            bottom_right_symbol,
-            horizontal_symbol,
-            vertical_symbol,
-        )
-    }
-
     fn content_height(&self) -> f32 {
         self.area_buffer.height() as f32
     }
@@ -217,64 +169,6 @@ impl<MSG> TextArea<MSG> {
         let abs_cursor_x = loc_x + cursor_loc_x as f32 + 1.0;
         let abs_cursor_y = loc_y + cursor_loc_y as f32 + 1.0 - self.scroll_top;
         (abs_cursor_x, abs_cursor_y)
-    }
-
-    fn draw_border(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
-        if self.has_border {
-            let layout = layout_tree.layout;
-            let loc_x = layout.location.x.round();
-            let loc_y = layout.location.y.round();
-            let width = layout.size.width.round();
-            let height = layout.size.height.round();
-
-            let (
-                top_left_symbol,
-                top_right_symbol,
-                bottom_left_symbol,
-                bottom_right_symbol,
-                horizontal_symbol,
-                vertical_symbol,
-            ) = self.get_symbols();
-
-            let bottom = loc_y + height - 1.0;
-            let right = loc_x + width - 1.0;
-            // draw the horizontal border
-            for i in 0..width as usize {
-                buf.set_symbol(
-                    loc_x as usize + i,
-                    loc_y as usize,
-                    horizontal_symbol,
-                );
-                buf.set_symbol(
-                    loc_x as usize + i,
-                    bottom as usize,
-                    horizontal_symbol,
-                );
-            }
-
-            // draw the vertical border
-            for j in 0..height as usize {
-                buf.set_symbol(
-                    loc_x as usize,
-                    loc_y as usize + j,
-                    vertical_symbol,
-                );
-                buf.set_symbol(
-                    right as usize,
-                    loc_y as usize + j,
-                    vertical_symbol,
-                );
-            }
-
-            buf.set_symbol(loc_x as usize, loc_y as usize, top_left_symbol);
-            buf.set_symbol(loc_x as usize, bottom as usize, bottom_left_symbol);
-            buf.set_symbol(right as usize, loc_y as usize, top_right_symbol);
-            buf.set_symbol(
-                right as usize,
-                bottom as usize,
-                bottom_right_symbol,
-            );
-        }
     }
 
     fn draw_scrollers(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
@@ -308,6 +202,34 @@ impl<MSG> TextArea<MSG> {
                 buf.set_symbol(right as usize - i - 1, bottom as usize, '▮');
             }
         }
+    }
+
+    fn draw_border(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+        let layout = layout_tree.layout;
+        let loc_x = layout.location.x.round() as usize;
+        let loc_y = layout.location.y.round() as usize;
+        let width = layout.size.width.round() as usize;
+        let height = layout.size.height.round() as usize;
+
+        let left = loc_x;
+        let top = loc_y;
+        let bottom = top + height - 1;
+        let right = left + width - 1;
+
+        let border = Border {
+            use_thick_border: self.focused,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: false,
+            is_top_right_rounded: false,
+            is_bottom_left_rounded: false,
+            is_bottom_right_rounded: false,
+        };
+        let mut canvas = Canvas::new();
+        canvas.draw_rect((left, top), (right, bottom), border);
+        buf.write_canvas(canvas);
     }
 }
 
@@ -359,15 +281,6 @@ where
         let width = layout.size.width.round();
         let height = layout.size.height.round();
         self.layout = Some(layout.clone());
-
-        let (
-            top_left_symbol,
-            top_right_symbol,
-            bottom_left_symbol,
-            bottom_right_symbol,
-            horizontal_symbol,
-            vertical_symbol,
-        ) = self.get_symbols();
 
         let bottom = loc_y + height - 1.0;
         let right = loc_x + width - 1.0;

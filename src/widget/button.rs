@@ -3,10 +3,6 @@ use crate::{
         Buffer,
         Cell,
     },
-    symbol::{
-        line,
-        rounded,
-    },
     Cmd,
     LayoutTree,
     Widget,
@@ -14,6 +10,10 @@ use crate::{
 use crossterm::event::{
     Event,
     MouseEvent,
+};
+use ito_canvas::unicode_canvas::{
+    Border,
+    Canvas,
 };
 use sauron_vdom::Callback;
 use std::{
@@ -133,17 +133,26 @@ where
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
 
-        let bottom = loc_y as i32 + height as i32 - 1;
-        let right = loc_x as i32 + width as i32 - 1;
+        let left = loc_x;
+        let top = loc_y;
+        let bottom = top + height - 1;
+        let right = left + width - 1;
 
-        for i in 0..width {
-            buf.set_symbol(loc_x + i, loc_y, line::HORIZONTAL);
-            buf.set_symbol(loc_x + i, bottom as usize, line::HORIZONTAL);
-        }
-        for j in 0..height {
-            buf.set_symbol(loc_x, loc_y + j, line::VERTICAL);
-            buf.set_symbol(right as usize, loc_y + j, line::VERTICAL);
-        }
+        let border = Border {
+            use_thick_border: false,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: self.is_rounded,
+            is_top_right_rounded: self.is_rounded,
+            is_bottom_left_rounded: self.is_rounded,
+            is_bottom_right_rounded: self.is_rounded,
+        };
+        let mut canvas = Canvas::new();
+        canvas.draw_rect((left, top), (right, bottom), border);
+        buf.write_canvas(canvas);
+
         for (t, ch) in self.label.chars().enumerate() {
             let mut cell = Cell::new(ch);
             if self.focused {
@@ -152,30 +161,6 @@ where
             buf.set_cell(loc_x + 1 + t, loc_y + 1, cell);
         }
 
-        let top_left_symbol = if self.is_rounded {
-            rounded::TOP_LEFT
-        } else {
-            line::TOP_LEFT
-        };
-        let top_right_symbol = if self.is_rounded {
-            rounded::TOP_RIGHT
-        } else {
-            line::TOP_RIGHT
-        };
-        let bottom_left_symbol = if self.is_rounded {
-            rounded::BOTTOM_LEFT
-        } else {
-            line::BOTTOM_LEFT
-        };
-        let bottom_right_symbol = if self.is_rounded {
-            rounded::BOTTOM_RIGHT
-        } else {
-            line::BOTTOM_RIGHT
-        };
-        buf.set_symbol(loc_x, loc_y, top_left_symbol);
-        buf.set_symbol(loc_x, bottom as usize, bottom_left_symbol);
-        buf.set_symbol(right as usize, loc_y, top_right_symbol);
-        buf.set_symbol(right as usize, bottom as usize, bottom_right_symbol);
         vec![]
     }
 

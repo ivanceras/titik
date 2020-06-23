@@ -1,11 +1,5 @@
 use crate::{
     buffer::Buffer,
-    symbol::{
-        bar,
-        line,
-        rounded,
-        thick_line,
-    },
     widget::Flex,
     Cmd,
     LayoutTree,
