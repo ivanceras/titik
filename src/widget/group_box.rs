@@ -113,7 +113,7 @@ where
                 height: if let Some(height) = self.height() {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Points((self.children.len() + 10) as f32)
+                    Dimension::Auto
                 },
             },
             overflow: Overflow::Scroll,

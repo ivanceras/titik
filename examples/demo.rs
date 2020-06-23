@@ -81,7 +81,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
         "And more tabs..".into(),
     ];
     tab1.active_tab = 1;
-    tab1.set_size(None, Some(10.0));
+    tab1.set_size(None, Some(30.0));
 
     let mut gb1 = GroupBox::new();
     gb1.set_label("Selection");
@@ -144,6 +144,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
 
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
+    tab1.add_child(Box::new(gb1));
     let mut row = FlexBox::new();
     row.is_expand_width = true;
     row.is_expand_height = false;
@@ -152,7 +153,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     row.add_child(Box::new(svg));
     root_node.add_child(Box::new(row));
     root_node.add_child(Box::new(tab1));
-    root_node.add_child(Box::new(gb1));
+    //root_node.add_child(Box::new(gb1));
     root_node.add_child(Box::new(input1));
     root_node.add_child(Box::new(input2));
     root_node.add_child(Box::new(text_area1));

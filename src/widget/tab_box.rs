@@ -236,15 +236,20 @@ impl<MSG> TabBox<MSG> {
             .iter_mut()
             .zip(layout_tree.children_layout.iter())
             .flat_map(|(child, child_layout)| {
+                eprintln!("drawing child: {:?}", child);
+                eprintln!("with layout: {:#?}", child_layout);
                 child.draw(&mut inner_buf, child_layout)
             })
             .collect();
+        eprintln!("There are {} children", self.children.len());
+        eprintln!("Children: {:#?}", self.children);
 
         for (j, line) in inner_buf.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
+                eprintln!("cell: {:?}", cell);
                 buf.set_cell(
                     loc_x as usize + i + 1,
-                    loc_y as usize + 3,
+                    loc_y as usize + j + 3,
                     cell.clone(),
                 )
             }
@@ -269,7 +274,7 @@ where
                 height: if let Some(height) = self.height() {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Points((self.children.len() + 10) as f32)
+                    Dimension::Auto
                 },
             },
             overflow: Overflow::Scroll,

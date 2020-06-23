@@ -199,20 +199,23 @@ impl<'a, MSG> Renderer<'a, MSG> {
                 // if it focused or not.
                 if let Some((x, y)) = extract_location(&event) {
                     let mut hits = self.layout_tree.hit(x as f32, y as f32);
-                    let hit = hits.pop().expect("process only 1 for now");
-                    let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                        { find_widget_mut(self.root_node, hit) };
+                    //let hit = hits.pop().expect("process only 1 for now");
+                    for hit in hits.iter().rev() {
+                        let mut hit_widget: Option<&mut dyn Widget<MSG>> =
+                            { find_widget_mut(self.root_node, *hit) };
 
-                    let focused_layout = find_layout(&self.layout_tree, hit)
-                        .expect("must have a layout tree");
+                        let focused_layout =
+                            find_layout(&self.layout_tree, *hit)
+                                .expect("must have a layout tree");
 
-                    if let Some(hit_widget) = &mut hit_widget {
-                        let msgs = hit_widget.process_event(event);
-                        eprintln!(
+                        if let Some(hit_widget) = &mut hit_widget {
+                            let msgs = hit_widget.process_event(event);
+                            eprintln!(
                             "done processing event... now processing msgs: {}",
                             msgs.len()
                         );
-                        self.dispatch_msg(msgs);
+                            self.dispatch_msg(msgs);
+                        }
                     }
                 }
             }
