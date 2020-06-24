@@ -248,8 +248,8 @@ impl<MSG> TabBox<MSG> {
             for (i, cell) in line.iter().enumerate() {
                 eprintln!("cell: {:?}", cell);
                 buf.set_cell(
-                    loc_x as usize + i + 1,
-                    loc_y as usize + j + 3,
+                    loc_x as usize + i,
+                    loc_y as usize + j + 2,
                     cell.clone(),
                 )
             }
@@ -340,10 +340,10 @@ where
             is_bottom_right_rounded: true,
         };
 
+        self.draw_children(buf, layout_tree);
         self.draw_labels(buf, &mut canvas, layout_tree);
         canvas.draw_rect((left, top), (right, bottom), border);
         buf.write_canvas(canvas);
-        self.draw_children(buf, layout_tree);
         vec![]
     }
 

@@ -37,6 +37,7 @@ mod flex_box;
 mod group_box;
 mod image_control;
 mod radio;
+mod slider;
 mod svg_image;
 mod tab_box;
 mod text_area;
