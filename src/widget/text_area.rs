@@ -248,7 +248,7 @@ where
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Points(self.content_height() as f32)
+                    Dimension::Points(self.content_height())
                 },
             },
             min_size: Size {
