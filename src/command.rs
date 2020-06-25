@@ -1,3 +1,4 @@
+//! command to the terminal, such as moving the cursor and clearing the screen
 use crossterm::{
     cursor,
     event::{
@@ -10,11 +11,7 @@ use crossterm::{
 };
 use std::io::Write;
 
-pub fn move_to(w: &mut dyn Write) -> crossterm::Result<()> {
-    crossterm::execute!(w, cursor::Hide, cursor::MoveTo(1, 1))
-}
-
-pub fn reset_top(w: &mut dyn Write) -> crossterm::Result<()> {
+pub(crate) fn reset_top(w: &mut dyn Write) -> crossterm::Result<()> {
     crossterm::queue!(
         w,
         style::ResetColor,
@@ -24,12 +21,12 @@ pub fn reset_top(w: &mut dyn Write) -> crossterm::Result<()> {
     )
 }
 
-pub fn init(w: &mut dyn Write) -> crossterm::Result<()> {
+pub(crate) fn init(w: &mut dyn Write) -> crossterm::Result<()> {
     crossterm::execute!(w, terminal::EnterAlternateScreen, EnableMouseCapture)?;
     terminal::enable_raw_mode()
 }
 
-pub fn finalize(w: &mut dyn Write) -> crossterm::Result<()> {
+pub(crate) fn finalize(w: &mut dyn Write) -> crossterm::Result<()> {
     crossterm::execute!(
         w,
         style::ResetColor,

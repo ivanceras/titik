@@ -24,18 +24,20 @@ use stretch::{
     },
 };
 
+/// A one line text input
 #[derive(Default, Debug)]
 pub struct TextInput {
-    pub input_buffer: InputBuffer,
-    pub is_rounded: bool,
+    input_buffer: InputBuffer,
+    is_rounded: bool,
     focused: bool,
-    pub width: Option<f32>,
-    pub height: Option<f32>,
-    pub id: Option<String>,
+    width: Option<f32>,
+    height: Option<f32>,
+    id: Option<String>,
     layout: Option<Layout>,
 }
 
 impl TextInput {
+    /// creates a new text input with initial value
     pub fn new<S>(value: S) -> Self
     where
         S: ToString,
@@ -49,18 +51,22 @@ impl TextInput {
         }
     }
 
+    /// process the key event for this text input
     pub fn process_key(&mut self, key_event: KeyEvent) {
         self.input_buffer.process_key_event(key_event);
     }
 
+    /// set the value of the buffer
     pub fn set_value<S: ToString>(&mut self, value: S) {
         self.input_buffer = InputBuffer::new_with_value(value);
     }
 
+    /// returns a reference to the text value of this text input widget
     pub fn get_value(&self) -> &str {
         self.input_buffer.get_content()
     }
 
+    /// set whether to use rounded corner when drawing the border of the text input
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }

@@ -18,18 +18,20 @@ use std::{
 };
 use stretch::style::Style;
 
+/// an Image made from svg document
 pub struct SvgImage<MSG> {
-    pub image: DynamicImage,
+    image: DynamicImage,
     /// the width of cells used for this image
-    pub width: Option<f32>,
+    width: Option<f32>,
     /// the height of unit cells, will be divided by 2 when used for computing
     /// style layout
-    pub height: Option<f32>,
-    pub id: Option<String>,
+    height: Option<f32>,
+    id: Option<String>,
     _phantom_msg: PhantomData<MSG>,
 }
 
 impl<MSG> SvgImage<MSG> {
+    /// create a new svg image from svg text document
     pub fn new(svg: String) -> Self {
         let rtree =
             resvg::usvg::Tree::from_str(&svg, &resvg::usvg::Options::default())

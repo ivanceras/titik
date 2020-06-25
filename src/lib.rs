@@ -27,16 +27,15 @@
 //!
 //!
 #![deny(warnings)]
-//#![deny(
-//    missing_docs,
+#![deny(
+    missing_docs,
 //    missing_debug_implementations,
 //    missing_copy_implementations,
 //    trivial_casts,
 //    trivial_numeric_casts,
 //    unstable_features,
 //    unused_import_braces
-//)]
-pub use area_buffer::AreaBuffer;
+)]
 pub use buffer::{
     Buffer,
     Cell,
@@ -50,14 +49,7 @@ pub use find_node::{
     find_widget_mut,
 };
 pub use input_buffer::InputBuffer;
-pub use layout::{
-    compute_layout,
-    find_layout,
-    set_focused_node,
-    widget_hit_at,
-    widget_node_idx_at,
-    LayoutTree,
-};
+pub(crate) use layout::LayoutTree;
 pub use renderer::{
     Dispatch,
     Renderer,
@@ -85,7 +77,7 @@ mod cmd;
 pub mod command;
 mod find_node;
 mod input_buffer;
-mod layout;
+pub(crate) mod layout;
 pub mod renderer;
 #[allow(unused)]
 mod symbol;

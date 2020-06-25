@@ -50,15 +50,15 @@ fn build_ui() -> Box<dyn Widget<()>> {
     root_node.vertical();
 
     let mut tab1 = TabBox::new();
-    tab1.tab_labels = vec![
+    tab1.set_tab_labels(vec![
         "Tab1".into(),
         "Tab2".into(),
         "Tab3".into(),
         "Tab4".into(),
         "Tab5".into(),
         "And more tabs..".into(),
-    ];
-    tab1.active_tab = 1;
+    ]);
+    tab1.set_active_tab(1);
     tab1.set_size(None, Some(30.0));
 
     let mut gb1 = GroupBox::new();
@@ -118,14 +118,16 @@ fn build_ui() -> Box<dyn Widget<()>> {
     let mut btn1: Button<()> = Button::new("Button 1");
     btn1.set_id("btn1");
 
-    btn1.on_click = vec![Callback::from(|_| {})];
+    btn1.add_click_listener(Callback::from(|_| {
+        eprintln!("btn1 is clicked");
+    }));
 
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(btn2));
     tab1.add_child(Box::new(gb1));
     let mut row = FlexBox::new();
-    row.is_expand_width = true;
-    row.is_expand_height = false;
+    row.set_expand_width(true);
+    row.set_expand_height(false);
     row.horizontal();
     row.add_child(Box::new(img));
     row.add_child(Box::new(svg));

@@ -6,7 +6,7 @@ use unicode_width::UnicodeWidthChar;
 
 /// Area buffer is a 2 dimensional text buffer
 #[derive(Default, Debug, PartialEq, Clone)]
-pub struct AreaBuffer {
+pub(crate) struct AreaBuffer {
     pub(crate) content: Vec<Vec<char>>,
     content_width: usize,
     cursor_loc_x: usize,
@@ -14,15 +14,6 @@ pub struct AreaBuffer {
 }
 
 impl AreaBuffer {
-    pub fn new() -> Self {
-        AreaBuffer {
-            content: vec![],
-            content_width: 0,
-            cursor_loc_x: 0,
-            cursor_loc_y: 0,
-        }
-    }
-
     fn add_char(&mut self, c: char) {
         let line = self
             .content
@@ -42,7 +33,7 @@ impl AreaBuffer {
             .unwrap_or(0);
     }
 
-    pub fn add_line<S: ToString>(&mut self, s: S) {
+    pub(crate) fn add_line<S: ToString>(&mut self, s: S) {
         let line = s.to_string().chars().collect();
         self.content.push(line);
         self.cursor_loc_y += 1;

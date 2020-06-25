@@ -14,24 +14,26 @@ use stretch::style::{
     Style,
 };
 
+/// a flex box
 #[derive(Default, Debug)]
 pub struct FlexBox<MSG> {
-    pub children: Vec<Box<dyn Widget<MSG>>>,
-    pub width: Option<f32>,
-    pub height: Option<f32>,
-    pub flex_direction: FlexDirection,
-    pub scroll_top: f32,
-    pub id: Option<String>,
-    pub has_border: bool,
-    pub is_rounded_border: bool,
-    pub is_thick_border: bool,
+    children: Vec<Box<dyn Widget<MSG>>>,
+    width: Option<f32>,
+    height: Option<f32>,
+    flex_direction: FlexDirection,
+    scroll_top: f32,
+    id: Option<String>,
+    has_border: bool,
+    is_rounded_border: bool,
+    is_thick_border: bool,
     /// take as much height as possible
-    pub is_expand_height: bool,
+    is_expand_height: bool,
     /// take as much width as possible
-    pub is_expand_width: bool,
+    is_expand_width: bool,
 }
 
 impl<MSG> FlexBox<MSG> {
+    ///create a new flexbox
     pub fn new() -> Self {
         FlexBox {
             width: None,
@@ -63,8 +65,19 @@ impl<MSG> FlexBox<MSG> {
         self.flex_direction = FlexDirection::Row;
     }
 
+    /// scroll the flexbox
     pub fn set_scroll_top(&mut self, scroll_top: f32) {
         self.scroll_top = scroll_top;
+    }
+
+    /// set if to expand the width or not
+    pub fn set_expand_width(&mut self, is_expand_width: bool) {
+        self.is_expand_width = is_expand_width;
+    }
+
+    /// set whether to expand the height or not
+    pub fn set_expand_height(&mut self, is_expand_height: bool) {
+        self.is_expand_height = is_expand_height;
     }
 }
 

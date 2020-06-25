@@ -43,6 +43,8 @@ pub fn find_widget<MSG>(
     find_node(root_widget, node_idx, &mut 0)
 }
 
+/// returns a mutable reference to the widget from the root_widget tree matching the supplied node
+/// index
 pub fn find_widget_mut<MSG>(
     root_widget: &mut dyn Widget<MSG>,
     node_idx: usize,
@@ -50,6 +52,7 @@ pub fn find_widget_mut<MSG>(
     find_node_mut(root_widget, node_idx, &mut 0)
 }
 
+/// returns a reference to the widget from the root widget tree matching the supplied id
 pub fn find_widget_by_id<'a, MSG>(
     root_widget: &'a dyn Widget<MSG>,
     id: &str,
@@ -74,6 +77,7 @@ pub fn find_widget_by_id<'a, MSG>(
     }
 }
 
+/// returns a mutable reference to the widget from the root widget tree matching the supplied id
 pub fn find_widget_by_id_mut<'a, MSG>(
     root_widget: &'a mut dyn Widget<MSG>,
     id: &str,

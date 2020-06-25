@@ -29,18 +29,19 @@ use stretch::{
     },
 };
 
+/// A button widget
 #[derive(PartialEq, Clone)]
 pub struct Button<MSG>
 where
     MSG: 'static,
 {
-    pub label: String,
-    pub is_rounded: bool,
-    pub width: Option<f32>,
-    pub height: Option<f32>,
+    label: String,
+    is_rounded: bool,
+    width: Option<f32>,
+    height: Option<f32>,
     focused: bool,
-    pub on_click: Vec<Callback<sauron_vdom::Event, MSG>>,
-    pub id: Option<String>,
+    on_click: Vec<Callback<sauron_vdom::Event, MSG>>,
+    id: Option<String>,
 }
 
 impl<MSG> Default for Button<MSG> {
@@ -70,6 +71,7 @@ impl<MSG> Button<MSG>
 where
     MSG: 'static,
 {
+    /// create a new button with label
     pub fn new<S>(label: S) -> Self
     where
         S: ToString,
@@ -81,12 +83,22 @@ where
         }
     }
 
+    /// set the label of the button
     pub fn set_label<S: ToString>(&mut self, label: S) {
         self.label = label.to_string();
     }
 
+    /// set to use a rounded border
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
+    }
+
+    /// add to the click listener of this button
+    pub fn add_click_listener(
+        &mut self,
+        cb: Callback<sauron_vdom::Event, MSG>,
+    ) {
+        self.on_click.push(cb);
     }
 }
 
@@ -181,10 +193,8 @@ where
     }
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        eprintln!("button events..");
         match event {
             Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                eprintln!("mouse is clicked");
                 let s_event: sauron_vdom::Event =
                     sauron_vdom::event::MouseEvent::click(x as i32, y as i32)
                         .into();

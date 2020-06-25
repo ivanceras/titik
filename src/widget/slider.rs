@@ -17,6 +17,7 @@ use stretch::{
     },
 };
 
+/// A slider with value from 0.0 to 1.0
 #[derive(Debug)]
 pub struct Slider<MSG> {
     value: f32,
@@ -37,6 +38,7 @@ impl<MSG> Default for Slider<MSG> {
 }
 
 impl<MSG> Slider<MSG> {
+    /// create a new slider with value
     pub fn new(value: f32) -> Self {
         Slider {
             value,

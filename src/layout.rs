@@ -17,8 +17,8 @@ use stretch::{
 /// therefore can not be executed every draw call
 #[derive(Debug, Clone)]
 pub struct LayoutTree {
-    pub layout: Layout,
-    pub children_layout: Vec<LayoutTree>,
+    pub(crate) layout: Layout,
+    pub(crate) children_layout: Vec<LayoutTree>,
 }
 
 impl LayoutTree {
@@ -48,11 +48,13 @@ impl LayoutTree {
         hits
     }
 
+    /// get which index of this layout tree is hit
     pub fn hit(&self, x: f32, y: f32) -> Vec<usize> {
         self.at_location(x, y, &mut 0)
     }
 }
 
+#[allow(unused)]
 /// return the widget that is hit at this location
 /// base on the layout tree
 pub fn widget_hit_at<'a, MSG>(
@@ -68,6 +70,7 @@ pub fn widget_hit_at<'a, MSG>(
     }
 }
 
+/// get the widget that hits at this location
 pub fn widget_node_idx_at<'a>(
     layout_tree: &LayoutTree,
     x: f32,
@@ -76,28 +79,7 @@ pub fn widget_node_idx_at<'a>(
     layout_tree.hit(x, y).pop()
 }
 
-pub fn find_layout<'a>(
-    node: &'a LayoutTree,
-    node_idx: usize,
-) -> Option<&'a LayoutTree> {
-    find_layout_tree(node, node_idx, &mut 0)
-}
-
-fn find_layout_tree<'a>(
-    node: &'a LayoutTree,
-    node_idx: usize,
-    cur_index: &mut usize,
-) -> Option<&'a LayoutTree> {
-    if node_idx == *cur_index {
-        return Some(node);
-    } else {
-        node.children_layout.iter().find_map(|child| {
-            *cur_index += 1;
-            find_layout_tree(child, node_idx, cur_index)
-        })
-    }
-}
-
+/// set the node with idx to be in focused
 pub fn set_focused_node<'a, MSG>(
     node: &'a mut dyn Widget<MSG>,
     node_idx: usize,

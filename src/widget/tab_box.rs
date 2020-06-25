@@ -50,26 +50,26 @@ use stretch::{
 ///  │                                │
 ///  └────────────────────────────────┘
 /// ```
-
 #[derive(Debug)]
 pub struct TabBox<MSG> {
     /// The labels for each of the tabs for each corresponding children
-    pub tab_labels: Vec<String>,
-    pub active_tab: usize,
+    tab_labels: Vec<String>,
+    active_tab: usize,
     /// The children could be flexbox, group_box,
-    pub children: Vec<Box<dyn Widget<MSG>>>,
-    pub width: Option<f32>,
-    pub height: Option<f32>,
-    pub flex_direction: FlexDirection,
-    pub scroll_top: f32,
-    pub id: Option<String>,
-    pub has_border: bool,
-    pub is_rounded_border: bool,
-    pub is_thick_border: bool,
+    children: Vec<Box<dyn Widget<MSG>>>,
+    width: Option<f32>,
+    height: Option<f32>,
+    flex_direction: FlexDirection,
+    scroll_top: f32,
+    id: Option<String>,
+    has_border: bool,
+    is_rounded_border: bool,
+    is_thick_border: bool,
     layout: Option<Layout>,
 }
 
 impl<MSG> TabBox<MSG> {
+    /// creates a new tab box
     pub fn new() -> Self {
         TabBox {
             width: None,
@@ -102,10 +102,6 @@ impl<MSG> TabBox<MSG> {
         self.flex_direction = FlexDirection::Row;
     }
 
-    pub fn set_scroll_top(&mut self, scroll_top: f32) {
-        self.scroll_top = scroll_top;
-    }
-
     /// return the calculation of tab_level
     fn tab_label_rects(&self) -> Vec<((usize, usize), (usize, usize))> {
         let layout = self.layout.expect("must have a layout");
@@ -127,7 +123,6 @@ impl<MSG> TabBox<MSG> {
     }
 
     fn hit_tab_label(&self, x: usize, y: usize) -> Option<usize> {
-        eprintln!("cursor: ({},{})", x, y);
         let tab_rects = self.tab_label_rects();
         for (tab_index, ((left, top), (right, bottom))) in
             tab_rects.iter().enumerate()
@@ -230,17 +225,12 @@ impl<MSG> TabBox<MSG> {
             .iter_mut()
             .zip(layout_tree.children_layout.iter())
             .flat_map(|(child, child_layout)| {
-                eprintln!("drawing child: {:?}", child);
-                eprintln!("with layout: {:#?}", child_layout);
                 child.draw(&mut inner_buf, child_layout)
             })
             .collect();
-        eprintln!("There are {} children", self.children.len());
-        eprintln!("Children: {:#?}", self.children);
 
         for (j, line) in inner_buf.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
-                eprintln!("cell: {:?}", cell);
                 buf.set_cell(
                     loc_x as usize + i,
                     loc_y as usize + j + 2,
@@ -249,6 +239,18 @@ impl<MSG> TabBox<MSG> {
             }
         }
         cmds
+    }
+
+    /// set the tab labels
+    pub fn set_tab_labels(&mut self, labels: Vec<String>) {
+        self.tab_labels = labels;
+    }
+
+    /// set the active tab index
+    pub fn set_active_tab(&mut self, index: usize) {
+        if index < self.tab_labels.len() {
+            self.active_tab = index;
+        }
     }
 }
 
@@ -392,7 +394,6 @@ where
                 if let Some(active_tab) =
                     self.hit_tab_label(x as usize, y as usize)
                 {
-                    eprintln!("active_tab: {:?}", active_tab);
                     self.active_tab = active_tab;
                 }
                 vec![]

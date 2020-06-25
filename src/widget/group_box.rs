@@ -28,21 +28,24 @@ use stretch::{
     },
 };
 
+/// Group elements together
+/// Radio buttons in the same group will have an exclusive behavior
 #[derive(Default, Debug)]
 pub struct GroupBox<MSG> {
-    pub children: Vec<Box<dyn Widget<MSG>>>,
-    pub width: Option<f32>,
-    pub height: Option<f32>,
-    pub flex_direction: FlexDirection,
-    pub scroll_top: f32,
-    pub id: Option<String>,
-    pub has_border: bool,
-    pub is_rounded_border: bool,
-    pub is_thick_border: bool,
-    pub label: Option<String>,
+    children: Vec<Box<dyn Widget<MSG>>>,
+    width: Option<f32>,
+    height: Option<f32>,
+    flex_direction: FlexDirection,
+    scroll_top: f32,
+    id: Option<String>,
+    has_border: bool,
+    is_rounded_border: bool,
+    is_thick_border: bool,
+    label: Option<String>,
 }
 
 impl<MSG> GroupBox<MSG> {
+    /// create a new groupbox
     pub fn new() -> Self {
         GroupBox {
             width: None,
@@ -73,15 +76,12 @@ impl<MSG> GroupBox<MSG> {
         self.flex_direction = FlexDirection::Row;
     }
 
-    pub fn set_scroll_top(&mut self, scroll_top: f32) {
-        self.scroll_top = scroll_top;
-    }
-
+    /// set the label of the group box
     pub fn set_label(&mut self, label: &str) {
         self.label = Some(label.to_string());
     }
 
-    pub fn draw_label(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
+    fn draw_label(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;

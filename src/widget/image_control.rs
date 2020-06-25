@@ -16,18 +16,20 @@ use std::{
 };
 use stretch::style::Style;
 
+/// Image widget, supported formats: jpg, png
 pub struct Image<MSG> {
-    pub image: DynamicImage,
+    image: DynamicImage,
     /// the width of cells used for this image
-    pub width: Option<f32>,
+    width: Option<f32>,
     /// the height of unit cells, will be divided by 2 when used for computing
     /// style layout
-    pub height: Option<f32>,
-    pub id: Option<String>,
+    height: Option<f32>,
+    id: Option<String>,
     _phantom_msg: PhantomData<MSG>,
 }
 
 impl<MSG> Image<MSG> {
+    /// create a new image widget
     pub fn new(bytes: Vec<u8>) -> Self {
         let image = Image {
             image: image::load_from_memory(&bytes)

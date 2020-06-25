@@ -23,12 +23,13 @@ use stretch::{
     },
 };
 
+/// A checkbox widget
 #[derive(PartialEq)]
 pub struct Checkbox<MSG> {
-    pub label: String,
-    pub is_checked: bool,
-    pub id: Option<String>,
-    pub on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
+    label: String,
+    is_checked: bool,
+    id: Option<String>,
+    on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
 }
 
 impl<MSG> Default for Checkbox<MSG> {
@@ -43,6 +44,7 @@ impl<MSG> Default for Checkbox<MSG> {
 }
 
 impl<MSG> Checkbox<MSG> {
+    /// create a new checkbox with label
     pub fn new<S>(label: S) -> Self
     where
         S: ToString,
@@ -53,10 +55,12 @@ impl<MSG> Checkbox<MSG> {
         }
     }
 
+    /// set the checkbox label
     pub fn set_label<S: ToString>(&mut self, label: S) {
         self.label = label.to_string();
     }
 
+    /// set the checked status
     pub fn set_checked(&mut self, checked: bool) {
         self.is_checked = checked;
     }
@@ -108,11 +112,6 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
         match event {
             Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
-                eprintln!("checkbox is clicked");
-                eprintln!(
-                    "there are {} on_input listeners",
-                    self.on_input.len()
-                );
                 self.is_checked = !self.is_checked;
                 let s_event: sauron_vdom::Event =
                     sauron_vdom::event::InputEvent::new(self.is_checked).into();

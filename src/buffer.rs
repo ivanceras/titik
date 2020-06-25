@@ -20,6 +20,8 @@ use std::{
 };
 use unicode_width::UnicodeWidthStr;
 
+/// Cell contains the attributes of the char used in the buffer.
+/// This information is needed when rendering each cell to the terminal
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct Cell {
     /// the character symbol
@@ -32,12 +34,15 @@ pub struct Cell {
     pub attributes: Attributes,
 }
 
+/// Contains a vec of cells.
+/// Buffer contains the information needed to render into the screen
 #[derive(PartialEq, Debug)]
 pub struct Buffer {
-    pub cells: Vec<Vec<Cell>>,
+    pub(crate) cells: Vec<Vec<Cell>>,
 }
 
 impl Cell {
+    /// create a new Cell from character or string
     pub fn new<S>(symbol: S) -> Self
     where
         S: ToString,
@@ -48,10 +53,13 @@ impl Cell {
         }
     }
 
+    /// returns the unicode width of the cell.
+    /// Some characters are wide such as CJK
     pub fn unicode_width(&self) -> usize {
         UnicodeWidthStr::width(&*self.symbol)
     }
 
+    /// creates an empty Cell
     pub fn empty() -> Self {
         Cell {
             symbol: symbol::EMPTY.to_string(),
@@ -59,28 +67,35 @@ impl Cell {
         }
     }
 
+    /// render this cell as bold
     pub fn bold(&mut self) {
         self.attributes.set(Attribute::Bold);
     }
 
+    /// whether or not this cell is blank
     pub fn is_blank(&self) -> bool {
-        self.symbol == " "
+        self.symbol == symbol::EMPTY.to_string()
     }
 
+    /// whether or not this cell is a filler of a wide character
+    /// that appears before it
     pub fn is_filler(&self) -> bool {
         self.symbol == "\0"
     }
 
+    /// return the attributes of this cell
     pub fn attributes(&mut self, attributes: Vec<Attribute>) {
         for attr in attributes {
             self.attributes.set(attr);
         }
     }
 
+    /// set the foreground color of this cell
     pub fn color(&mut self, color: Color) {
         self.foreground_color = Some(color);
     }
 
+    /// set the background color of this cell
     pub fn background(&mut self, color: Color) {
         self.background_color = Some(color);
     }
@@ -96,29 +111,35 @@ impl Buffer {
         Buffer { cells }
     }
 
+    /// reset the content of the buffer to empty
     pub fn reset(&mut self) {
         self.cells.iter_mut().for_each(|line| {
             line.iter_mut().for_each(|cell| *cell = Cell::empty())
         })
     }
 
+    /// set the character of this location with symbol
     pub fn set_symbol<S: ToString>(&mut self, x: usize, y: usize, symbol: S) {
         self.set_cell(x, y, Cell::new(symbol));
     }
 
+    /// enumerate the characters in the string and set the cells horizontally incrementing on the x
+    /// component
     pub fn write_str<S: ToString>(&mut self, x: usize, y: usize, s: S) {
         for (i, ch) in s.to_string().chars().enumerate() {
             self.set_cell(x + i, y, Cell::new(ch));
         }
     }
 
-    // commits a canvas into the buffer
+    /// get the characters from the drawing canvas and
+    /// insert them into this buffer
     pub(crate) fn write_canvas(&mut self, canvas: Canvas) {
         canvas
             .get_cells()
             .for_each(|(x, y, ch)| self.set_symbol(x, y, ch))
     }
 
+    /// set the cell at this location
     pub fn set_cell(&mut self, x: usize, y: usize, new_cell: Cell) {
         if let Some(line) = self.cells.get_mut(y) {
             if let Some(cell) = line.get_mut(x) {
@@ -148,6 +169,7 @@ impl Buffer {
         patches
     }
 
+    /// writes to the stdout buffer
     pub fn render(&self, w: &mut dyn Write) -> crossterm::Result<()> {
         crossterm::queue!(w, cursor::Hide)?;
         for (j, line) in self.cells.iter().enumerate() {

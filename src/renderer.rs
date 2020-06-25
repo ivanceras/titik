@@ -1,9 +1,9 @@
+//! Provides the core functionality of rendering to the terminal
+//! This has the event loop which calculates and process the events to the target widget
 use crate::{
     command,
-    compute_layout,
-    find_widget_mut,
-    set_focused_node,
-    widget_node_idx_at,
+    find_node,
+    layout,
     Buffer,
     LayoutTree,
     Widget,
@@ -40,10 +40,15 @@ use stretch::{
     number::Number,
 };
 
+/// A Dispatch trait which the implementing APP will update
+/// its own state based on the supplied msg.
 pub trait Dispatch<MSG> {
+    /// dispatch the msg and passed the root node for the implementing
+    /// app to access it and change the state of the UI.
     fn dispatch(&self, msg: MSG, root_node: &mut dyn Widget<MSG>);
 }
 
+/// This provides the render loop of the terminal UI
 pub struct Renderer<'a, MSG> {
     write: &'a mut dyn Write,
     program: Option<&'a dyn Dispatch<MSG>>,
@@ -54,6 +59,7 @@ pub struct Renderer<'a, MSG> {
 }
 
 impl<'a, MSG> Renderer<'a, MSG> {
+    /// create a new renderer with the supplied root_node
     pub fn new(
         write: &'a mut dyn Write,
         program: Option<&'a dyn Dispatch<MSG>>,
@@ -64,7 +70,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
         root_node.set_size(Some((width) as f32), Some(height as f32));
 
-        let layout_tree = compute_layout(
+        let layout_tree = layout::compute_layout(
             root_node,
             Size {
                 width: Number::Defined(width as f32),
@@ -83,7 +89,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
     fn recompute_layout(&mut self) {
         let (width, height) = self.terminal_size;
-        self.layout_tree = compute_layout(
+        self.layout_tree = layout::compute_layout(
             self.root_node,
             Size {
                 width: Number::Defined(width as f32),
@@ -94,15 +100,14 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
     fn dispatch_msg(&mut self, msgs: Vec<MSG>) {
         if let Some(program) = self.program {
-            eprintln!("dispatching the msgs to the program");
             for msg in msgs {
-                eprintln!("dispatching msg");
                 program.dispatch(msg, self.root_node);
             }
         }
         self.recompute_layout();
     }
 
+    /// run the event loop of the renderer
     pub fn run(&mut self) -> Result<()> {
         command::init(&mut self.write)?;
         command::reset_top(&mut self.write)?;
@@ -110,7 +115,6 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
         loop {
             let mut buf = Buffer::new(width as usize, height as usize);
-            eprintln!("looping...");
 
             buf.reset();
             {
@@ -148,7 +152,10 @@ impl<'a, MSG> Renderer<'a, MSG> {
                             {
                                 let active_widget: Option<
                                     &mut dyn Widget<MSG>,
-                                > = find_widget_mut(self.root_node, *idx);
+                                > = find_node::find_widget_mut(
+                                    self.root_node,
+                                    *idx,
+                                );
                                 if let Some(focused_widget) = active_widget {
                                     let msgs =
                                         focused_widget.process_event(event);
@@ -159,14 +166,14 @@ impl<'a, MSG> Renderer<'a, MSG> {
                     }
                     // mouse clicks sets the focused the widget underneath
                     Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                        self.focused_widget_idx = widget_node_idx_at(
+                        self.focused_widget_idx = layout::widget_node_idx_at(
                             &self.layout_tree,
                             x as f32,
                             y as f32,
                         );
 
                         if let Some(idx) = self.focused_widget_idx.as_ref() {
-                            set_focused_node(self.root_node, *idx);
+                            layout::set_focused_node(self.root_node, *idx);
                         }
                     }
                     Event::Resize(width, height) => {
@@ -183,14 +190,10 @@ impl<'a, MSG> Renderer<'a, MSG> {
                     //let hit = hits.pop().expect("process only 1 for now");
                     for hit in hits.iter().rev() {
                         let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                            { find_widget_mut(self.root_node, *hit) };
+                            find_node::find_widget_mut(self.root_node, *hit);
 
                         if let Some(hit_widget) = &mut hit_widget {
                             let msgs = hit_widget.process_event(event);
-                            eprintln!(
-                            "done processing event... now processing msgs: {}",
-                            msgs.len()
-                        );
                             self.dispatch_msg(msgs);
                         }
                     }

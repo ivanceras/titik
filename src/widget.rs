@@ -44,23 +44,31 @@ mod text_area;
 mod text_input;
 mod traits;
 
+/// All widgets must implement the Widget trait
 pub trait Widget<MSG>
 where
     Self: fmt::Debug,
 {
+    /// return the style of this widget
     fn style(&self) -> Style;
+
+    /// add a child to this widget
+    /// returns true if it can accept a child, false otherwise
     fn add_child(&mut self, _child: Box<dyn Widget<MSG>>) -> bool {
         false
     }
 
+    /// get a referemce tp the children of this widget
     fn children(&self) -> Option<&[Box<dyn Widget<MSG>>]> {
         None
     }
 
+    /// get a mutable reference to the children of this widget
     fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget<MSG>>]> {
         None
     }
 
+    /// return a mutable reference to a child at index location
     fn child_mut(
         &mut self,
         _index: usize,
@@ -68,8 +76,13 @@ where
         None
     }
 
+    /// this is called in the render loop in the renderer where the widget
+    /// writes into the buffer. The result will then be written into the
+    /// stdout terminal.
     fn draw(&mut self, but: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd>;
 
+    /// build a node with styles from this widget and its children
+    /// The Layout tree is then calculated see `layout::compute_layout`
     fn style_node(&self, stretch: &mut Stretch) -> Option<Node> {
         let children_styles = if let Some(children) = self.children() {
             children
@@ -82,19 +95,27 @@ where
         stretch.new_node(self.style(), children_styles).ok()
     }
 
+    /// set the widget as focused
     fn set_focused(&mut self, _focused: bool) {}
 
+    /// get an Any reference
     fn as_any(&self) -> &dyn Any;
+
+    /// get an Any mutable reference for casting purposed
     fn as_any_mut(&mut self) -> &mut dyn Any;
 
+    /// set the size of the widget
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>);
 
+    /// get a mutable reference of this widget
     fn as_mut(&mut self) -> Option<&mut Self>
     where
         Self: Sized + 'static,
     {
         self.as_any_mut().downcast_mut::<Self>()
     }
+
+    /// this process the event and all callbacks attached to the widgets will be dispatched.
     fn process_event(&mut self, _event: Event) -> Vec<MSG> {
         vec![]
     }
@@ -104,8 +125,10 @@ where
         None
     }
 
+    /// set the id of this widget
     fn set_id(&mut self, id: &str);
 
+    /// get the id of this widget
     fn get_id(&self) -> &Option<String>;
 }
 

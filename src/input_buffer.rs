@@ -19,6 +19,7 @@ pub struct InputBuffer {
 }
 
 impl InputBuffer {
+    /// create a new input buffer
     pub fn new() -> Self {
         InputBuffer {
             content: String::new(),
@@ -87,6 +88,7 @@ impl InputBuffer {
         self.cursor_loc = self.content.len();
     }
 
+    /// set the cursor location on this buffer
     pub fn set_cursor_loc(&mut self, x: usize) {
         if x < self.content.len() {
             self.cursor_loc = x;
@@ -100,14 +102,16 @@ impl InputBuffer {
         }
     }
 
-    // Keys to be processed:
-    // - Left
-    // - Right
-    // - Home
-    // - End
-    // - Delete
-    // - Backspace
-    // - Char(char)
+    /// Process key events
+    ///
+    /// Keys to be processed:
+    /// - Left
+    /// - Right
+    /// - Home
+    /// - End
+    /// - Delete
+    /// - Backspace
+    /// - Char(char)
     pub fn process_key_event(
         &mut self,
         KeyEvent { code, modifiers: _ }: KeyEvent,

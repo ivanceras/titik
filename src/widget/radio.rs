@@ -22,15 +22,17 @@ use stretch::{
     },
 };
 
+/// Radio button widget
 #[derive(Default, PartialEq)]
 pub struct Radio<MSG> {
-    pub label: String,
-    pub is_checked: bool,
-    pub id: Option<String>,
-    pub on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
+    label: String,
+    is_checked: bool,
+    id: Option<String>,
+    on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
 }
 
 impl<MSG> Radio<MSG> {
+    /// create a new radio button with label
     pub fn new<S>(label: S) -> Self
     where
         S: ToString,
@@ -43,10 +45,12 @@ impl<MSG> Radio<MSG> {
         }
     }
 
+    /// set the label value
     pub fn set_label<S: ToString>(&mut self, label: S) {
         self.label = label.to_string();
     }
 
+    /// set the checked status
     pub fn set_checked(&mut self, checked: bool) {
         self.is_checked = checked;
     }

@@ -1,7 +1,7 @@
 use crate::{
+    area_buffer::AreaBuffer,
     buffer::Buffer,
     symbol::bar,
-    AreaBuffer,
     Cmd,
     LayoutTree,
     Widget,
@@ -30,24 +30,26 @@ use stretch::{
     },
 };
 
-//TODO: make the widget scroll to the cursor location when cursor is not visible
+/// A textarea is a 2 dimensional editor
+/// where each line is separated by \n.
 #[derive(Debug)]
 pub struct TextArea<MSG> {
-    pub area_buffer: AreaBuffer,
+    area_buffer: AreaBuffer,
     focused: bool,
-    pub width: Option<f32>,
-    pub height: Option<f32>,
-    pub scroll_top: f32,
-    pub scroll_left: f32,
-    pub id: Option<String>,
-    pub on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
-    pub has_border: bool,
-    pub is_rounded_border: bool,
-    pub is_thick_border: bool,
+    width: Option<f32>,
+    height: Option<f32>,
+    scroll_top: f32,
+    scroll_left: f32,
+    id: Option<String>,
+    on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
+    has_border: bool,
+    is_rounded_border: bool,
+    is_thick_border: bool,
     layout: Option<Layout>,
 }
 
 impl<MSG> TextArea<MSG> {
+    /// create a new text area with initial value
     pub fn new<S>(value: S) -> Self
     where
         S: ToString,
@@ -68,22 +70,27 @@ impl<MSG> TextArea<MSG> {
         }
     }
 
+    /// get the content of this text area, same as get_value
     pub fn get_content(&self) -> String {
         self.area_buffer.to_string()
     }
 
+    /// process the keypress event
     pub fn process_key(&mut self, key_event: KeyEvent) {
         self.area_buffer.process_key_event(key_event);
     }
 
+    /// set the value of this text area
     pub fn set_value<S: ToString>(&mut self, value: S) {
         self.area_buffer = AreaBuffer::from(value.to_string());
     }
 
+    /// add a line to the last end of buffer of this text area
     pub fn add_line<S: ToString>(&mut self, s: S) {
         self.area_buffer.add_line(s);
     }
 
+    /// return the string value of this text_area
     pub fn get_value(&self) -> String {
         self.area_buffer.to_string()
     }
@@ -341,16 +348,13 @@ where
     }
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        eprintln!("textare events..");
         let layout = self.layout.expect("must have a layout");
         match event {
             Event::Key(ke) => {
-                eprintln!("textare input events..");
                 self.process_key(ke);
                 let s_event: sauron_vdom::Event =
                     sauron_vdom::event::InputEvent::new(self.get_content())
                         .into();
-                eprintln!("new content: {}", self.get_content());
                 self.on_input
                     .iter()
                     .map(|cb| cb.emit(s_event.clone()))
