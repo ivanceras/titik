@@ -143,6 +143,7 @@ fn derive_layout_tree(node: Node, stretch: &Stretch) -> LayoutTree {
 mod test {
     use super::*;
     use crate::*;
+    use stretch::geometry::Point;
 
     #[test]
     fn layout() {

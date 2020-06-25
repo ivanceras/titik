@@ -155,7 +155,7 @@ mod tests {
         btn.set_size(Some(20.0), Some(10.0));
         control.add_child(boxed::Box::new(btn));
 
-        let layout_tree = compute_layout(
+        let layout_tree = crate::layout::compute_layout(
             &mut control,
             Size {
                 width: Number::Defined(100.0),
@@ -199,7 +199,7 @@ mod tests {
 
         control.add_child(boxed::Box::new(hrow));
 
-        let layout_tree = compute_layout(
+        let layout_tree = crate::layout::compute_layout(
             &mut control,
             Size {
                 width: Number::Defined(100.0),

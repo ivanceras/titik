@@ -130,7 +130,6 @@ mod test {
             .expect("must be button");
         println!("btn1: {:?}", got_btn1);
         assert_eq!(*got_btn1.get_id(), Some("btn1".to_string()));
-        assert_eq!(got_btn1.label, "Hello");
         assert_eq!(got_btn1, &btn1_clone);
 
         let got_btn2 = find_widget_by_id(&control, "btn2")
@@ -140,7 +139,6 @@ mod test {
             .expect("must be button");
         println!("btn2: {:?}", got_btn2);
         assert_eq!(*got_btn2.get_id(), Some("btn2".to_string()));
-        assert_eq!(got_btn2.label, "world");
         assert_eq!(got_btn2, &btn2_clone);
     }
 }
