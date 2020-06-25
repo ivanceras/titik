@@ -70,6 +70,14 @@ impl<MSG> TextArea<MSG> {
         }
     }
 
+    /// attach an listener to the input event of this textarea
+    pub fn add_input_listener(
+        &mut self,
+        cb: Callback<sauron_vdom::Event, MSG>,
+    ) {
+        self.on_input.push(cb);
+    }
+
     /// get the content of this text area, same as get_value
     pub fn get_content(&self) -> String {
         self.area_buffer.to_string()

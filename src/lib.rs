@@ -49,7 +49,7 @@ pub use find_node::{
     find_widget_mut,
 };
 pub use input_buffer::InputBuffer;
-pub(crate) use layout::LayoutTree;
+pub use layout::LayoutTree;
 pub use renderer::{
     Dispatch,
     Renderer,

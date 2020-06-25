@@ -64,6 +64,15 @@ impl<MSG> Checkbox<MSG> {
     pub fn set_checked(&mut self, checked: bool) {
         self.is_checked = checked;
     }
+
+    /// attach a listener to this checkbox which will be triggered
+    /// when the check status is changed
+    pub fn add_input_listener(
+        &mut self,
+        cb: Callback<sauron_vdom::Event, MSG>,
+    ) {
+        self.on_input.push(cb);
+    }
 }
 
 impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
