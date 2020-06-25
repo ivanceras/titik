@@ -1,5 +1,5 @@
 //! [![Build Status](https://api.travis-ci.com/ivanceras/titik.svg?branch=master)](https://travis-ci.com/github/ivanceras/titik)
-//! ![Latest Version](https://img.shields.io/crates/v/titik.svg)](https://crates.io/crates/titik)
+//! [![Latest Version](https://img.shields.io/crates/v/titik.svg)](https://crates.io/crates/titik)
 
 //!
 //! Titik is a crossplatform TUI widget library with the goal of being able to interact
