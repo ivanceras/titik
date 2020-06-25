@@ -17,7 +17,6 @@ use std::{
 };
 use stretch::{
     geometry::Size,
-    result::Layout,
     style::{
         Dimension,
         Style,
@@ -108,7 +107,7 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
         match event {
-            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
+            Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
                 eprintln!("checkbox is clicked");
                 eprintln!(
                     "there are {} on_input listeners",

@@ -8,10 +8,6 @@ use ito_canvas::unicode_canvas::{
     Border,
     Canvas,
 };
-use std::{
-    any::Any,
-    fmt,
-};
 use stretch::{
     geometry::{
         Rect,

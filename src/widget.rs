@@ -10,6 +10,7 @@ pub use flex_box::FlexBox;
 pub use group_box::GroupBox;
 pub use image_control::Image;
 pub use radio::Radio;
+pub use slider::Slider;
 use std::{
     any::Any,
     fmt,
@@ -19,7 +20,6 @@ use stretch::{
         Node,
         Stretch,
     },
-    result::Layout,
     style::Style,
 };
 pub use svg_image::SvgImage;
@@ -100,7 +100,7 @@ where
     }
 
     ///  take the children at this index location
-    fn take_child(&mut self, index: usize) -> Option<Box<dyn Widget<MSG>>> {
+    fn take_child(&mut self, _index: usize) -> Option<Box<dyn Widget<MSG>>> {
         None
     }
 

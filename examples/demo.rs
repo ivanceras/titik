@@ -1,3 +1,4 @@
+#![deny(warnings)]
 pub use crossterm::{
     cursor,
     event::{
@@ -24,40 +25,17 @@ pub use crossterm::{
     Command,
     Result,
 };
-use std::{
-    cell::RefCell,
-    fmt,
-    io::{
-        self,
-        Write,
-    },
-    rc::Rc,
-};
+use std::io::{self,};
 
 use titik::{
-    command,
-    compute_layout,
-    find_layout,
-    find_widget,
-    find_widget_by_id,
-    find_widget_by_id_mut,
-    find_widget_mut,
-    renderer,
-    renderer::Renderer,
-    set_focused_node,
-    widget_hit_at,
-    widget_node_idx_at,
-    Buffer,
     Button,
     Callback,
     Checkbox,
-    Cmd,
     FlexBox,
     GroupBox,
     Image,
-    InputBuffer,
-    LayoutTree,
     Radio,
+    Renderer,
     SvgImage,
     TabBox,
     TextArea,
@@ -164,6 +142,6 @@ fn main() -> Result<()> {
     let mut stdout = io::stdout();
     let mut root_node = build_ui();
     let mut renderer = Renderer::new(&mut stdout, None, root_node.as_mut());
-    renderer.run();
+    renderer.run()?;
     Ok(())
 }

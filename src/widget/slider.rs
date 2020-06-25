@@ -11,7 +11,6 @@ use std::{
 };
 use stretch::{
     geometry::Size,
-    result::Layout,
     style::{
         Dimension,
         Style,
@@ -19,7 +18,7 @@ use stretch::{
 };
 
 #[derive(Debug)]
-struct Slider<MSG> {
+pub struct Slider<MSG> {
     value: f32,
     width: Option<f32>,
     id: Option<String>,
@@ -64,7 +63,11 @@ where
         }
     }
 
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+    fn draw(
+        &mut self,
+        _buf: &mut Buffer,
+        _layout_tree: &LayoutTree,
+    ) -> Vec<Cmd> {
         vec![]
     }
 

@@ -26,7 +26,7 @@
 //! ```
 //!
 //!
-//#![deny(warnings)]
+#![deny(warnings)]
 //#![deny(
 //    missing_docs,
 //    missing_debug_implementations,
@@ -58,7 +58,10 @@ pub use layout::{
     widget_node_idx_at,
     LayoutTree,
 };
-pub use renderer::Dispatch;
+pub use renderer::{
+    Dispatch,
+    Renderer,
+};
 pub use sauron_vdom::Callback;
 pub use stretch;
 pub use widget::{
@@ -68,6 +71,7 @@ pub use widget::{
     GroupBox,
     Image,
     Radio,
+    Slider,
     SvgImage,
     TabBox,
     TextArea,

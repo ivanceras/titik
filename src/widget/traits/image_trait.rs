@@ -9,20 +9,12 @@ use crate::{
     symbol::bar,
     Cmd,
     LayoutTree,
-    Widget,
 };
 use crossterm::style::Color;
 use image::{
     self,
     DynamicImage,
     GenericImageView,
-    ImageBuffer,
-    RgbaImage,
-};
-use std::{
-    any::Any,
-    fmt,
-    marker::PhantomData,
 };
 use stretch::{
     geometry::Size,

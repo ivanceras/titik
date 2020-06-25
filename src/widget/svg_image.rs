@@ -1,19 +1,13 @@
 use crate::{
-    buffer::{
-        Buffer,
-        Cell,
-    },
-    symbol::bar,
+    buffer::Buffer,
     widget::ImageTrait,
     Cmd,
     LayoutTree,
     Widget,
 };
-use crossterm::style::Color;
 use image::{
     self,
     DynamicImage,
-    GenericImageView,
     ImageBuffer,
     RgbaImage,
 };
@@ -22,13 +16,7 @@ use std::{
     fmt,
     marker::PhantomData,
 };
-use stretch::{
-    geometry::Size,
-    style::{
-        Dimension,
-        Style,
-    },
-};
+use stretch::style::Style;
 
 pub struct SvgImage<MSG> {
     pub image: DynamicImage,
@@ -59,7 +47,7 @@ impl<MSG> SvgImage<MSG> {
             ImageBuffer::from_raw(width, height, rgba_vec)
                 .expect("must construct imagebuffer");
 
-        let mut image = SvgImage {
+        let image = SvgImage {
             image: DynamicImage::ImageRgba8(img_buffer),
             width: Some(width as f32 / 10.0),
             height: Some(height as f32 / 10.0 / 2.0),

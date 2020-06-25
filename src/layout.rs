@@ -3,10 +3,7 @@ use crate::{
     Widget,
 };
 use stretch::{
-    geometry::{
-        Point,
-        Size,
-    },
+    geometry::Size,
     node::{
         Node,
         Stretch,
@@ -152,11 +149,7 @@ fn derive_layout_tree(node: Node, stretch: &Stretch) -> LayoutTree {
         stretch.children(node).expect("must get children");
     let children_layout: Vec<LayoutTree> = children
         .into_iter()
-        .map(|child| {
-            let mut child_tree = derive_layout_tree(child, stretch);
-            let orig_pos = child_tree.layout.location;
-            child_tree
-        })
+        .map(|child| derive_layout_tree(child, stretch))
         .collect();
     LayoutTree {
         layout,

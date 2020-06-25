@@ -1,8 +1,5 @@
 use crate::{
-    buffer::{
-        Buffer,
-        Cell,
-    },
+    buffer::Buffer,
     widget::Flex,
     Cmd,
     LayoutTree,
@@ -90,8 +87,7 @@ impl<MSG> GroupBox<MSG> {
         let loc_y = layout.location.y.round() as usize;
         if let Some(label) = &self.label {
             for (t, ch) in label.chars().enumerate() {
-                let mut cell = Cell::new(ch);
-                buf.set_cell(loc_x + 3 + t, loc_y, cell);
+                buf.set_symbol(loc_x + 3 + t, loc_y, ch);
             }
         }
     }

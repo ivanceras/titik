@@ -20,7 +20,6 @@ use sauron_vdom::Callback;
 use std::{
     any::Any,
     fmt,
-    marker::PhantomData,
 };
 use stretch::{
     geometry::Size,
@@ -151,11 +150,11 @@ impl<MSG> TextArea<MSG> {
         self.area_buffer.width() as f32
     }
 
-    fn scroller_height(&self, layout: &Layout) -> f32 {
+    fn scroller_height(&self, _layout: &Layout) -> f32 {
         1.0
     }
 
-    fn scroller_width(&self, layout: &Layout) -> f32 {
+    fn scroller_width(&self, _layout: &Layout) -> f32 {
         3.0
     }
 
@@ -278,12 +277,10 @@ where
         let layout = layout_tree.layout;
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
-        let width = layout.size.width.round();
         let height = layout.size.height.round();
         self.layout = Some(layout.clone());
 
         let bottom = loc_y + height - 1.0;
-        let right = loc_x + width - 1.0;
 
         // draw the text content
         let text_loc_y = loc_y - self.scroll_top;

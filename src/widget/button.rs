@@ -23,7 +23,6 @@ use std::{
 };
 use stretch::{
     geometry::Size,
-    result::Layout,
     style::{
         Dimension,
         Style,

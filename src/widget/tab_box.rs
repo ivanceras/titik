@@ -1,8 +1,5 @@
 use crate::{
-    buffer::{
-        Buffer,
-        Cell,
-    },
+    buffer::Buffer,
     widget::Flex,
     Cmd,
     LayoutTree,
@@ -10,8 +7,6 @@ use crate::{
 };
 use crossterm::event::{
     Event,
-    KeyEvent,
-    KeyModifiers,
     MouseEvent,
 };
 use ito_canvas::unicode_canvas::{
@@ -119,11 +114,10 @@ impl<MSG> TabBox<MSG> {
         let left_pad = 3;
         let mut left = loc_x + left_pad;
         let top = loc_y;
-        let width = layout.size.width.round() as usize;
         let height = 2;
         let bottom = top + height;
         let mut tab_rects: Vec<((usize, usize), (usize, usize))> = vec![];
-        for (tab_index, label) in self.tab_labels.iter().enumerate() {
+        for label in self.tab_labels.iter() {
             let label_width = label.len() + 3;
             let right = left + label_width;
             tab_rects.push(((left, top), (right, bottom)));
@@ -316,7 +310,6 @@ where
 
     fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
         // offset the position of the top_border
-        let layout = layout_tree.layout;
         let layout = layout_tree.layout;
         self.layout = Some(layout.clone());
         let loc_x = layout.location.x.round();

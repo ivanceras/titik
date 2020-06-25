@@ -1,32 +1,20 @@
 use crate::{
-    buffer::{
-        Buffer,
-        Cell,
-    },
-    symbol::bar,
+    buffer::Buffer,
     widget::traits::ImageTrait,
     Cmd,
     LayoutTree,
     Widget,
 };
-use crossterm::style::Color;
 use image::{
     self,
     DynamicImage,
-    GenericImageView,
 };
 use std::{
     any::Any,
     fmt,
     marker::PhantomData,
 };
-use stretch::{
-    geometry::Size,
-    style::{
-        Dimension,
-        Style,
-    },
-};
+use stretch::style::Style;
 
 pub struct Image<MSG> {
     pub image: DynamicImage,
@@ -41,7 +29,7 @@ pub struct Image<MSG> {
 
 impl<MSG> Image<MSG> {
     pub fn new(bytes: Vec<u8>) -> Self {
-        let mut image = Image {
+        let image = Image {
             image: image::load_from_memory(&bytes)
                 .expect("unable to load from memory"),
             width: None,

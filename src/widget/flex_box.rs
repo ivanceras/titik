@@ -9,23 +9,9 @@ use std::{
     any::Any,
     fmt,
 };
-use stretch::{
-    geometry::{
-        Rect,
-        Size,
-    },
-    style::{
-        AlignContent,
-        AlignItems,
-        AlignSelf,
-        Dimension,
-        FlexDirection,
-        FlexWrap,
-        JustifyContent,
-        Overflow,
-        PositionType,
-        Style,
-    },
+use stretch::style::{
+    FlexDirection,
+    Style,
 };
 
 #[derive(Default, Debug)]
