@@ -36,6 +36,12 @@
 
 - [ ] process the key modifiers in events
 - [ ] Fix a bug in inner buffer of flexbox, 1-line off
+- [ ] Charts
+   - [ ] bar charts
+   - [ ] line chart
+       - [ ] vertical
+       - [ ] horizontal
+   - [ ] scatter point charts
 
 ## Document
 - [ ] document each function in the widget interface

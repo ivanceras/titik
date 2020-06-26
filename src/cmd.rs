@@ -2,7 +2,7 @@ use crossterm::cursor;
 use std::io::Write;
 
 /// creates a Cmd representation which translate to actual tty commands
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Cmd {
     /// Move the cursor to x,y location
     MoveTo(usize, usize),
