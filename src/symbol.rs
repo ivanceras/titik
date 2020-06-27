@@ -28,3 +28,6 @@ pub const RADIO_CHECKED: char = '⦿';
 pub const RADIO_UNCHECKED: char = '〇';
 
 pub const EMPTY: char = ' ';
+
+/// used in scrollbar thumb
+pub const MIDDLE_BLOCK: char = '▮';

@@ -36,6 +36,7 @@ use titik::{
     Image,
     Radio,
     Renderer,
+    Slider,
     SvgImage,
     TabBox,
     TextArea,
@@ -49,6 +50,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     root_node.set_scroll_top(0.0);
     root_node.vertical();
 
+    let slider = Slider::new(0.5);
     let mut tab1 = TabBox::new();
     tab1.set_tab_labels(vec![
         "Tab1".into(),
@@ -123,6 +125,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     }));
 
     root_node.add_child(Box::new(btn1));
+    root_node.add_child(Box::new(slider));
     root_node.add_child(Box::new(btn2));
     tab1.add_child(Box::new(gb1));
     let mut row = FlexBox::new();

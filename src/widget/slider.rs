@@ -2,8 +2,10 @@ use crate::{
     buffer::Buffer,
     cmd::Cmd,
     layout::LayoutTree,
+    symbol,
     Widget,
 };
+use ito_canvas::unicode_canvas::Canvas;
 use std::{
     any::Any,
     fmt,
@@ -45,6 +47,11 @@ impl<MSG> Slider<MSG> {
             ..Default::default()
         }
     }
+
+    /// set the value of this slider
+    pub fn set_value(&mut self, value: f32) {
+        self.value = value;
+    }
 }
 
 impl<MSG> Widget<MSG> for Slider<MSG>
@@ -65,11 +72,18 @@ where
         }
     }
 
-    fn draw(
-        &mut self,
-        _buf: &mut Buffer,
-        _layout_tree: &LayoutTree,
-    ) -> Vec<Cmd> {
+    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+        let layout = layout_tree.layout;
+        let loc_x = layout.location.x.round() as usize;
+        let loc_y = layout.location.y.round() as usize;
+        let width = layout.size.width.round() as usize;
+        let _height = layout.size.height.round() as usize;
+        let mut canvas = Canvas::new();
+        let right = loc_x + width - 2;
+        canvas.draw_horizontal_line((loc_x + 1, loc_y), (right, loc_y), false);
+        buf.write_canvas(canvas);
+        let slider_loc = (self.value * width as f32) as usize;
+        buf.set_symbol(loc_x + slider_loc, loc_y, symbol::MIDDLE_BLOCK);
         vec![]
     }
 

@@ -1,6 +1,7 @@
 use crate::{
     area_buffer::AreaBuffer,
     buffer::Buffer,
+    symbol,
     symbol::bar,
     Cmd,
     LayoutTree,
@@ -213,7 +214,11 @@ impl<MSG> TextArea<MSG> {
 
         if inner_width > 0.0 {
             for i in 0..scroller_width {
-                buf.set_symbol(right as usize - i - 1, bottom as usize, '▮');
+                buf.set_symbol(
+                    right as usize - i - 1,
+                    bottom as usize,
+                    symbol::MIDDLE_BLOCK,
+                );
             }
         }
     }
