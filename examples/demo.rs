@@ -73,7 +73,15 @@ fn build_ui() -> Box<dyn Widget<()>> {
     let rb1 = Radio::new("Radio1");
     let rb2 = Radio::new("Radio2");
 
-    let list_box1 = ListBox::new();
+    let mut list_box1 = ListBox::new();
+    list_box1.set_list(vec![
+        "Item1".into(),
+        "Item2".into(),
+        "Item3".into(),
+        "Item4".into(),
+        "Item5".into(),
+        "Item6".into(),
+    ]);
     root_node.add_child(Box::new(list_box1));
 
     gb1.add_child(Box::new(cb1));

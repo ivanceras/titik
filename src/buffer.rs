@@ -131,6 +131,15 @@ impl Buffer {
         }
     }
 
+    /// write string as bold
+    pub fn write_bold_str<S: ToString>(&mut self, x: usize, y: usize, s: S) {
+        for (i, ch) in s.to_string().chars().enumerate() {
+            let mut cell = Cell::new(ch);
+            cell.bold();
+            self.set_cell(x + i, y, cell);
+        }
+    }
+
     /// get the characters from the drawing canvas and
     /// insert them into this buffer
     pub(crate) fn write_canvas(&mut self, canvas: Canvas) {

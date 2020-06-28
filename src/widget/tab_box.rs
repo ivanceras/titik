@@ -158,7 +158,15 @@ impl<MSG> TabBox<MSG> {
         for (tab_index, ((left, top), (right, bottom))) in
             tab_rects.iter().enumerate()
         {
-            buf.write_str(left + 2, top + 1, &self.tab_labels[tab_index]);
+            if self.active_tab == tab_index {
+                buf.write_bold_str(
+                    left + 2,
+                    top + 1,
+                    &self.tab_labels[tab_index],
+                );
+            } else {
+                buf.write_str(left + 2, top + 1, &self.tab_labels[tab_index]);
+            }
             canvas.draw_rect(
                 (*left, *top),
                 (*right, *bottom),
