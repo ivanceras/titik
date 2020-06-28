@@ -34,6 +34,7 @@ use titik::{
     FlexBox,
     GroupBox,
     Image,
+    ListBox,
     Radio,
     Renderer,
     Slider,
@@ -50,7 +51,8 @@ fn build_ui() -> Box<dyn Widget<()>> {
     root_node.set_scroll_top(0.0);
     root_node.vertical();
 
-    let slider = Slider::new(0.5);
+    let mut slider = Slider::new(0.5);
+    slider.use_thick_track(true);
     let mut tab1 = TabBox::new();
     tab1.set_tab_labels(vec![
         "Tab1".into(),
@@ -70,6 +72,9 @@ fn build_ui() -> Box<dyn Widget<()>> {
     let cb2 = Checkbox::new("Checkbox2");
     let rb1 = Radio::new("Radio1");
     let rb2 = Radio::new("Radio2");
+
+    let list_box1 = ListBox::new();
+    root_node.add_child(Box::new(list_box1));
 
     gb1.add_child(Box::new(cb1));
     gb1.add_child(Box::new(cb2));

@@ -31,8 +31,7 @@ impl LayoutTree {
         let loc = self.layout.location;
         let width = self.layout.size.width;
         let height = self.layout.size.height;
-        if x >= loc.x && x <= loc.x + width && y >= loc.y && y <= loc.y + height
-        {
+        if x >= loc.x && x < loc.x + width && y >= loc.y && y < loc.y + height {
             hits.push(*cur_index);
         }
         let child_hits: Vec<usize> = self
