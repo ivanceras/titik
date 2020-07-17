@@ -1,39 +1,14 @@
-use crate::{
-    buffer::Buffer,
-    widget::Flex,
-    Cmd,
-    LayoutTree,
-    Widget,
-};
-use crossterm::event::{
-    Event,
-    MouseEvent,
-};
-use ito_canvas::unicode_canvas::{
-    Border,
-    Canvas,
-};
-use std::{
-    any::Any,
-    fmt,
-};
+use crate::Event;
+use crate::{buffer::Buffer, widget::Flex, Cmd, LayoutTree, Widget};
+use crossterm::event::MouseEvent;
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt};
 use stretch::{
-    geometry::{
-        Rect,
-        Size,
-    },
+    geometry::{Rect, Size},
     result::Layout,
     style::{
-        AlignContent,
-        AlignItems,
-        AlignSelf,
-        Dimension,
-        FlexDirection,
-        FlexWrap,
-        JustifyContent,
-        Overflow,
-        PositionType,
-        Style,
+        AlignContent, AlignItems, AlignSelf, Dimension, FlexDirection,
+        FlexWrap, JustifyContent, Overflow, PositionType, Style,
     },
 };
 

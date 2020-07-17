@@ -1,26 +1,13 @@
+use crate::Event;
 use crate::{
-    buffer::Buffer,
-    symbol,
-    Cmd,
-    LayoutTree,
+    buffer::Buffer, event::InputEvent, symbol, Callback, Cmd, LayoutTree,
     Widget,
 };
-use crossterm::event::{
-    Event,
-    MouseEvent,
-};
-use sauron_vdom::Callback;
-use std::{
-    any::Any,
-    fmt,
-    fmt::Debug,
-};
+use crossterm::event::MouseEvent;
+use std::{any::Any, fmt, fmt::Debug};
 use stretch::{
     geometry::Size,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 /// A checkbox widget
@@ -29,7 +16,7 @@ pub struct Checkbox<MSG> {
     label: String,
     is_checked: bool,
     id: Option<String>,
-    on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
+    on_input: Vec<Callback<Event, MSG>>,
 }
 
 impl<MSG> Default for Checkbox<MSG> {
@@ -67,10 +54,7 @@ impl<MSG> Checkbox<MSG> {
 
     /// attach a listener to this checkbox which will be triggered
     /// when the check status is changed
-    pub fn add_input_listener(
-        &mut self,
-        cb: Callback<sauron_vdom::Event, MSG>,
-    ) {
+    pub fn add_input_listener(&mut self, cb: Callback<Event, MSG>) {
         self.on_input.push(cb);
     }
 }
@@ -119,18 +103,10 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
     fn set_size(&mut self, _width: Option<f32>, _height: Option<f32>) {}
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        match event {
-            Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
-                self.is_checked = !self.is_checked;
-                let s_event: sauron_vdom::Event =
-                    sauron_vdom::event::InputEvent::new(self.is_checked).into();
-                self.on_input
-                    .iter()
-                    .map(|cb| cb.emit(s_event.clone()))
-                    .collect()
-            }
-            _ => vec![],
-        }
+        self.on_input
+            .iter()
+            .map(|cb| cb.emit(event.clone()))
+            .collect()
     }
 
     fn set_id(&mut self, id: &str) {

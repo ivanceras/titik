@@ -1,25 +1,10 @@
-use crate::{
-    buffer::Buffer,
-    symbol,
-    Cmd,
-    LayoutTree,
-    Widget,
-};
-use crossterm::event::{
-    Event,
-    MouseEvent,
-};
-use sauron_vdom::Callback;
-use std::{
-    any::Any,
-    fmt,
-};
+use crate::Event;
+use crate::{buffer::Buffer, symbol, Callback, Cmd, LayoutTree, Widget};
+use crossterm::event::MouseEvent;
+use std::{any::Any, fmt};
 use stretch::{
     geometry::Size,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 /// Radio button widget
@@ -28,7 +13,7 @@ pub struct Radio<MSG> {
     label: String,
     is_checked: bool,
     id: Option<String>,
-    on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
+    on_input: Vec<Callback<Event, MSG>>,
 }
 
 impl<MSG> Radio<MSG> {

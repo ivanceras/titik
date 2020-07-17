@@ -1,14 +1,15 @@
 use crate::{
     buffer::Buffer,
+    Callback,
     Cmd,
     LayoutTree,
     Widget,
 };
+use crossterm::event::Event;
 use ito_canvas::unicode_canvas::{
     Border,
     Canvas,
 };
-use sauron_vdom::Callback;
 use std::{
     any::Any,
     fmt,
@@ -30,7 +31,7 @@ pub struct ListBox<MSG> {
     height: Option<f32>,
     flex_direction: FlexDirection,
     scroll_top: f32,
-    on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
+    on_input: Vec<Callback<Event, MSG>>,
     id: Option<String>,
     use_divider: bool,
 }

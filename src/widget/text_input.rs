@@ -1,27 +1,12 @@
-use crate::{
-    buffer::Buffer,
-    Cmd,
-    InputBuffer,
-    LayoutTree,
-    Widget,
-};
-use crossterm::event::{
-    Event,
-    KeyEvent,
-    MouseEvent,
-};
-use ito_canvas::unicode_canvas::{
-    Border,
-    Canvas,
-};
+use crate::Event;
+use crate::{buffer::Buffer, Cmd, InputBuffer, LayoutTree, Widget};
+use crossterm::event::{KeyEvent, MouseEvent};
+use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::any::Any;
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 /// A one line text input

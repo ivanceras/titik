@@ -1,28 +1,14 @@
-use crate::{
-    buffer::Buffer,
-    cmd::Cmd,
-    layout::LayoutTree,
-    symbol,
-    Widget,
-};
-use crossterm::event::{
-    Event,
-    MouseEvent,
-};
+use crate::Event;
+use crate::{buffer::Buffer, cmd::Cmd, layout::LayoutTree, symbol, Widget};
+use crossterm::event::MouseEvent;
 use stretch::result::Layout;
 
+use crate::Callback;
 use ito_canvas::unicode_canvas::Canvas;
-use sauron_vdom::Callback;
-use std::{
-    any::Any,
-    fmt,
-};
+use std::{any::Any, fmt};
 use stretch::{
     geometry::Size,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 /// A slider with value from 0.0 to 1.0
@@ -33,7 +19,7 @@ pub struct Slider<MSG> {
     id: Option<String>,
     use_thick_track: bool,
     layout: Option<Layout>,
-    on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
+    on_input: Vec<Callback<Event, MSG>>,
 }
 
 impl<MSG> Default for Slider<MSG> {

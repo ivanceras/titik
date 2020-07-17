@@ -1,34 +1,16 @@
+use crate::Event;
+use crate::Value;
 use crate::{
-    area_buffer::AreaBuffer,
-    buffer::Buffer,
-    symbol,
-    symbol::bar,
-    Cmd,
-    LayoutTree,
-    Widget,
+    area_buffer::AreaBuffer, buffer::Buffer, event::InputEvent, symbol,
+    symbol::bar, Callback, Cmd, LayoutTree, Widget,
 };
-use crossterm::event::{
-    Event,
-    KeyEvent,
-    KeyModifiers,
-    MouseEvent,
-};
-use ito_canvas::unicode_canvas::{
-    Border,
-    Canvas,
-};
-use sauron_vdom::Callback;
-use std::{
-    any::Any,
-    fmt,
-};
+use crossterm::event::{KeyEvent, KeyModifiers, MouseEvent};
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt};
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 /// A textarea is a 2 dimensional editor
@@ -42,7 +24,7 @@ pub struct TextArea<MSG> {
     scroll_top: f32,
     scroll_left: f32,
     id: Option<String>,
-    on_input: Vec<Callback<sauron_vdom::Event, MSG>>,
+    on_input: Vec<Callback<Event, MSG>>,
     has_border: bool,
     is_rounded_border: bool,
     is_thick_border: bool,
@@ -72,10 +54,7 @@ impl<MSG> TextArea<MSG> {
     }
 
     /// attach an listener to the input event of this textarea
-    pub fn add_input_listener(
-        &mut self,
-        cb: Callback<sauron_vdom::Event, MSG>,
-    ) {
+    pub fn add_input_listener(&mut self, cb: Callback<Event, MSG>) {
         self.on_input.push(cb);
     }
 
@@ -365,9 +344,9 @@ where
         match event {
             Event::Key(ke) => {
                 self.process_key(ke);
-                let s_event: sauron_vdom::Event =
-                    sauron_vdom::event::InputEvent::new(self.get_content())
-                        .into();
+                let s_event: Event = Event::from(InputEvent::from(
+                    Value::from(self.get_content()),
+                ));
                 self.on_input
                     .iter()
                     .map(|cb| cb.emit(s_event.clone()))

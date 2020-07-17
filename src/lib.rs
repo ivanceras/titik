@@ -30,59 +30,43 @@
 //! ```
 //!
 //!
-#![deny(warnings)]
-#![deny(
-    missing_docs,
-    missing_copy_implementations,
-    trivial_casts,
-    trivial_numeric_casts,
-    unstable_features,
-    unused_import_braces
-)]
-pub use buffer::{
-    Buffer,
-    Cell,
-};
+//#![deny(warnings)]
+//#![deny(
+//    missing_docs,
+//    missing_copy_implementations,
+//    trivial_casts,
+//    trivial_numeric_casts,
+//    unstable_features,
+//    unused_import_braces
+//)]
+pub use buffer::{Buffer, Cell};
 pub use cmd::Cmd;
 pub use crossterm;
+pub use event::Event;
 pub use find_node::{
-    find_widget,
-    find_widget_by_id,
-    find_widget_by_id_mut,
-    find_widget_mut,
+    find_widget, find_widget_by_id, find_widget_by_id_mut, find_widget_mut,
 };
 pub use input_buffer::InputBuffer;
 pub use layout::LayoutTree;
-pub use renderer::{
-    Dispatch,
-    Renderer,
-};
-pub use sauron_vdom::Callback;
+pub use mt_dom::{self, Callback};
+pub use renderer::{Dispatch, Renderer};
 pub use stretch;
+pub use value::Value;
 pub use widget::{
-    Button,
-    Checkbox,
-    FlexBox,
-    GroupBox,
-    Image,
-    ListBox,
-    Radio,
-    Slider,
-    SvgImage,
-    TabBox,
-    TextArea,
-    TextInput,
-    Widget,
+    Button, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio, Slider,
+    SvgImage, TabBox, TextArea, TextInput, Widget,
 };
 
 mod area_buffer;
 mod buffer;
 mod cmd;
 pub mod command;
+pub mod event;
 mod find_node;
 mod input_buffer;
 pub(crate) mod layout;
 pub mod renderer;
 #[allow(unused)]
 mod symbol;
+mod value;
 mod widget;

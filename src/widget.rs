@@ -1,36 +1,23 @@
-use crate::{
-    buffer::Buffer,
-    Cmd,
-    LayoutTree,
-};
+use crate::Event;
+use crate::{buffer::Buffer, Cmd, LayoutTree};
 pub use button::Button;
 pub use checkbox::Checkbox;
-use crossterm::event::Event;
 pub use flex_box::FlexBox;
 pub use group_box::GroupBox;
 pub use image_control::Image;
 pub use list_box::ListBox;
 pub use radio::Radio;
 pub use slider::Slider;
-use std::{
-    any::Any,
-    fmt,
-};
+use std::{any::Any, fmt};
 use stretch::{
-    node::{
-        Node,
-        Stretch,
-    },
+    node::{Node, Stretch},
     style::Style,
 };
 pub use svg_image::SvgImage;
 pub use tab_box::TabBox;
 pub use text_area::TextArea;
 pub use text_input::TextInput;
-pub use traits::{
-    Flex,
-    ImageTrait,
-};
+pub use traits::{Flex, ImageTrait};
 
 mod button;
 mod checkbox;
@@ -94,7 +81,7 @@ where
         } else {
             vec![]
         };
-        stretch.new_node(self.style(), children_styles).ok()
+        stretch.new_node(self.style(), &children_styles).ok()
     }
 
     /// set the widget as focused
@@ -139,10 +126,7 @@ mod tests {
     use super::*;
     use crate::*;
     use std::boxed;
-    use stretch::{
-        geometry::*,
-        number::Number,
-    };
+    use stretch::{geometry::*, number::Number};
 
     #[test]
     fn layout() {

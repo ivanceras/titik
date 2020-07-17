@@ -1,44 +1,17 @@
 //! Provides the core functionality of rendering to the terminal
 //! This has the event loop which calculates and process the events to the target widget
-use crate::{
-    command,
-    find_node,
-    layout,
-    Buffer,
-    LayoutTree,
-    Widget,
-};
+use crate::Event;
+use crate::{command, find_node, layout, Buffer, LayoutTree, Widget};
 pub use crossterm::{
     cursor,
-    event::{
-        self,
-        Event,
-        KeyCode,
-        KeyEvent,
-        KeyModifiers,
-        MouseEvent,
-    },
-    execute,
-    queue,
-    style,
-    style::{
-        Attribute,
-        Attributes,
-        Color,
-        ContentStyle,
-    },
-    terminal::{
-        self,
-        ClearType,
-    },
-    Command,
-    Result,
+    event::{self, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
+    execute, queue, style,
+    style::{Attribute, Attributes, Color, ContentStyle},
+    terminal::{self, ClearType},
+    Command, Result,
 };
 use std::io::Write;
-use stretch::{
-    geometry::Size,
-    number::Number,
-};
+use stretch::{geometry::Size, number::Number};
 
 /// A Dispatch trait which the implementing APP will update
 /// its own state based on the supplied msg.
@@ -126,7 +99,9 @@ impl<'a, MSG> Renderer<'a, MSG> {
             }
             self.write.flush()?;
 
-            if let Ok(event) = event::read() {
+            if let Ok(c_event) = event::read() {
+                let event = Event::from_crossterm(c_event);
+                let location = extract_location(&event);
                 match event {
                     Event::Key(key_event) => {
                         // To quite, press any of the following:
@@ -136,14 +111,12 @@ impl<'a, MSG> Renderer<'a, MSG> {
                         //  - CTRL-z
                         if key_event.modifiers.contains(KeyModifiers::CONTROL) {
                             match key_event.code {
-                                KeyCode::Char(c) => {
-                                    match c {
-                                        'c' | 'q' | 'd' | 'z' => {
-                                            break;
-                                        }
-                                        _ => (),
+                                KeyCode::Char(c) => match c {
+                                    'c' | 'q' | 'd' | 'z' => {
+                                        break;
                                     }
-                                }
+                                    _ => (),
+                                },
                                 _ => (),
                             }
                         } else {
@@ -157,8 +130,8 @@ impl<'a, MSG> Renderer<'a, MSG> {
                                     *idx,
                                 );
                                 if let Some(focused_widget) = active_widget {
-                                    let msgs =
-                                        focused_widget.process_event(event);
+                                    let msgs = focused_widget
+                                        .process_event(event.clone());
                                     self.dispatch_msg(msgs);
                                 }
                             }
@@ -193,7 +166,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                             find_node::find_widget_mut(self.root_node, *hit);
 
                         if let Some(hit_widget) = &mut hit_widget {
-                            let msgs = hit_widget.process_event(event);
+                            let msgs = hit_widget.process_event(event.clone());
                             self.dispatch_msg(msgs);
                         }
                     }
@@ -215,5 +188,6 @@ fn extract_location(event: &Event) -> Option<(u16, u16)> {
         Event::Mouse(MouseEvent::ScrollUp(x, y, _modifier)) => Some((*x, *y)),
         Event::Key(_) => None,
         Event::Resize(_, _) => None,
+        Event::InputEvent(_) => None,
     }
 }

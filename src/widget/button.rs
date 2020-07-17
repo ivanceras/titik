@@ -1,32 +1,15 @@
+use crate::Event;
 use crate::{
-    buffer::{
-        Buffer,
-        Cell,
-    },
-    Cmd,
-    LayoutTree,
-    Widget,
+    buffer::{Buffer, Cell},
+    mt_dom::Callback,
+    Cmd, LayoutTree, Widget,
 };
-use crossterm::event::{
-    Event,
-    MouseEvent,
-};
-use ito_canvas::unicode_canvas::{
-    Border,
-    Canvas,
-};
-use sauron_vdom::Callback;
-use std::{
-    any::Any,
-    fmt,
-    fmt::Debug,
-};
+use crossterm::event::MouseEvent;
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt, fmt::Debug};
 use stretch::{
     geometry::Size,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 /// A button widget
@@ -40,7 +23,7 @@ where
     width: Option<f32>,
     height: Option<f32>,
     focused: bool,
-    on_click: Vec<Callback<sauron_vdom::Event, MSG>>,
+    on_click: Vec<Callback<Event, MSG>>,
     id: Option<String>,
 }
 
@@ -94,10 +77,7 @@ where
     }
 
     /// add to the click listener of this button
-    pub fn add_click_listener(
-        &mut self,
-        cb: Callback<sauron_vdom::Event, MSG>,
-    ) {
+    pub fn add_click_listener(&mut self, cb: Callback<Event, MSG>) {
         self.on_click.push(cb);
     }
 }
@@ -193,18 +173,10 @@ where
     }
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        match event {
-            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                let s_event: sauron_vdom::Event =
-                    sauron_vdom::event::MouseEvent::click(x as i32, y as i32)
-                        .into();
-                self.on_click
-                    .iter()
-                    .map(|cb| cb.emit(s_event.clone()))
-                    .collect()
-            }
-            _ => vec![],
-        }
+        self.on_click
+            .iter()
+            .map(|cb| cb.emit(event.clone()))
+            .collect()
     }
 
     fn set_id(&mut self, id: &str) {
