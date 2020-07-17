@@ -1,9 +1,9 @@
 use crate::Value;
-use crossterm::event::{KeyEvent, MouseEvent};
+pub use crossterm::event::{KeyEvent, MouseEvent};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct InputEvent {
-    value: Value,
+    pub value: Value,
 }
 
 impl From<Value> for InputEvent {
@@ -29,11 +29,21 @@ impl From<InputEvent> for Event {
 impl Event {
     pub fn from_crossterm(c_event: crossterm::event::Event) -> Self {
         match c_event {
-            crossterm::event::Event::Key(ke) => todo!(),
-            crossterm::event::Event::Mouse(me) => todo!(),
+            crossterm::event::Event::Key(ke) => Event::Key(ke),
+            crossterm::event::Event::Mouse(me) => Event::Mouse(me),
             crossterm::event::Event::Resize(width, height) => {
                 Event::Resize(width, height)
             }
+        }
+    }
+
+    pub fn is_mouse_click(&self) -> bool {
+        match self {
+            Event::Mouse(me) => match me {
+                MouseEvent::Down(_, _, _, _) => true,
+                _ => false,
+            },
+            _ => false,
         }
     }
 }

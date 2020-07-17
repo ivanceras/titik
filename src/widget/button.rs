@@ -173,10 +173,14 @@ where
     }
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        self.on_click
-            .iter()
-            .map(|cb| cb.emit(event.clone()))
-            .collect()
+        if event.is_mouse_click() {
+            self.on_click
+                .iter()
+                .map(|cb| cb.emit(event.clone()))
+                .collect()
+        } else {
+            vec![]
+        }
     }
 
     fn set_id(&mut self, id: &str) {
