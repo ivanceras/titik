@@ -1,5 +1,5 @@
 use crate::Value;
-pub use crossterm::event::{KeyEvent, MouseEvent};
+pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct InputEvent {
