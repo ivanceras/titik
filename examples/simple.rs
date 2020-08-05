@@ -12,11 +12,11 @@ fn main() -> Result<()> {
     root_node.set_thick_border(true);
     let mut column = FlexBox::new();
     column.vertical();
-    column.set_border(true);
+    //column.set_border(true);
     column.set_thick_border(false);
     let mut row = FlexBox::<()>::new();
     row.horizontal();
-    row.set_border(true);
+    //row.set_border(true);
     row.set_thick_border(false);
     row.set_rounded(true);
     let btn1 = Button::<()>::new("btn 1");
@@ -26,6 +26,8 @@ fn main() -> Result<()> {
 
     let rb1 = Radio::<()>::new("Radio1");
     let rb2 = Radio::<()>::new("Radio2");
+
+    let input1 = TextInput::new("Hello");
 
     let mut list_box1 = ListBox::new();
     list_box1.set_use_divider(true);
@@ -66,6 +68,7 @@ fn main() -> Result<()> {
     column.add_child(Box::new(rb1));
     column.add_child(Box::new(rb2));
     column.add_child(Box::new(list_box1));
+    column.add_child(Box::new(input1));
 
     //column.add_child(Box::new(row));
     row.add_child(Box::new(btn1));

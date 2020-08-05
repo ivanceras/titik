@@ -1,5 +1,6 @@
 //! Provides the core functionality of rendering to the terminal
 //! This has the event loop which calculates and process the events to the target widget
+use crate::cmd::Cmd;
 use crate::Event;
 use crate::{command, find_node, layout, Buffer, Widget};
 pub use crossterm::{
@@ -76,17 +77,22 @@ impl<'a, MSG> Renderer<'a, MSG> {
         self.recompute_layout();
     }
 
-    fn draw_widget(buf: &mut Buffer, widget: &dyn Widget<MSG>) -> Result<()>
+    fn draw_widget(
+        buf: &mut Buffer,
+        widget: &dyn Widget<MSG>,
+    ) -> Result<Vec<Cmd>>
     where
         MSG: 'a,
     {
-        widget.draw(buf);
+        let mut cmds = widget.draw(buf);
         if let Some(children) = widget.children() {
             for child in children {
-                Self::draw_widget(buf, child.as_ref())?;
+                let more_cmds = Self::draw_widget(buf, child.as_ref())?;
+                cmds.extend(more_cmds);
             }
         }
-        Ok(())
+
+        Ok(cmds)
     }
 
     /// run the event loop of the renderer
@@ -100,8 +106,12 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
             buf.reset();
             {
-                Self::draw_widget(&mut buf, self.root_node)?;
+                let cmds = Self::draw_widget(&mut buf, self.root_node)?;
                 buf.render(&mut self.write)?;
+
+                cmds.iter().for_each(|cmd| {
+                    cmd.execute(self.write).expect("must execute")
+                });
             }
             self.write.flush()?;
 
@@ -143,20 +153,20 @@ impl<'a, MSG> Renderer<'a, MSG> {
                             }
                         }
                     }
-                    /*
                     // mouse clicks sets the focused the widget underneath
                     Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                        self.focused_widget_idx = layout::widget_node_idx_at(
-                            &self.layout_tree,
+                        self.focused_widget_idx = layout::node_hit_at(
+                            self.root_node,
                             x as f32,
                             y as f32,
-                        );
+                            &mut 0,
+                        )
+                        .pop();
 
                         if let Some(idx) = self.focused_widget_idx.as_ref() {
-                            layout::set_focused_node(self.root_node, *idx);
+                            find_node::set_focused_node(self.root_node, *idx);
                         }
                     }
-                    */
                     Event::Resize(width, height) => {
                         eprintln!("resizing the terminal..");
                         self.terminal_size = (width, height);
@@ -167,16 +177,24 @@ impl<'a, MSG> Renderer<'a, MSG> {
                 // any other activities, such as mouse scroll is
                 // sent the widget underneath the location, regardless
                 // if it focused or not.
-                /*
+
                 if let Some((x, y)) = extract_location(&event) {
-                    let hit_widgets: Vec<&dyn Widget<MSG>> =
-                        layout::node_hit_at(self.root_node, x as f32, y as f32);
-                    for hit_widget in hit_widgets.iter().rev() {
-                        let msgs = hit_widget.process_event(event.clone());
-                        self.dispatch_msg(msgs);
+                    let hits = layout::node_hit_at(
+                        self.root_node,
+                        x as f32,
+                        y as f32,
+                        &mut 0,
+                    );
+                    for hit in hits.iter().rev() {
+                        let mut hit_widget: Option<&mut dyn Widget<MSG>> =
+                            find_node::find_widget_mut(self.root_node, *hit);
+
+                        if let Some(hit_widget) = &mut hit_widget {
+                            let msgs = hit_widget.process_event(event.clone());
+                            self.dispatch_msg(msgs);
+                        }
                     }
                 }
-                */
             }
         }
         command::finalize(self.write)?;

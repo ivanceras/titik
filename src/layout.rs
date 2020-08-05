@@ -28,7 +28,8 @@ pub(crate) fn node_hit_at<MSG>(
     node: &dyn Widget<MSG>,
     x: f32,
     y: f32,
-) -> Vec<&dyn Widget<MSG>> {
+    cur_node_idx: &mut usize,
+) -> Vec<usize> {
     let layout = node.layout().expect("must have a layout");
     let loc = layout.location;
     let width = layout.size.width;
@@ -36,15 +37,16 @@ pub(crate) fn node_hit_at<MSG>(
 
     let mut hits = vec![];
 
+    if x >= loc.x && x < loc.x + width && y >= loc.y && y < loc.y + height {
+        hits.push(*cur_node_idx);
+    }
     if let Some(children) = node.children() {
-        for child in children {
-            hits.extend(node_hit_at(child.as_ref(), x, y));
+        for child in children.iter() {
+            *cur_node_idx += 1;
+            hits.extend(node_hit_at(child.as_ref(), x, y, cur_node_idx));
         }
     }
 
-    if x >= loc.x && x < loc.x + width && y >= loc.y && y < loc.y + height {
-        hits.push(node);
-    }
     hits
 }
 

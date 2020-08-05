@@ -102,6 +102,33 @@ pub fn find_widget_by_id_mut<'a, MSG>(
     }
 }
 
+/// set the node with idx to be in focused
+pub fn set_focused_node<'a, MSG>(
+    node: &'a mut dyn Widget<MSG>,
+    node_idx: usize,
+) {
+    set_focused_widget(node, node_idx, &mut 0)
+}
+
+/// Set the node at node_idx as focused, while the rest
+/// should be set to false
+fn set_focused_widget<'a, MSG>(
+    node: &'a mut dyn Widget<MSG>,
+    node_idx: usize,
+    cur_index: &mut usize,
+) {
+    if node_idx == *cur_index {
+        node.set_focused(true);
+    } else if let Some(children) = node.children_mut() {
+        children.iter_mut().for_each(|child| {
+            *cur_index += 1;
+            set_focused_widget(child.as_mut(), node_idx, cur_index)
+        })
+    } else {
+        node.set_focused(false);
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
