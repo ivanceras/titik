@@ -101,20 +101,12 @@ pub trait Flex<MSG>: Widget<MSG> {
                 width: if let Some(width) = self.width() {
                     Dimension::Points(width)
                 } else {
-                    if self.is_expand_width() {
-                        Dimension::Percent(1.0)
-                    } else {
-                        Dimension::Auto
-                    }
+                    Dimension::Percent(1.0)
                 },
                 height: if let Some(height) = self.height() {
                     Dimension::Points(height)
                 } else {
-                    if self.is_expand_height() {
-                        Dimension::Percent(1.0)
-                    } else {
-                        Dimension::Auto
-                    }
+                    Dimension::Percent(1.0)
                 },
             },
             overflow: Overflow::Scroll,
@@ -161,33 +153,7 @@ pub trait Flex<MSG>: Widget<MSG> {
         let width = layout.size.width.round();
         let height = layout.size.height.round();
 
-        let mut inner_buf = Buffer::new(
-            width as usize
-                - (self.border_left() + self.border_right()) as usize,
-            height as usize
-                - (self.border_top() + self.border_bottom()) as usize,
-        );
-
-        let cmds = self
-            .children()
-            .expect("must have children")
-            .iter()
-            .flat_map(|child| child.draw(&mut inner_buf))
-            .collect();
-
-        for (j, line) in inner_buf.cells.iter().enumerate() {
-            for (i, cell) in line.iter().enumerate() {
-                if j >= self.scroll_top() as usize {
-                    let y = j - self.scroll_top() as usize;
-                    buf.set_cell(
-                        loc_x as usize + i,
-                        loc_y as usize + y,
-                        cell.clone(),
-                    )
-                }
-            }
-        }
         self.draw_border(buf, loc_x, loc_y, width, height);
-        cmds
+        vec![]
     }
 }

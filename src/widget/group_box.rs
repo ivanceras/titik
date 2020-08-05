@@ -95,7 +95,7 @@ where
                 height: if let Some(height) = self.height() {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
             },
             overflow: Overflow::Scroll,

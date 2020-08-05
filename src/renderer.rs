@@ -78,6 +78,19 @@ impl<'a, MSG> Renderer<'a, MSG> {
         self.recompute_layout();
     }
 
+    fn draw_widget(buf: &mut Buffer, widget: &dyn Widget<MSG>) -> Result<()>
+    where
+        MSG: 'a,
+    {
+        widget.draw(buf);
+        if let Some(children) = widget.children() {
+            for child in children {
+                Self::draw_widget(buf, child.as_ref())?;
+            }
+        }
+        Ok(())
+    }
+
     /// run the event loop of the renderer
     pub fn run(&mut self) -> Result<()> {
         command::init(&mut self.write)?;
@@ -89,11 +102,8 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
             buf.reset();
             {
-                let tty_cmds = self.root_node.draw(&mut buf);
-                buf.render(self.write)?;
-                tty_cmds.iter().for_each(|cmd| {
-                    cmd.execute(self.write).expect("must execute")
-                });
+                Self::draw_widget(&mut buf, self.root_node)?;
+                buf.render(&mut self.write)?;
             }
             self.write.flush()?;
 

@@ -1,48 +1,17 @@
-#![deny(warnings)]
+//#![deny(warnings)]
 pub use crossterm::{
     cursor,
-    event::{
-        self,
-        Event,
-        KeyCode,
-        KeyEvent,
-        KeyModifiers,
-        MouseEvent,
-    },
-    execute,
-    queue,
-    style,
-    style::{
-        Attribute,
-        Attributes,
-        Color,
-        ContentStyle,
-    },
-    terminal::{
-        self,
-        ClearType,
-    },
-    Command,
-    Result,
+    event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
+    execute, queue, style,
+    style::{Attribute, Attributes, Color, ContentStyle},
+    terminal::{self, ClearType},
+    Command, Result,
 };
-use std::io::{self,};
+use std::io::{self};
 
 use titik::{
-    Button,
-    Callback,
-    Checkbox,
-    FlexBox,
-    GroupBox,
-    Image,
-    ListBox,
-    Radio,
-    Renderer,
-    Slider,
-    SvgImage,
-    TabBox,
-    TextArea,
-    TextInput,
-    Widget,
+    Button, Callback, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio,
+    Renderer, Slider, SvgImage, TabBox, TextArea, TextInput, Widget,
 };
 
 fn build_ui() -> Box<dyn Widget<()>> {
@@ -124,11 +93,11 @@ fn build_ui() -> Box<dyn Widget<()>> {
     btn2.set_id("btn2");
     let mut img: Image<()> =
         Image::new(include_bytes!("../horse.jpg").to_vec());
-    img.set_size(Some(60.0), Some(40.0));
+    //img.set_size(Some(60.0), Some(40.0));
 
     let mut svg: SvgImage<()> =
         SvgImage::new(include_str!("bob.svg").to_string());
-    svg.set_size(Some(60.0), Some(40.0));
+    //svg.set_size(Some(60.0), Some(40.0));
 
     let mut btn1: Button<()> = Button::new("Button 1");
     btn1.set_id("btn1");
@@ -142,11 +111,11 @@ fn build_ui() -> Box<dyn Widget<()>> {
     root_node.add_child(Box::new(btn2));
     tab1.add_child(Box::new(gb1));
     let mut row = FlexBox::new();
+    row.horizontal();
     row.set_expand_width(true);
     row.set_expand_height(false);
-    row.horizontal();
-    row.add_child(Box::new(img));
-    row.add_child(Box::new(svg));
+    //row.add_child(Box::new(img));
+    //row.add_child(Box::new(svg));
     root_node.add_child(Box::new(row));
     root_node.add_child(Box::new(tab1));
     //root_node.add_child(Box::new(gb1));

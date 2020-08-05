@@ -8,7 +8,7 @@ use crossterm::event::MouseEvent;
 use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::{any::Any, fmt, fmt::Debug};
 use stretch::{
-    geometry::Size,
+    geometry::{Rect, Size},
     result::Layout,
     style::{Dimension, Style},
 };
@@ -83,6 +83,22 @@ where
     pub fn add_click_listener(&mut self, cb: Callback<Event, MSG>) {
         self.on_click.push(cb);
     }
+
+    fn border_top(&self) -> f32 {
+        1.0
+    }
+
+    fn border_bottom(&self) -> f32 {
+        1.0
+    }
+
+    fn border_left(&self) -> f32 {
+        1.0
+    }
+
+    fn border_right(&self) -> f32 {
+        1.0
+    }
 }
 
 impl<MSG> Widget<MSG> for Button<MSG>
@@ -98,12 +114,14 @@ where
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    Dimension::Points((self.label.len() + 2) as f32)
+                    //Dimension::Points((self.label.len() + 2) as f32)
+                    Dimension::Percent(1.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Points(3.0)
+                    //Dimension::Points(3.0)
+                    Dimension::Percent(1.0)
                 },
             },
             min_size: Size {
@@ -117,6 +135,12 @@ where
                 } else {
                     Dimension::Points(3.0)
                 },
+            },
+            border: Rect {
+                top: Dimension::Points(self.border_top()),
+                bottom: Dimension::Points(self.border_bottom()),
+                start: Dimension::Points(self.border_left()),
+                end: Dimension::Points(self.border_right()),
             },
             ..Default::default()
         }

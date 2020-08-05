@@ -184,38 +184,6 @@ impl<MSG> TabBox<MSG> {
         canvas.draw_horizontal_line((loc_x, bottom), (left_pad, bottom), false);
     }
 
-    /*
-    fn draw_children(&mut self, buf: &mut Buffer) -> Vec<Cmd> {
-        let loc_x = self.layout.location.x.round();
-        let loc_y = self.layout.location.y.round();
-        let width = self.layout.size.width.round();
-        let height = self.layout.size.height.round();
-
-        let mut inner_buf =
-            Buffer::new(width as usize - 2, height as usize - 2);
-
-        let cmds = self
-            .children
-            .iter_mut()
-            .zip(layout_tree.children_layout.iter())
-            .flat_map(|(child, child_layout)| {
-                child.draw(&mut inner_buf, child_layout)
-            })
-            .collect();
-
-        for (j, line) in inner_buf.cells.iter().enumerate() {
-            for (i, cell) in line.iter().enumerate() {
-                buf.set_cell(
-                    loc_x as usize + i,
-                    loc_y as usize + j + 2,
-                    cell.clone(),
-                )
-            }
-        }
-        cmds
-    }
-    */
-
     /// set the tab labels
     pub fn set_tab_labels(&mut self, labels: Vec<String>) {
         self.tab_labels = labels;
@@ -248,7 +216,7 @@ where
                 height: if let Some(height) = self.height() {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Auto
+                    Dimension::Percent(1.0)
                 },
             },
             overflow: Overflow::Scroll,
