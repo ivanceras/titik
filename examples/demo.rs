@@ -51,7 +51,8 @@ fn build_ui() -> Box<dyn Widget<()>> {
         "Item5".into(),
         "Item6".into(),
     ]);
-    root_node.add_child(Box::new(list_box1));
+
+    tab1.add_child_to_tab(0, Box::new(list_box1));
 
     gb1.add_child(Box::new(cb1));
     gb1.add_child(Box::new(cb2));
@@ -106,16 +107,16 @@ fn build_ui() -> Box<dyn Widget<()>> {
         eprintln!("btn1 is clicked");
     }));
 
-    root_node.add_child(Box::new(btn1));
+    //root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(slider));
-    root_node.add_child(Box::new(btn2));
+    //root_node.add_child(Box::new(btn2));
     tab1.add_child(Box::new(gb1));
     let mut row = FlexBox::new();
     row.horizontal();
     row.set_expand_width(true);
     row.set_expand_height(false);
-    //row.add_child(Box::new(img));
-    //row.add_child(Box::new(svg));
+    row.add_child(Box::new(img));
+    row.add_child(Box::new(svg));
     root_node.add_child(Box::new(row));
     root_node.add_child(Box::new(tab1));
     //root_node.add_child(Box::new(gb1));

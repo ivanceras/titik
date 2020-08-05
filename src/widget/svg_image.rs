@@ -39,8 +39,8 @@ impl<MSG> SvgImage<MSG> {
         SvgImage {
             layout: None,
             image: DynamicImage::ImageRgba8(img_buffer),
-            width: Some(width as f32 / 10.0),
-            height: Some(height as f32 / 10.0 / 2.0),
+            width: None,
+            height: None,
             id: None,
             _phantom_msg: PhantomData,
         }
