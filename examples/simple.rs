@@ -28,7 +28,7 @@ fn main() -> Result<()> {
     let rb2 = Radio::<()>::new("Radio2");
 
     let mut list_box1 = ListBox::new();
-    list_box1.set_use_divider(false);
+    list_box1.set_use_divider(true);
     list_box1.set_list(vec![
         "Item1".into(),
         "Item2".into(),

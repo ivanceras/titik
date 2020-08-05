@@ -81,7 +81,6 @@ impl<MSG> ListBox<MSG> {
         let loc_y = layout.location.y;
         let width = layout.size.width;
         let height = layout.size.height;
-        eprintln!("list item layout: {:#?}", layout);
         for (j, li) in self.list.iter().enumerate() {
             let left = loc_x + 1.0;
             let right = loc_x + width - 2.0;
@@ -92,7 +91,6 @@ impl<MSG> ListBox<MSG> {
                 loc_y + j as f32
             };
 
-            eprintln!("top: {}", top);
             let bottom = top + 2.0;
             if bottom < layout.location.y + height {
                 let mut canvas = Canvas::new();

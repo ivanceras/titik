@@ -154,8 +154,6 @@ where
         let width = layout.size.width.round() as usize;
         let height = layout.size.height.round() as usize;
 
-        eprintln!("btn layout: {:#?}", layout);
-
         let left = loc_x;
         let top = loc_y;
         let bottom = top + height - 1;

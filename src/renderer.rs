@@ -40,8 +40,6 @@ impl<'a, MSG> Renderer<'a, MSG> {
         let (width, height) =
             terminal::size().expect("must get the terminal size");
 
-        root_node.set_size(Some((width) as f32), Some(height as f32));
-
         layout::compute_node_layout(
             root_node,
             Size {
@@ -160,6 +158,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                     }
                     */
                     Event::Resize(width, height) => {
+                        eprintln!("resizing the terminal..");
                         self.terminal_size = (width, height);
                         self.recompute_layout();
                     }
