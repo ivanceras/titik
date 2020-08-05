@@ -1,5 +1,5 @@
 use crate::Event;
-use crate::{buffer::Buffer, widget::Flex, Cmd, Widget};
+use crate::{buffer::Buffer, Cmd, Widget};
 use crossterm::event::MouseEvent;
 use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::{any::Any, fmt};
@@ -195,63 +195,71 @@ impl<MSG> TabBox<MSG> {
             self.active_tab = index;
         }
     }
+
+    fn border_top(&self) -> f32 {
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
+    }
+
+    fn border_bottom(&self) -> f32 {
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
+    }
+
+    fn border_left(&self) -> f32 {
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
+    }
+
+    fn border_right(&self) -> f32 {
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
+    }
 }
 
 impl<MSG> Widget<MSG> for TabBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn set_layout(&mut self, layout: Layout) {
         self.layout = Some(layout);
     }
     fn style(&self) -> Style {
         Style {
-            flex_direction: self.flex_direction(),
+            flex_direction: self.flex_direction,
             size: Size {
-                width: if let Some(width) = self.width() {
+                width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
                     Dimension::Percent(1.0)
                 },
-                height: if let Some(height) = self.height() {
+                height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
                     Dimension::Percent(1.0)
                 },
             },
-            overflow: Overflow::Scroll,
             border: Rect {
                 top: Dimension::Points(self.border_top()),
                 bottom: Dimension::Points(self.border_bottom()),
                 start: Dimension::Points(self.border_left()),
                 end: Dimension::Points(self.border_right()),
             },
-            align_items: AlignItems::FlexStart,
-            justify_content: JustifyContent::FlexStart,
-            align_self: AlignSelf::FlexStart,
-            align_content: AlignContent::FlexStart,
-            flex_shrink: 1.0,
-            flex_grow: 0.0,
-            position: Rect {
-                top: Dimension::Points(0.0),
-                start: Dimension::Points(0.0),
-                bottom: Dimension::Points(0.0),
-                end: Dimension::Points(0.0),
-            },
-            margin: Rect {
-                top: Dimension::Points(0.0),
-                start: Dimension::Points(0.0),
-                bottom: Dimension::Points(0.0),
-                end: Dimension::Points(0.0),
-            },
-            padding: Rect {
-                top: Dimension::Points(1.0),
-                start: Dimension::Points(1.0),
-                bottom: Dimension::Points(0.0),
-                end: Dimension::Points(0.0),
-            },
-            flex_wrap: FlexWrap::NoWrap,
-            position_type: PositionType::Relative,
             ..Default::default()
         }
     }
@@ -269,7 +277,7 @@ where
         let top = (loc_y + 2.0) as usize;
         let bottom = top + height as usize - 3;
         let border = Border {
-            use_thick_border: self.is_expand_width(),
+            use_thick_border: false,
             has_top: false,
             has_bottom: true,
             has_left: true,
@@ -345,41 +353,5 @@ where
             }
             _ => vec![],
         }
-    }
-}
-
-impl<MSG> Flex<MSG> for TabBox<MSG>
-where
-    MSG: fmt::Debug + 'static,
-{
-    fn layout(&self) -> Option<&Layout> {
-        self.layout.as_ref()
-    }
-    fn has_border(&self) -> bool {
-        self.has_border
-    }
-
-    fn is_rounded_border(&self) -> bool {
-        self.is_rounded_border
-    }
-
-    fn is_thick_border(&self) -> bool {
-        self.is_thick_border
-    }
-
-    fn flex_direction(&self) -> FlexDirection {
-        self.flex_direction
-    }
-
-    fn width(&self) -> Option<f32> {
-        self.width
-    }
-
-    fn height(&self) -> Option<f32> {
-        self.height
-    }
-
-    fn scroll_top(&self) -> f32 {
-        self.scroll_top
     }
 }

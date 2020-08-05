@@ -1,7 +1,14 @@
-use crate::{buffer::Buffer, widget::Flex, Cmd, Widget};
+use crate::{buffer::Buffer, Cmd, Widget};
+use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::{any::Any, fmt};
 use stretch::result::Layout;
-use stretch::style::{FlexDirection, Style};
+use stretch::{
+    geometry::{Rect, Size},
+    style::{
+        AlignContent, AlignItems, AlignSelf, Dimension, FlexDirection,
+        FlexWrap, JustifyContent, Overflow, PositionType, Style,
+    },
+};
 
 /// a flex box
 #[derive(Default, Debug)]
@@ -82,21 +89,106 @@ impl<MSG> FlexBox<MSG> {
     pub fn set_rounded(&mut self, use_rounded_border: bool) {
         self.is_rounded_border = use_rounded_border;
     }
+
+    fn border_top(&self) -> f32 {
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
+    }
+
+    fn border_bottom(&self) -> f32 {
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
+    }
+
+    fn border_left(&self) -> f32 {
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
+    }
+
+    fn border_right(&self) -> f32 {
+        if self.has_border {
+            1.0
+        } else {
+            0.0
+        }
+    }
 }
 
 impl<MSG> Widget<MSG> for FlexBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn set_layout(&mut self, layout: Layout) {
         self.layout = Some(layout);
     }
     fn style(&self) -> Style {
-        self.flex_style()
+        Style {
+            flex_direction: self.flex_direction,
+            size: Size {
+                width: if let Some(width) = self.width {
+                    Dimension::Points(width)
+                } else {
+                    Dimension::Percent(1.0)
+                },
+                height: if let Some(height) = self.height {
+                    Dimension::Points(height)
+                } else {
+                    Dimension::Percent(1.0)
+                },
+            },
+            border: Rect {
+                top: Dimension::Points(self.border_top()),
+                bottom: Dimension::Points(self.border_bottom()),
+                start: Dimension::Points(self.border_left()),
+                end: Dimension::Points(self.border_right()),
+            },
+            ..Default::default()
+        }
     }
 
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        self.draw_flex(buf)
+        let layout = self.layout().expect("must have a layout");
+        let loc_x = layout.location.x.round();
+        let loc_y = layout.location.y.round();
+        let width = layout.size.width.round();
+        let height = layout.size.height.round();
+
+        if self.has_border {
+            let border = Border {
+                use_thick_border: self.is_thick_border,
+                has_top: true,
+                has_bottom: true,
+                has_left: true,
+                has_right: true,
+                is_top_left_rounded: self.is_rounded_border,
+                is_top_right_rounded: self.is_rounded_border,
+                is_bottom_left_rounded: self.is_rounded_border,
+                is_bottom_right_rounded: self.is_rounded_border,
+            };
+
+            let left = loc_x as usize;
+            let top = loc_y as usize;
+            let bottom = (loc_y + height - 1.0) as usize;
+            let right = (loc_x + width - 1.0) as usize;
+            let mut canvas = Canvas::new();
+            canvas.draw_rect((left, top), (right, bottom), border);
+            for (i, j, ch) in canvas.get_cells() {
+                buf.set_symbol(i, j, ch);
+            }
+        }
+        vec![]
     }
 
     fn add_child(&mut self, child: Box<dyn Widget<MSG>>) -> bool {
@@ -143,49 +235,5 @@ where
 
     fn get_id(&self) -> &Option<String> {
         &self.id
-    }
-}
-
-impl<MSG> Flex<MSG> for FlexBox<MSG>
-where
-    MSG: fmt::Debug + 'static,
-{
-    fn layout(&self) -> Option<&Layout> {
-        self.layout.as_ref()
-    }
-    fn has_border(&self) -> bool {
-        self.has_border
-    }
-
-    fn is_rounded_border(&self) -> bool {
-        self.is_rounded_border
-    }
-
-    fn is_thick_border(&self) -> bool {
-        self.is_thick_border
-    }
-
-    fn is_expand_width(&self) -> bool {
-        self.is_expand_width
-    }
-
-    fn is_expand_height(&self) -> bool {
-        self.is_expand_height
-    }
-
-    fn flex_direction(&self) -> FlexDirection {
-        self.flex_direction
-    }
-
-    fn width(&self) -> Option<f32> {
-        self.width
-    }
-
-    fn height(&self) -> Option<f32> {
-        self.height
-    }
-
-    fn scroll_top(&self) -> f32 {
-        self.scroll_top
     }
 }

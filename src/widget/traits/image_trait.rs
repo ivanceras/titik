@@ -15,7 +15,7 @@ use stretch::{
 };
 
 pub trait ImageTrait {
-    fn layout(&self) -> Option<&Layout>;
+    fn image_layout(&self) -> Option<&Layout>;
     fn width(&self) -> Option<f32>;
     fn height(&self) -> Option<f32>;
 
@@ -73,7 +73,7 @@ pub trait ImageTrait {
     }
 
     fn draw_image(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout().expect("must have a layout");
+        let layout = self.image_layout().expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let cells = self.create_cells(layout.size.width, layout.size.height);

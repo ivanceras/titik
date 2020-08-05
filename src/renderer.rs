@@ -164,21 +164,16 @@ impl<'a, MSG> Renderer<'a, MSG> {
                     }
                     _ => (),
                 }
-                /*
                 // any other activities, such as mouse scroll is
                 // sent the widget underneath the location, regardless
                 // if it focused or not.
+                /*
                 if let Some((x, y)) = extract_location(&event) {
-                    let hits = self.layout_tree.hit(x as f32, y as f32);
-                    //let hit = hits.pop().expect("process only 1 for now");
-                    for hit in hits.iter().rev() {
-                        let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                            find_node::find_widget_mut(self.root_node, *hit);
-
-                        if let Some(hit_widget) = &mut hit_widget {
-                            let msgs = hit_widget.process_event(event.clone());
-                            self.dispatch_msg(msgs);
-                        }
+                    let hit_widgets: Vec<&dyn Widget<MSG>> =
+                        layout::node_hit_at(self.root_node, x as f32, y as f32);
+                    for hit_widget in hit_widgets.iter().rev() {
+                        let msgs = hit_widget.process_event(event.clone());
+                        self.dispatch_msg(msgs);
                     }
                 }
                 */

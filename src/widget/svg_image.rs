@@ -48,10 +48,9 @@ impl<MSG> SvgImage<MSG> {
 }
 
 impl<MSG> ImageTrait for SvgImage<MSG> {
-    fn layout(&self) -> Option<&Layout> {
+    fn image_layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
-
     fn width(&self) -> Option<f32> {
         self.width
     }
@@ -69,6 +68,9 @@ impl<MSG> Widget<MSG> for SvgImage<MSG>
 where
     MSG: 'static,
 {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn set_layout(&mut self, layout: Layout) {
         self.layout = Some(layout);
     }

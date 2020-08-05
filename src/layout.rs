@@ -6,7 +6,6 @@ use stretch::Stretch;
 
 /// calculate the layout of the nodes utilizing the styles set on each of the widget
 /// and its children widget styles
-#[allow(unused)]
 pub(crate) fn compute_node_layout<MSG>(
     widget_node: &mut dyn Widget<MSG>,
     parent_size: Size<Number>,
@@ -23,6 +22,30 @@ pub(crate) fn compute_node_layout<MSG>(
         &stretch,
         (0.0, 0.0),
     )
+}
+
+pub(crate) fn node_hit_at<MSG>(
+    node: &dyn Widget<MSG>,
+    x: f32,
+    y: f32,
+) -> Vec<&dyn Widget<MSG>> {
+    let layout = node.layout().expect("must have a layout");
+    let loc = layout.location;
+    let width = layout.size.width;
+    let height = layout.size.height;
+
+    let mut hits = vec![];
+
+    if let Some(children) = node.children() {
+        for child in children {
+            hits.extend(node_hit_at(child.as_ref(), x, y));
+        }
+    }
+
+    if x >= loc.x && x < loc.x + width && y >= loc.y && y < loc.y + height {
+        hits.push(node);
+    }
+    hits
 }
 
 fn build_stretch_node_recursive<MSG>(

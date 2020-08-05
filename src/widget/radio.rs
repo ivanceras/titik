@@ -45,6 +45,9 @@ impl<MSG> Radio<MSG> {
 }
 
 impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn set_layout(&mut self, layout: Layout) {
         self.layout = Some(layout);
     }

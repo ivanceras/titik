@@ -18,7 +18,7 @@ pub use svg_image::SvgImage;
 pub use tab_box::TabBox;
 pub use text_area::TextArea;
 pub use text_input::TextInput;
-pub use traits::{Flex, ImageTrait};
+pub use traits::ImageTrait;
 
 mod button;
 mod checkbox;
@@ -41,6 +41,9 @@ where
 {
     /// return the style of this widget
     fn style(&self) -> Style;
+
+    /// return the layout of thiswidget
+    fn layout(&self) -> Option<&Layout>;
 
     fn set_layout(&mut self, layout: Layout);
 

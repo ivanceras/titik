@@ -105,6 +105,9 @@ impl<MSG> Widget<MSG> for Button<MSG>
 where
     MSG: 'static,
 {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn set_layout(&mut self, layout: Layout) {
         self.layout = Some(layout);
     }

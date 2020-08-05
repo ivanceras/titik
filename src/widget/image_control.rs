@@ -33,7 +33,7 @@ impl<MSG> Image<MSG> {
 }
 
 impl<MSG> ImageTrait for Image<MSG> {
-    fn layout(&self) -> Option<&Layout> {
+    fn image_layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
     fn width(&self) -> Option<f32> {
@@ -53,6 +53,9 @@ impl<MSG> Widget<MSG> for Image<MSG>
 where
     MSG: 'static,
 {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn set_layout(&mut self, layout: Layout) {
         self.layout = Some(layout);
     }
