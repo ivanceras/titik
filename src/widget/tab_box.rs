@@ -128,14 +128,16 @@ impl<MSG> TabBox<MSG> {
         for (tab_index, ((left, top), (right, bottom))) in
             tab_rects.iter().enumerate()
         {
+            let tab_label = &self.tab_labels[tab_index];
             if self.active_tab == tab_index {
-                buf.write_bold_str(
-                    left + 2,
-                    top + 1,
-                    &self.tab_labels[tab_index],
+                buf.write_bold_str(left + 2, top + 1, tab_label);
+                canvas.eraser_horizontal_line(
+                    (*left, *bottom),
+                    (*right, *bottom),
+                    false,
                 );
             } else {
-                buf.write_str(left + 2, top + 1, &self.tab_labels[tab_index]);
+                buf.write_str(left + 2, top + 1, tab_label);
             }
             canvas.draw_rect(
                 (*left, *top),
@@ -173,15 +175,6 @@ impl<MSG> TabBox<MSG> {
                 is_bottom_right_rounded: false,
             },
         );
-
-        // draw a line to the rest of the width
-        let ((_, _), (right, _)) = tab_rects[tab_rects.len() - 1];
-        canvas.draw_horizontal_line(
-            (right, bottom),
-            (loc_x + width, bottom),
-            false,
-        );
-        canvas.draw_horizontal_line((loc_x, bottom), (left_pad, bottom), false);
     }
 
     /// set the tab labels
@@ -278,7 +271,7 @@ where
         let bottom = top + height as usize - 3;
         let border = Border {
             use_thick_border: false,
-            has_top: false,
+            has_top: true,
             has_bottom: true,
             has_left: true,
             has_right: true,
@@ -288,9 +281,9 @@ where
             is_bottom_right_rounded: true,
         };
 
-        //self.draw_children(buf, layout_tree);
-        self.draw_labels(buf, &mut canvas);
         canvas.draw_rect((left, top), (right, bottom), border);
+
+        self.draw_labels(buf, &mut canvas);
         buf.write_canvas(canvas);
         vec![]
     }

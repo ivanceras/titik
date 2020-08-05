@@ -8,15 +8,15 @@ use titik::{
 fn main() -> Result<()> {
     let mut stdout = io::stdout();
     let mut root_node = FlexBox::<()>::new();
-    root_node.set_border(true);
+    root_node.set_border(false);
     root_node.set_thick_border(true);
     let mut column = FlexBox::new();
     column.vertical();
-    //column.set_border(true);
+    column.set_border(false);
     column.set_thick_border(false);
     let mut row = FlexBox::<()>::new();
     row.horizontal();
-    //row.set_border(true);
+    row.set_border(false);
     row.set_thick_border(false);
     row.set_rounded(true);
     let btn1 = Button::<()>::new("btn 1");
@@ -29,7 +29,7 @@ fn main() -> Result<()> {
 
     let input1 = TextInput::new("Hello");
 
-    let mut list_box1 = ListBox::new();
+    let mut list_box1 = ListBox::<()>::new();
     list_box1.set_use_divider(true);
     list_box1.set_list(vec![
         "Item1".into(),
@@ -63,6 +63,18 @@ fn main() -> Result<()> {
         "Item29".into(),
         "Item30".into(),
     ]);
+
+    let mut tab1 = TabBox::new();
+    tab1.set_tab_labels(vec![
+        "Tab1".into(),
+        "Tab2".into(),
+        "Tab3".into(),
+        "Tab4".into(),
+        "Tab5".into(),
+        "And more tabs..".into(),
+    ]);
+    tab1.set_active_tab(1);
+
     column.add_child(Box::new(cb1));
     column.add_child(Box::new(cb2));
     column.add_child(Box::new(rb1));
@@ -70,11 +82,11 @@ fn main() -> Result<()> {
     column.add_child(Box::new(list_box1));
     column.add_child(Box::new(input1));
 
-    //column.add_child(Box::new(row));
     row.add_child(Box::new(btn1));
     row.add_child(Box::new(btn2));
+    row.add_child(Box::new(tab1));
+    column.add_child(Box::new(row));
     root_node.add_child(Box::new(column));
-    root_node.add_child(Box::new(row));
     let mut renderer = Renderer::<()>::new(&mut stdout, None, &mut root_node);
     renderer.run()?;
     Ok(())

@@ -117,13 +117,11 @@ where
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)
                 } else {
-                    //Dimension::Points((self.label.len() + 2) as f32)
                     Dimension::Percent(1.0)
                 },
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    //Dimension::Points(3.0)
                     Dimension::Percent(1.0)
                 },
             },

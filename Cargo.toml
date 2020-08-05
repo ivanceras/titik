@@ -19,8 +19,9 @@ mt-dom = { version = "0.3", path = "../mt-dom" }
 itertools = "0.9.0"
 resvg = { version = "0.9.0", features = ["raqote-backend"] }
 lazy_static = "1.4.0"
-ito-canvas = { version= "0.1.0"}
+ito-canvas = { path = "../ito-canvas", version= "0.1.0"}
 
 
 [patch.crates-io]
 stretch = { path = "../stretch" }
+ito-canvas = { path = "../ito-canvas" }
