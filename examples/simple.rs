@@ -74,16 +74,33 @@ fn main() -> Result<()> {
         "And more tabs..".into(),
     ]);
 
+    let cb11 = Checkbox::new("Checkbox1");
+    let cb12 = Checkbox::new("Checkbox2");
+    let rb11 = Radio::new("Radio1");
+    let rb12 = Radio::new("Radio2");
+
+    let mut gb1 = GroupBox::new();
+    gb1.set_label("Selection");
+    gb1.add_child(Box::new(cb11));
+    gb1.add_child(Box::new(cb12));
+    gb1.add_child(Box::new(rb11));
+    gb1.add_child(Box::new(rb12));
+
     let mut tab_row = FlexBox::new();
     tab_row.vertical();
 
-    tab1.set_active_tab(1);
+    tab1.set_active_tab(2);
     tab1.add_child_to_tab(1, Box::new(list_box1));
     tab_row.add_child(Box::new(Checkbox::new("checkbox1 in first tab")));
     tab_row.add_child(Box::new(Checkbox::new("checkbox2 in first tab")));
     tab_row.add_child(Box::new(Radio::new("radio1 in first tab")));
     tab_row.add_child(Box::new(TextInput::new("Hello input in first tab")));
     tab1.add_child_to_tab(0, Box::new(tab_row));
+    tab1.add_child_to_tab(2, Box::new(gb1));
+    tab1.add_child_to_tab(
+        3,
+        Box::new(TextArea::new("This is a good textarea view")),
+    );
 
     column.add_child(Box::new(cb1));
     column.add_child(Box::new(cb2));

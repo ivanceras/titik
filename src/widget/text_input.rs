@@ -117,18 +117,6 @@ impl<MSG> Widget<MSG> for TextInput {
                     Dimension::Points(3.0)
                 },
             },
-            min_size: Size {
-                width: if let Some(width) = self.width {
-                    Dimension::Points(width)
-                } else {
-                    Dimension::Points(5.0)
-                },
-                height: if let Some(height) = self.height {
-                    Dimension::Points(height)
-                } else {
-                    Dimension::Points(3.0)
-                },
-            },
             ..Default::default()
         }
     }
@@ -163,16 +151,14 @@ impl<MSG> Widget<MSG> for TextInput {
 
         let inner_width = self.inner_width(&layout);
         for (t, ch) in self.get_value().chars().enumerate() {
-            if loc_x + t < inner_width {
-                buf.set_symbol(loc_x + 1 + t, loc_y + 1, ch);
-            }
+            buf.set_symbol(left + 1 + t, top + 1, ch);
         }
 
         let cursor_loc_x = self.input_buffer.get_cursor_location();
         if self.focused {
             vec![
                 Cmd::ShowCursor,
-                Cmd::MoveTo(loc_x + cursor_loc_x + 1, loc_y + 1),
+                Cmd::MoveTo(left + cursor_loc_x + 1, top + 1),
             ]
         } else {
             vec![]

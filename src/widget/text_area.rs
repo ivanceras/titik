@@ -252,25 +252,7 @@ where
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Points(self.content_height())
-                },
-            },
-            min_size: Size {
-                width: if let Some(width) = self.width {
-                    Dimension::Points(width)
-                } else {
-                    Dimension::Points(std::cmp::max(
-                        20,
-                        self.content_width() as usize,
-                    ) as f32)
-                },
-                height: if let Some(height) = self.height {
-                    Dimension::Points(height)
-                } else {
-                    Dimension::Points(std::cmp::max(
-                        3,
-                        self.content_height() as usize,
-                    ) as f32)
+                    Dimension::Percent(1.0)
                 },
             },
             ..Default::default()
