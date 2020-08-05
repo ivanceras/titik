@@ -70,6 +70,18 @@ impl<MSG> FlexBox<MSG> {
     pub fn set_expand_height(&mut self, is_expand_height: bool) {
         self.is_expand_height = is_expand_height;
     }
+
+    pub fn set_border(&mut self, has_border: bool) {
+        self.has_border = has_border;
+    }
+
+    pub fn set_thick_border(&mut self, use_thick_border: bool) {
+        self.is_thick_border = use_thick_border;
+    }
+
+    pub fn set_rounded(&mut self, use_rounded_border: bool) {
+        self.is_rounded_border = use_rounded_border;
+    }
 }
 
 impl<MSG> Widget<MSG> for FlexBox<MSG>

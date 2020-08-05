@@ -17,7 +17,12 @@ pub(crate) fn compute_node_layout<MSG>(
     stretch
         .compute_layout(stretch_node, parent_size)
         .expect("must compute the layout");
-    set_node_layout_from_stretch_node(widget_node, stretch_node, &stretch)
+    set_node_layout_from_stretch_node(
+        widget_node,
+        stretch_node,
+        &stretch,
+        (0.0, 0.0),
+    )
 }
 
 fn build_stretch_node_recursive<MSG>(
@@ -40,8 +45,9 @@ fn set_node_layout_from_stretch_node<MSG>(
     widget_node: &mut dyn Widget<MSG>,
     stretch_node: stretch::node::Node,
     stretch: &Stretch,
+    offset: (f32, f32),
 ) {
-    let layout = *stretch.layout(stretch_node).expect("must have layout");
+    let mut layout = *stretch.layout(stretch_node).expect("must have layout");
     let stretch_node_children: Vec<stretch::node::Node> =
         stretch.children(stretch_node).expect("must get children");
 
@@ -55,8 +61,12 @@ fn set_node_layout_from_stretch_node<MSG>(
                 widget_child.as_mut(),
                 stretch_node_child,
                 stretch,
+                (layout.location.x, layout.location.y),
             )
         });
+    let (offset_x, offset_y) = offset;
+    layout.location.x += offset_x;
+    layout.location.y += offset_y;
 
     widget_node.set_layout(layout);
 }

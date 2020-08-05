@@ -38,6 +38,10 @@ impl<MSG> ListBox<MSG> {
         }
     }
 
+    pub fn set_use_divider(&mut self, use_divider: bool) {
+        self.use_divider = use_divider;
+    }
+
     fn draw_border(&self, buf: &mut Buffer) {
         let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
@@ -73,22 +77,34 @@ impl<MSG> ListBox<MSG> {
 
     fn draw_items(&self, buf: &mut Buffer) {
         let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
-        let width = layout.size.width.round() as usize;
+        let loc_x = layout.location.x;
+        let loc_y = layout.location.y;
+        let width = layout.size.width;
+        let height = layout.size.height;
+        eprintln!("list item layout: {:#?}", layout);
         for (j, li) in self.list.iter().enumerate() {
-            if self.use_divider {
+            let left = loc_x + 1.0;
+            let right = loc_x + width - 2.0;
+
+            let top = if self.use_divider {
+                loc_y + (j as f32 * 2.0)
+            } else {
+                loc_y + j as f32
+            };
+
+            eprintln!("top: {}", top);
+            let bottom = top + 2.0;
+            if bottom < layout.location.y + height {
                 let mut canvas = Canvas::new();
-                buf.write_str(loc_x + 2, loc_y + 1 + (j * 2), li);
-                let left = loc_x + 1;
-                let right = loc_x + width - 2;
-                let bottom = loc_y + 1 + (j * 2) + 1;
-                canvas.draw_horizontal_line(
-                    (left, bottom),
-                    (right, bottom),
-                    false,
-                );
-                buf.write_canvas(canvas);
+                buf.write_str((left + 1.0) as usize, (top + 1.0) as usize, li);
+                if self.use_divider {
+                    canvas.draw_horizontal_line(
+                        (left as usize, bottom as usize),
+                        (right as usize, bottom as usize),
+                        false,
+                    );
+                    buf.write_canvas(canvas);
+                }
             }
         }
     }
