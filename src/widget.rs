@@ -45,6 +45,12 @@ where
     /// return the layout of thiswidget
     fn layout(&self) -> Option<&Layout>;
 
+    /// return the offset of the parent,
+    /// this before any of it's children to be drawn
+    fn get_offset(&self) -> (f32, f32) {
+        (0.0, 0.0)
+    }
+
     fn set_layout(&mut self, layout: Layout);
 
     /// add a child to this widget

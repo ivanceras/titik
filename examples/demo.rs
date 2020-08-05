@@ -32,7 +32,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
         "And more tabs..".into(),
     ]);
     tab1.set_active_tab(1);
-    tab1.set_size(None, Some(30.0));
+    //tab1.set_size(None, Some(30.0));
 
     let mut gb1 = GroupBox::new();
     gb1.set_label("Selection");
@@ -86,7 +86,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
             \n19. and another line\
             \n20. This is the last line and also a looooooooooooooooooooong line",
     );
-    text_area1.set_size(Some(60.0), Some(10.0));
+    //text_area1.set_size(Some(60.0), Some(10.0));
 
     let mut btn2: Button<()> = Button::new("Button2");
     btn2.set_rounded(true);

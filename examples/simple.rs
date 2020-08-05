@@ -73,18 +73,28 @@ fn main() -> Result<()> {
         "Tab5".into(),
         "And more tabs..".into(),
     ]);
+
+    let mut tab_row = FlexBox::new();
+    tab_row.vertical();
+
     tab1.set_active_tab(1);
+    tab1.add_child_to_tab(1, Box::new(list_box1));
+    tab_row.add_child(Box::new(Checkbox::new("checkbox1 in first tab")));
+    tab_row.add_child(Box::new(Checkbox::new("checkbox2 in first tab")));
+    tab_row.add_child(Box::new(Radio::new("radio1 in first tab")));
+    tab_row.add_child(Box::new(TextInput::new("Hello input in first tab")));
+    tab1.add_child_to_tab(0, Box::new(tab_row));
 
     column.add_child(Box::new(cb1));
     column.add_child(Box::new(cb2));
     column.add_child(Box::new(rb1));
     column.add_child(Box::new(rb2));
-    column.add_child(Box::new(list_box1));
     column.add_child(Box::new(input1));
 
     row.add_child(Box::new(btn1));
     row.add_child(Box::new(btn2));
     row.add_child(Box::new(tab1));
+    //row.add_child(Box::new(list_box1));
     column.add_child(Box::new(row));
     root_node.add_child(Box::new(column));
     let mut renderer = Renderer::<()>::new(&mut stdout, None, &mut root_node);

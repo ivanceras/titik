@@ -32,7 +32,7 @@ pub struct TabBox<MSG> {
     tab_labels: Vec<String>,
     active_tab: usize,
     /// The children could be flexbox, group_box,
-    children: Vec<Box<dyn Widget<MSG>>>,
+    children: Vec<Vec<Box<dyn Widget<MSG>>>>,
     width: Option<f32>,
     height: Option<f32>,
     flex_direction: FlexDirection,
@@ -65,6 +65,29 @@ impl<MSG> TabBox<MSG> {
     /// remove all children of this flex_box
     pub fn clear_children(&mut self) {
         self.children = vec![];
+    }
+
+    fn ensure_has_tab_index(&mut self, tab_index: usize) {
+        let children_len = self.children.len();
+        if tab_index >= children_len {
+            for i in children_len..tab_index {
+                self.children.push(vec![]);
+            }
+        }
+    }
+
+    pub fn add_child_to_tab(
+        &mut self,
+        tab_index: usize,
+        child: Box<dyn Widget<MSG>>,
+    ) -> bool {
+        self.ensure_has_tab_index(tab_index);
+        if let Some(existing) = self.children.get_mut(tab_index) {
+            existing.push(child);
+        } else {
+            self.children.push(vec![child]);
+        }
+        true
     }
 
     /// set to vertical column direction
@@ -232,6 +255,11 @@ where
     fn set_layout(&mut self, layout: Layout) {
         self.layout = Some(layout);
     }
+
+    /// the tab box has an offset of 2 from the top before drawing the child components
+    fn get_offset(&self) -> (f32, f32) {
+        (0.0, 2.0)
+    }
     fn style(&self) -> Style {
         Style {
             flex_direction: self.flex_direction,
@@ -288,29 +316,33 @@ where
         vec![]
     }
 
+    /// add a child widget to the current active tab
     fn add_child(&mut self, child: Box<dyn Widget<MSG>>) -> bool {
-        self.children.push(child);
-        true
+        self.add_child_to_tab(self.active_tab, child)
     }
 
     fn children(&self) -> Option<&[Box<dyn Widget<MSG>>]> {
-        Some(&self.children)
+        self.children
+            .get(self.active_tab)
+            .map(|children| children.as_slice())
     }
 
     fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget<MSG>>]> {
-        Some(&mut self.children)
+        self.children
+            .get_mut(self.active_tab)
+            .map(|children| children.as_mut_slice())
     }
 
     // TODO: use remove_item when it will be stabilized
     fn take_child(&mut self, index: usize) -> Option<Box<dyn Widget<MSG>>> {
-        Some(self.children.remove(index))
+        Some(self.children[self.active_tab].remove(index))
     }
 
     fn child_mut<'a>(
         &'a mut self,
         index: usize,
     ) -> Option<&'a mut Box<dyn Widget<MSG>>> {
-        self.children.get_mut(index)
+        self.children[self.active_tab].get_mut(index)
     }
 
     fn as_any(&self) -> &dyn Any {

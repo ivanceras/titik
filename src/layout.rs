@@ -21,6 +21,7 @@ pub(crate) fn compute_node_layout<MSG>(
         stretch_node,
         &stretch,
         (0.0, 0.0),
+        (0.0, 0.0),
     )
 }
 
@@ -70,9 +71,23 @@ fn set_node_layout_from_stretch_node<MSG>(
     widget_node: &mut dyn Widget<MSG>,
     stretch_node: stretch::node::Node,
     stretch: &Stretch,
-    offset: (f32, f32),
+    parent_loc: (f32, f32),
+    parent_offset: (f32, f32),
 ) {
     let mut layout = *stretch.layout(stretch_node).expect("must have layout");
+
+    let (parent_loc_x, parent_loc_y) = parent_loc;
+    let (parent_offset_x, parent_offset_y) = parent_offset;
+    let (child_offset_x, child_offset_y) = widget_node.get_offset();
+
+    eprintln!("widget offset: ({},{})", child_offset_x, child_offset_y);
+
+    layout.location.x += parent_loc_x + parent_offset_x;
+    layout.location.y += parent_loc_y + parent_offset_y;
+
+    layout.size.width -= parent_offset_x;
+    layout.size.height -= parent_offset_y;
+
     let stretch_node_children: Vec<stretch::node::Node> =
         stretch.children(stretch_node).expect("must get children");
 
@@ -87,11 +102,9 @@ fn set_node_layout_from_stretch_node<MSG>(
                 stretch_node_child,
                 stretch,
                 (layout.location.x, layout.location.y),
+                (child_offset_x, child_offset_y),
             )
         });
-    let (offset_x, offset_y) = offset;
-    layout.location.x += offset_x;
-    layout.location.y += offset_y;
 
     widget_node.set_layout(layout);
 }

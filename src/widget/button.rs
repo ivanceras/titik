@@ -125,18 +125,6 @@ where
                     Dimension::Percent(1.0)
                 },
             },
-            min_size: Size {
-                width: if let Some(width) = self.width {
-                    Dimension::Points(width)
-                } else {
-                    Dimension::Points(5.0)
-                },
-                height: if let Some(height) = self.height {
-                    Dimension::Points(height)
-                } else {
-                    Dimension::Points(3.0)
-                },
-            },
             border: Rect {
                 top: Dimension::Points(self.border_top()),
                 bottom: Dimension::Points(self.border_bottom()),

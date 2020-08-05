@@ -81,24 +81,30 @@ impl<MSG> ListBox<MSG> {
         let loc_y = layout.location.y;
         let width = layout.size.width;
         let height = layout.size.height;
-        for (j, li) in self.list.iter().enumerate() {
-            let left = loc_x + 1.0;
-            let right = loc_x + width - 2.0;
+        let bottom = layout.location.y + height - 1.0;
 
-            let top = if self.use_divider {
+        for (j, li) in self.list.iter().enumerate() {
+            let item_left = loc_x + 1.0;
+            let item_right = loc_x + width - 2.0;
+
+            let item_top = if self.use_divider {
                 loc_y + (j as f32 * 2.0)
             } else {
                 loc_y + j as f32
             };
 
-            let bottom = top + 2.0;
-            if bottom < layout.location.y + height {
+            let item_bottom = item_top + 2.0;
+            if item_bottom < bottom {
                 let mut canvas = Canvas::new();
-                buf.write_str((left + 1.0) as usize, (top + 1.0) as usize, li);
+                buf.write_str(
+                    (item_left + 1.0) as usize,
+                    (item_top + 1.0) as usize,
+                    li,
+                );
                 if self.use_divider {
                     canvas.draw_horizontal_line(
-                        (left as usize, bottom as usize),
-                        (right as usize, bottom as usize),
+                        (item_left as usize, item_bottom as usize),
+                        (item_right as usize, item_bottom as usize),
                         false,
                     );
                     buf.write_canvas(canvas);
