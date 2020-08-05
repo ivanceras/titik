@@ -1,30 +1,11 @@
-use crate::{
-    buffer::Buffer,
-    widget::Flex,
-    Cmd,
-    LayoutTree,
-    Widget,
-};
-use std::{
-    any::Any,
-    fmt,
-};
+use crate::{buffer::Buffer, widget::Flex, Cmd, Widget};
+use std::{any::Any, fmt};
 use stretch::{
-    geometry::{
-        Rect,
-        Size,
-    },
+    geometry::{Rect, Size},
+    result::Layout,
     style::{
-        AlignContent,
-        AlignItems,
-        AlignSelf,
-        Dimension,
-        FlexDirection,
-        FlexWrap,
-        JustifyContent,
-        Overflow,
-        PositionType,
-        Style,
+        AlignContent, AlignItems, AlignSelf, Dimension, FlexDirection,
+        FlexWrap, JustifyContent, Overflow, PositionType, Style,
     },
 };
 
@@ -32,6 +13,7 @@ use stretch::{
 /// Radio buttons in the same group will have an exclusive behavior
 #[derive(Default, Debug)]
 pub struct GroupBox<MSG> {
+    layout: Option<Layout>,
     children: Vec<Box<dyn Widget<MSG>>>,
     width: Option<f32>,
     height: Option<f32>,
@@ -48,6 +30,7 @@ impl<MSG> GroupBox<MSG> {
     /// create a new groupbox
     pub fn new() -> Self {
         GroupBox {
+            layout: None,
             width: None,
             height: None,
             children: vec![],
@@ -81,8 +64,8 @@ impl<MSG> GroupBox<MSG> {
         self.label = Some(label.to_string());
     }
 
-    fn draw_label(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
-        let layout = layout_tree.layout;
+    fn draw_label(&self, buf: &mut Buffer) {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         if let Some(label) = &self.label {
@@ -97,6 +80,9 @@ impl<MSG> Widget<MSG> for GroupBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         Style {
             flex_direction: self.flex_direction(),
@@ -149,9 +135,9 @@ where
         }
     }
 
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        let cmds = self.draw_flex(buf, layout_tree);
-        self.draw_label(buf, layout_tree);
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let cmds = self.draw_flex(buf);
+        self.draw_label(buf);
         cmds
     }
 
@@ -206,6 +192,9 @@ impl<MSG> Flex<MSG> for GroupBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn has_border(&self) -> bool {
         self.has_border
     }

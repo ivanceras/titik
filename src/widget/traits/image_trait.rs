@@ -2,29 +2,20 @@
 //! ImageTrait is used so as to avoid conflict with image crate and Image structs.
 //!
 use crate::{
-    buffer::{
-        Buffer,
-        Cell,
-    },
+    buffer::{Buffer, Cell},
     symbol::bar,
     Cmd,
-    LayoutTree,
 };
 use crossterm::style::Color;
-use image::{
-    self,
-    DynamicImage,
-    GenericImageView,
-};
+use image::{self, DynamicImage, GenericImageView};
+use stretch::result::Layout;
 use stretch::{
     geometry::Size,
-    style::{
-        Dimension,
-        Style,
-    },
+    style::{Dimension, Style},
 };
 
 pub trait ImageTrait {
+    fn layout(&self) -> Option<&Layout>;
     fn width(&self) -> Option<f32>;
     fn height(&self) -> Option<f32>;
 
@@ -81,12 +72,8 @@ pub trait ImageTrait {
             .collect()
     }
 
-    fn draw_image(
-        &mut self,
-        buf: &mut Buffer,
-        layout_tree: &LayoutTree,
-    ) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
+    fn draw_image(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let layout = self.layout().expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let cells = self.create_cells(layout.size.width, layout.size.height);

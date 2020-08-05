@@ -1,18 +1,17 @@
 use crate::Event;
-use crate::{
-    buffer::Buffer, event::InputEvent, symbol, Callback, Cmd, LayoutTree,
-    Widget,
-};
+use crate::{buffer::Buffer, event::InputEvent, symbol, Callback, Cmd, Widget};
 use crossterm::event::MouseEvent;
 use std::{any::Any, fmt, fmt::Debug};
 use stretch::{
     geometry::Size,
+    result::Layout,
     style::{Dimension, Style},
 };
 
 /// A checkbox widget
 #[derive(PartialEq)]
 pub struct Checkbox<MSG> {
+    layout: Option<Layout>,
     label: String,
     is_checked: bool,
     id: Option<String>,
@@ -22,6 +21,7 @@ pub struct Checkbox<MSG> {
 impl<MSG> Default for Checkbox<MSG> {
     fn default() -> Self {
         Checkbox {
+            layout: None,
             label: String::new(),
             is_checked: false,
             id: None,
@@ -60,6 +60,10 @@ impl<MSG> Checkbox<MSG> {
 }
 
 impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
+
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -75,8 +79,8 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let box_symbol = if self.is_checked {

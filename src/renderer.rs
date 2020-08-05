@@ -1,7 +1,7 @@
 //! Provides the core functionality of rendering to the terminal
 //! This has the event loop which calculates and process the events to the target widget
 use crate::Event;
-use crate::{command, find_node, layout, Buffer, LayoutTree, Widget};
+use crate::{command, find_node, layout, Buffer, Widget};
 pub use crossterm::{
     cursor,
     event::{self, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
@@ -26,7 +26,6 @@ pub struct Renderer<'a, MSG> {
     write: &'a mut dyn Write,
     program: Option<&'a dyn Dispatch<MSG>>,
     root_node: &'a mut dyn Widget<MSG>,
-    layout_tree: LayoutTree,
     terminal_size: (u16, u16),
     focused_widget_idx: Option<usize>,
 }
@@ -43,7 +42,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
         root_node.set_size(Some((width) as f32), Some(height as f32));
 
-        let layout_tree = layout::compute_layout(
+        layout::compute_node_layout(
             root_node,
             Size {
                 width: Number::Defined(width as f32),
@@ -54,7 +53,6 @@ impl<'a, MSG> Renderer<'a, MSG> {
             write,
             program,
             root_node,
-            layout_tree,
             terminal_size: (width, height),
             focused_widget_idx: None,
         }
@@ -62,7 +60,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
     fn recompute_layout(&mut self) {
         let (width, height) = self.terminal_size;
-        self.layout_tree = layout::compute_layout(
+        layout::compute_node_layout(
             self.root_node,
             Size {
                 width: Number::Defined(width as f32),
@@ -91,7 +89,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
             buf.reset();
             {
-                let tty_cmds = self.root_node.draw(&mut buf, &self.layout_tree);
+                let tty_cmds = self.root_node.draw(&mut buf);
                 buf.render(self.write)?;
                 tty_cmds.iter().for_each(|cmd| {
                     cmd.execute(self.write).expect("must execute")
@@ -137,6 +135,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                             }
                         }
                     }
+                    /*
                     // mouse clicks sets the focused the widget underneath
                     Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
                         self.focused_widget_idx = layout::widget_node_idx_at(
@@ -149,12 +148,14 @@ impl<'a, MSG> Renderer<'a, MSG> {
                             layout::set_focused_node(self.root_node, *idx);
                         }
                     }
+                    */
                     Event::Resize(width, height) => {
                         self.terminal_size = (width, height);
                         self.recompute_layout();
                     }
                     _ => (),
                 }
+                /*
                 // any other activities, such as mouse scroll is
                 // sent the widget underneath the location, regardless
                 // if it focused or not.
@@ -171,6 +172,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                         }
                     }
                 }
+                */
             }
         }
         command::finalize(self.write)?;

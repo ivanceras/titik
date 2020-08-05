@@ -1,11 +1,10 @@
-use crate::Event;
-use crate::{buffer::Buffer, cmd::Cmd, layout::LayoutTree, symbol, Widget};
-use crossterm::event::MouseEvent;
-use stretch::result::Layout;
-
 use crate::Callback;
+use crate::Event;
+use crate::{buffer::Buffer, cmd::Cmd, symbol, Widget};
+use crossterm::event::MouseEvent;
 use ito_canvas::unicode_canvas::Canvas;
 use std::{any::Any, fmt};
+use stretch::result::Layout;
 use stretch::{
     geometry::Size,
     style::{Dimension, Style},
@@ -14,22 +13,22 @@ use stretch::{
 /// A slider with value from 0.0 to 1.0
 #[derive(Debug)]
 pub struct Slider<MSG> {
+    layout: Option<Layout>,
     value: f32,
     width: Option<f32>,
     id: Option<String>,
     use_thick_track: bool,
-    layout: Option<Layout>,
     on_input: Vec<Callback<Event, MSG>>,
 }
 
 impl<MSG> Default for Slider<MSG> {
     fn default() -> Self {
         Slider {
+            layout: None,
             value: 0.0,
             width: None,
             id: None,
             use_thick_track: false,
-            layout: None,
             on_input: vec![],
         }
     }
@@ -59,6 +58,9 @@ impl<MSG> Widget<MSG> for Slider<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -73,9 +75,8 @@ where
         }
     }
 
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
-        self.layout = Some(layout.clone());
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
@@ -106,7 +107,7 @@ where
     }
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        let layout = self.layout.expect("must have a layout set");
+        let layout = self.layout.expect("must have a layout");
         match event {
             Event::Mouse(MouseEvent::Down(_btn, x, _y, _modifier)) => {
                 let cursor_loc = x as i32 - layout.location.x.round() as i32;

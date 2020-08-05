@@ -1,33 +1,16 @@
-use crate::{
-    buffer::Buffer,
-    Cmd,
-    LayoutTree,
-    Widget,
-};
-use ito_canvas::unicode_canvas::{
-    Border,
-    Canvas,
-};
+use crate::{buffer::Buffer, Cmd, Widget};
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use stretch::result::Layout;
 use stretch::{
-    geometry::{
-        Rect,
-        Size,
-    },
+    geometry::{Rect, Size},
     style::{
-        AlignContent,
-        AlignItems,
-        AlignSelf,
-        Dimension,
-        FlexDirection,
-        FlexWrap,
-        JustifyContent,
-        Overflow,
-        PositionType,
-        Style,
+        AlignContent, AlignItems, AlignSelf, Dimension, FlexDirection,
+        FlexWrap, JustifyContent, Overflow, PositionType, Style,
     },
 };
 
 pub trait Flex<MSG>: Widget<MSG> {
+    fn layout(&self) -> Option<&Layout>;
     fn has_border(&self) -> bool;
     fn is_rounded_border(&self) -> bool;
     fn is_thick_border(&self) -> bool;
@@ -171,12 +154,8 @@ pub trait Flex<MSG>: Widget<MSG> {
         }
     }
 
-    fn draw_flex(
-        &mut self,
-        buf: &mut Buffer,
-        layout_tree: &LayoutTree,
-    ) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
+    fn draw_flex(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let layout = self.layout().expect("must have a layout");
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
         let width = layout.size.width.round();
@@ -190,13 +169,10 @@ pub trait Flex<MSG>: Widget<MSG> {
         );
 
         let cmds = self
-            .children_mut()
+            .children()
             .expect("must have children")
-            .iter_mut()
-            .zip(layout_tree.children_layout.iter())
-            .flat_map(|(child, child_layout)| {
-                child.draw(&mut inner_buf, child_layout)
-            })
+            .iter()
+            .flat_map(|child| child.draw(&mut inner_buf))
             .collect();
 
         for (j, line) in inner_buf.cells.iter().enumerate() {

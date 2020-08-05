@@ -1,22 +1,12 @@
-use crate::{
-    buffer::Buffer,
-    widget::Flex,
-    Cmd,
-    LayoutTree,
-    Widget,
-};
-use std::{
-    any::Any,
-    fmt,
-};
-use stretch::style::{
-    FlexDirection,
-    Style,
-};
+use crate::{buffer::Buffer, widget::Flex, Cmd, Widget};
+use std::{any::Any, fmt};
+use stretch::result::Layout;
+use stretch::style::{FlexDirection, Style};
 
 /// a flex box
 #[derive(Default, Debug)]
 pub struct FlexBox<MSG> {
+    layout: Option<Layout>,
     children: Vec<Box<dyn Widget<MSG>>>,
     width: Option<f32>,
     height: Option<f32>,
@@ -36,6 +26,7 @@ impl<MSG> FlexBox<MSG> {
     ///create a new flexbox
     pub fn new() -> Self {
         FlexBox {
+            layout: None,
             width: None,
             height: None,
             children: vec![],
@@ -85,12 +76,15 @@ impl<MSG> Widget<MSG> for FlexBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         self.flex_style()
     }
 
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        self.draw_flex(buf, layout_tree)
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        self.draw_flex(buf)
     }
 
     fn add_child(&mut self, child: Box<dyn Widget<MSG>>) -> bool {
@@ -144,6 +138,9 @@ impl<MSG> Flex<MSG> for FlexBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn has_border(&self) -> bool {
         self.has_border
     }

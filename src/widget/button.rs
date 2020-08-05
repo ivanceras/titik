@@ -2,13 +2,14 @@ use crate::Event;
 use crate::{
     buffer::{Buffer, Cell},
     mt_dom::Callback,
-    Cmd, LayoutTree, Widget,
+    Cmd, Widget,
 };
 use crossterm::event::MouseEvent;
 use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::{any::Any, fmt, fmt::Debug};
 use stretch::{
     geometry::Size,
+    result::Layout,
     style::{Dimension, Style},
 };
 
@@ -18,6 +19,7 @@ pub struct Button<MSG>
 where
     MSG: 'static,
 {
+    layout: Option<Layout>,
     label: String,
     is_rounded: bool,
     width: Option<f32>,
@@ -30,6 +32,7 @@ where
 impl<MSG> Default for Button<MSG> {
     fn default() -> Self {
         Button {
+            layout: None,
             label: String::new(),
             is_rounded: false,
             width: None,
@@ -86,6 +89,9 @@ impl<MSG> Widget<MSG> for Button<MSG>
 where
     MSG: 'static,
 {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -117,8 +123,8 @@ where
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;

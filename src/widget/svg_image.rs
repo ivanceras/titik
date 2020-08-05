@@ -1,25 +1,12 @@
-use crate::{
-    buffer::Buffer,
-    widget::ImageTrait,
-    Cmd,
-    LayoutTree,
-    Widget,
-};
-use image::{
-    self,
-    DynamicImage,
-    ImageBuffer,
-    RgbaImage,
-};
-use std::{
-    any::Any,
-    fmt,
-    marker::PhantomData,
-};
+use crate::{buffer::Buffer, widget::ImageTrait, Cmd, Widget};
+use image::{self, DynamicImage, ImageBuffer, RgbaImage};
+use std::{any::Any, fmt, marker::PhantomData};
+use stretch::result::Layout;
 use stretch::style::Style;
 
 /// an Image made from svg document
 pub struct SvgImage<MSG> {
+    layout: Option<Layout>,
     image: DynamicImage,
     /// the width of cells used for this image
     width: Option<f32>,
@@ -49,18 +36,22 @@ impl<MSG> SvgImage<MSG> {
             ImageBuffer::from_raw(width, height, rgba_vec)
                 .expect("must construct imagebuffer");
 
-        let image = SvgImage {
+        SvgImage {
+            layout: None,
             image: DynamicImage::ImageRgba8(img_buffer),
             width: Some(width as f32 / 10.0),
             height: Some(height as f32 / 10.0 / 2.0),
             id: None,
             _phantom_msg: PhantomData,
-        };
-        image
+        }
     }
 }
 
 impl<MSG> ImageTrait for SvgImage<MSG> {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
+
     fn width(&self) -> Option<f32> {
         self.width
     }
@@ -78,13 +69,16 @@ impl<MSG> Widget<MSG> for SvgImage<MSG>
 where
     MSG: 'static,
 {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         self.image_style()
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        self.draw_image(buf, layout_tree)
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        self.draw_image(buf)
     }
 
     fn as_any(&self) -> &dyn Any {

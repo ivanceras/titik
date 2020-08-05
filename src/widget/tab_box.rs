@@ -1,5 +1,5 @@
 use crate::Event;
-use crate::{buffer::Buffer, widget::Flex, Cmd, LayoutTree, Widget};
+use crate::{buffer::Buffer, widget::Flex, Cmd, Widget};
 use crossterm::event::MouseEvent;
 use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::{any::Any, fmt};
@@ -27,6 +27,7 @@ use stretch::{
 /// ```
 #[derive(Debug)]
 pub struct TabBox<MSG> {
+    layout: Option<Layout>,
     /// The labels for each of the tabs for each corresponding children
     tab_labels: Vec<String>,
     active_tab: usize,
@@ -40,13 +41,13 @@ pub struct TabBox<MSG> {
     has_border: bool,
     is_rounded_border: bool,
     is_thick_border: bool,
-    layout: Option<Layout>,
 }
 
 impl<MSG> TabBox<MSG> {
     /// creates a new tab box
     pub fn new() -> Self {
         TabBox {
+            layout: None,
             width: None,
             height: None,
             tab_labels: vec![],
@@ -58,7 +59,6 @@ impl<MSG> TabBox<MSG> {
             has_border: true,
             is_rounded_border: true,
             is_thick_border: false,
-            layout: None,
         }
     }
 
@@ -112,13 +112,8 @@ impl<MSG> TabBox<MSG> {
     ///  ╭──────╮──────┬──────╮
     ///  │ tab1 │ tab2 │ tab2 │
     ///  └──────┴──────┴──────┴
-    pub fn draw_labels(
-        &self,
-        buf: &mut Buffer,
-        canvas: &mut Canvas,
-        layout_tree: &LayoutTree,
-    ) {
-        let layout = layout_tree.layout;
+    pub fn draw_labels(&self, buf: &mut Buffer, canvas: &mut Canvas) {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let left_pad = 3;
@@ -189,16 +184,12 @@ impl<MSG> TabBox<MSG> {
         canvas.draw_horizontal_line((loc_x, bottom), (left_pad, bottom), false);
     }
 
-    fn draw_children(
-        &mut self,
-        buf: &mut Buffer,
-        layout_tree: &LayoutTree,
-    ) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
-        let loc_x = layout.location.x.round();
-        let loc_y = layout.location.y.round();
-        let width = layout.size.width.round();
-        let height = layout.size.height.round();
+    /*
+    fn draw_children(&mut self, buf: &mut Buffer) -> Vec<Cmd> {
+        let loc_x = self.layout.location.x.round();
+        let loc_y = self.layout.location.y.round();
+        let width = self.layout.size.width.round();
+        let height = self.layout.size.height.round();
 
         let mut inner_buf =
             Buffer::new(width as usize - 2, height as usize - 2);
@@ -223,6 +214,7 @@ impl<MSG> TabBox<MSG> {
         }
         cmds
     }
+    */
 
     /// set the tab labels
     pub fn set_tab_labels(&mut self, labels: Vec<String>) {
@@ -241,6 +233,9 @@ impl<MSG> Widget<MSG> for TabBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         Style {
             flex_direction: self.flex_direction(),
@@ -293,10 +288,9 @@ where
         }
     }
 
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         // offset the position of the top_border
-        let layout = layout_tree.layout;
-        self.layout = Some(layout.clone());
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
         let width = layout.size.width.round();
@@ -318,8 +312,8 @@ where
             is_bottom_right_rounded: true,
         };
 
-        self.draw_children(buf, layout_tree);
-        self.draw_labels(buf, &mut canvas, layout_tree);
+        //self.draw_children(buf, layout_tree);
+        self.draw_labels(buf, &mut canvas);
         canvas.draw_rect((left, top), (right, bottom), border);
         buf.write_canvas(canvas);
         vec![]
@@ -390,6 +384,9 @@ impl<MSG> Flex<MSG> for TabBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn layout(&self) -> Option<&Layout> {
+        self.layout.as_ref()
+    }
     fn has_border(&self) -> bool {
         self.has_border
     }

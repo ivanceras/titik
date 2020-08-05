@@ -1,31 +1,17 @@
-use crate::{
-    buffer::Buffer,
-    Callback,
-    Cmd,
-    LayoutTree,
-    Widget,
-};
+use crate::{buffer::Buffer, Callback, Cmd, Widget};
 use crossterm::event::Event;
-use ito_canvas::unicode_canvas::{
-    Border,
-    Canvas,
-};
-use std::{
-    any::Any,
-    fmt,
-};
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt};
 use stretch::{
     geometry::Size,
-    style::{
-        Dimension,
-        FlexDirection,
-        Style,
-    },
+    result::Layout,
+    style::{Dimension, FlexDirection, Style},
 };
 
 /// a flex box
 #[derive(Default, Debug)]
 pub struct ListBox<MSG> {
+    layout: Option<Layout>,
     list: Vec<String>,
     width: Option<f32>,
     height: Option<f32>,
@@ -40,6 +26,7 @@ impl<MSG> ListBox<MSG> {
     ///create a new flexbox
     pub fn new() -> Self {
         ListBox {
+            layout: None,
             width: None,
             height: None,
             flex_direction: FlexDirection::Row,
@@ -51,8 +38,8 @@ impl<MSG> ListBox<MSG> {
         }
     }
 
-    fn draw_border(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) {
-        let layout = layout_tree.layout;
+    fn draw_border(&self, buf: &mut Buffer) {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
@@ -84,8 +71,8 @@ impl<MSG> ListBox<MSG> {
         self.list = list;
     }
 
-    fn draw_items(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
-        let layout = layout_tree.layout;
+    fn draw_items(&self, buf: &mut Buffer) {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
@@ -111,6 +98,9 @@ impl<MSG> Widget<MSG> for ListBox<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -141,9 +131,9 @@ where
         }
     }
 
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        self.draw_border(buf, layout_tree);
-        self.draw_items(buf, layout_tree);
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        self.draw_border(buf);
+        self.draw_items(buf);
         vec![]
     }
 

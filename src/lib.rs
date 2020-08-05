@@ -47,7 +47,6 @@ pub use find_node::{
     find_widget, find_widget_by_id, find_widget_by_id_mut, find_widget_mut,
 };
 pub use input_buffer::InputBuffer;
-pub use layout::LayoutTree;
 pub use mt_dom::{self, Callback};
 pub use renderer::{Dispatch, Renderer};
 pub use stretch;

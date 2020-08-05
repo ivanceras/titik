@@ -1,5 +1,5 @@
 use crate::Event;
-use crate::{buffer::Buffer, Cmd, InputBuffer, LayoutTree, Widget};
+use crate::{buffer::Buffer, Cmd, InputBuffer, Widget};
 use crossterm::event::{KeyEvent, MouseEvent};
 use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::any::Any;
@@ -12,13 +12,13 @@ use stretch::{
 /// A one line text input
 #[derive(Default, Debug)]
 pub struct TextInput {
+    layout: Option<Layout>,
     input_buffer: InputBuffer,
     is_rounded: bool,
     focused: bool,
     width: Option<f32>,
     height: Option<f32>,
     id: Option<String>,
-    layout: Option<Layout>,
 }
 
 impl TextInput {
@@ -28,10 +28,10 @@ impl TextInput {
         S: ToString,
     {
         TextInput {
+            layout: None,
             input_buffer: InputBuffer::new_with_value(value),
             is_rounded: false,
             id: None,
-            layout: None,
             ..Default::default()
         }
     }
@@ -97,6 +97,9 @@ impl TextInput {
 }
 
 impl<MSG> Widget<MSG> for TextInput {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -128,9 +131,8 @@ impl<MSG> Widget<MSG> for TextInput {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
-        self.layout = Some(layout.clone());
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
@@ -156,7 +158,7 @@ impl<MSG> Widget<MSG> for TextInput {
         canvas.draw_rect((left, top), (right, bottom), border);
         buf.write_canvas(canvas);
 
-        let inner_width = self.inner_width(&layout_tree.layout);
+        let inner_width = self.inner_width(&layout);
         for (t, ch) in self.get_value().chars().enumerate() {
             if loc_x + t < inner_width {
                 buf.set_symbol(loc_x + 1 + t, loc_y + 1, ch);

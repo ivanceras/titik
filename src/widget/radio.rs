@@ -1,15 +1,17 @@
 use crate::Event;
-use crate::{buffer::Buffer, symbol, Callback, Cmd, LayoutTree, Widget};
+use crate::{buffer::Buffer, symbol, Callback, Cmd, Widget};
 use crossterm::event::MouseEvent;
 use std::{any::Any, fmt};
 use stretch::{
     geometry::Size,
+    result::Layout,
     style::{Dimension, Style},
 };
 
 /// Radio button widget
 #[derive(Default, PartialEq)]
 pub struct Radio<MSG> {
+    layout: Option<Layout>,
     label: String,
     is_checked: bool,
     id: Option<String>,
@@ -23,6 +25,7 @@ impl<MSG> Radio<MSG> {
         S: ToString,
     {
         Radio {
+            layout: None,
             label: label.to_string(),
             is_checked: false,
             id: None,
@@ -42,6 +45,9 @@ impl<MSG> Radio<MSG> {
 }
 
 impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -57,8 +63,8 @@ impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let (box_symbol, x_offset) = if self.is_checked {

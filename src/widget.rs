@@ -1,5 +1,5 @@
 use crate::Event;
-use crate::{buffer::Buffer, Cmd, LayoutTree};
+use crate::{buffer::Buffer, Cmd};
 pub use button::Button;
 pub use checkbox::Checkbox;
 pub use flex_box::FlexBox;
@@ -9,6 +9,7 @@ pub use list_box::ListBox;
 pub use radio::Radio;
 pub use slider::Slider;
 use std::{any::Any, fmt};
+use stretch::result::Layout;
 use stretch::{
     node::{Node, Stretch},
     style::Style,
@@ -41,6 +42,8 @@ where
     /// return the style of this widget
     fn style(&self) -> Style;
 
+    fn set_layout(&mut self, layout: Layout);
+
     /// add a child to this widget
     /// returns true if it can accept a child, false otherwise
     fn add_child(&mut self, _child: Box<dyn Widget<MSG>>) -> bool {
@@ -68,7 +71,7 @@ where
     /// this is called in the render loop in the renderer where the widget
     /// writes into the buffer. The result will then be written into the
     /// stdout terminal.
-    fn draw(&mut self, but: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd>;
+    fn draw(&self, but: &mut Buffer) -> Vec<Cmd>;
 
     /// build a node with styles from this widget and its children
     /// The Layout tree is then calculated see `layout::compute_layout`

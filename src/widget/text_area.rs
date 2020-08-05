@@ -2,7 +2,7 @@ use crate::Event;
 use crate::Value;
 use crate::{
     area_buffer::AreaBuffer, buffer::Buffer, event::InputEvent, symbol,
-    symbol::bar, Callback, Cmd, LayoutTree, Widget,
+    symbol::bar, Callback, Cmd, Widget,
 };
 use crossterm::event::{KeyEvent, KeyModifiers, MouseEvent};
 use ito_canvas::unicode_canvas::{Border, Canvas};
@@ -17,6 +17,7 @@ use stretch::{
 /// where each line is separated by \n.
 #[derive(Debug)]
 pub struct TextArea<MSG> {
+    layout: Option<Layout>,
     area_buffer: AreaBuffer,
     focused: bool,
     width: Option<f32>,
@@ -28,7 +29,6 @@ pub struct TextArea<MSG> {
     has_border: bool,
     is_rounded_border: bool,
     is_thick_border: bool,
-    layout: Option<Layout>,
 }
 
 impl<MSG> TextArea<MSG> {
@@ -38,6 +38,7 @@ impl<MSG> TextArea<MSG> {
         S: ToString,
     {
         TextArea {
+            layout: None,
             area_buffer: AreaBuffer::from(value.to_string()),
             width: None,
             height: None,
@@ -49,7 +50,6 @@ impl<MSG> TextArea<MSG> {
             has_border: true,
             is_rounded_border: false,
             is_thick_border: false,
-            layout: None,
         }
     }
 
@@ -165,8 +165,8 @@ impl<MSG> TextArea<MSG> {
         (abs_cursor_x, abs_cursor_y)
     }
 
-    fn draw_scrollers(&self, buf: &mut Buffer, layout_tree: &LayoutTree) {
-        let layout = layout_tree.layout;
+    fn draw_scrollers(&self, buf: &mut Buffer) {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
         let width = layout.size.width.round();
@@ -178,8 +178,8 @@ impl<MSG> TextArea<MSG> {
         let scroller_width = self.scroller_width(&layout) as usize;
         let scroller_height = self.scroller_height(&layout) as usize;
 
-        let inner_width = self.inner_width(&layout_tree.layout);
-        let inner_height = self.inner_height(&layout_tree.layout);
+        let inner_width = self.inner_width(&layout);
+        let inner_height = self.inner_height(&layout);
 
         if inner_height > 0.0 {
             for j in 0..scroller_height {
@@ -202,8 +202,8 @@ impl<MSG> TextArea<MSG> {
         }
     }
 
-    fn draw_border(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) {
-        let layout = layout_tree.layout;
+    fn draw_border(&self, buf: &mut Buffer) {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
@@ -235,6 +235,9 @@ impl<MSG> Widget<MSG> for TextArea<MSG>
 where
     MSG: fmt::Debug + 'static,
 {
+    fn set_layout(&mut self, layout: Layout) {
+        self.layout = Some(layout);
+    }
     fn style(&self) -> Style {
         Style {
             size: Size {
@@ -272,22 +275,19 @@ where
     }
 
     /// draw this button to the buffer, with the given computed layout
-    fn draw(&mut self, buf: &mut Buffer, layout_tree: &LayoutTree) -> Vec<Cmd> {
-        let layout = layout_tree.layout;
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
         let height = layout.size.height.round();
-        self.layout = Some(layout.clone());
 
         let bottom = loc_y + height - 1.0;
 
         // draw the text content
         let text_loc_y = loc_y - self.scroll_top;
         let text_loc_x = loc_x - self.scroll_left;
-        let bottom_scroll =
-            self.inner_height(&layout_tree.layout) + self.scroll_top;
-        let right_scroll =
-            self.inner_width(&layout_tree.layout) + self.scroll_left;
+        let bottom_scroll = self.inner_height(&layout) + self.scroll_top;
+        let right_scroll = self.inner_width(&layout) + self.scroll_left;
 
         for (j, line) in self.area_buffer.content.iter().enumerate() {
             if (j as f32) >= self.scroll_top && (j as f32) < bottom_scroll {
@@ -309,8 +309,8 @@ where
 
         let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < bottom;
 
-        self.draw_border(buf, layout_tree);
-        self.draw_scrollers(buf, layout_tree);
+        self.draw_border(buf);
+        self.draw_scrollers(buf);
 
         if self.focused && is_cursor_visible {
             vec![
