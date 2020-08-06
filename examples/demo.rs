@@ -11,7 +11,7 @@ use std::io::{self};
 
 use titik::{
     Button, Callback, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio,
-    Renderer, Slider, SvgImage, TabBox, TextArea, TextInput, Widget,
+    Renderer, Slider, TabBox, TextArea, TextInput, Widget,
 };
 
 fn build_ui() -> Box<dyn Widget<()>> {
@@ -94,11 +94,6 @@ fn build_ui() -> Box<dyn Widget<()>> {
     btn2.set_id("btn2");
     let mut img: Image<()> =
         Image::new(include_bytes!("../horse.jpg").to_vec());
-    //img.set_size(Some(60.0), Some(40.0));
-
-    let mut svg: SvgImage<()> =
-        SvgImage::new(include_str!("bob.svg").to_string());
-    //svg.set_size(Some(60.0), Some(40.0));
 
     let mut btn1: Button<()> = Button::new("Button 1");
     btn1.set_id("btn1");
@@ -116,7 +111,6 @@ fn build_ui() -> Box<dyn Widget<()>> {
     row.set_expand_width(true);
     row.set_expand_height(false);
     row.add_child(Box::new(img));
-    row.add_child(Box::new(svg));
     root_node.add_child(Box::new(row));
     root_node.add_child(Box::new(tab1));
     //root_node.add_child(Box::new(gb1));

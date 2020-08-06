@@ -2,7 +2,7 @@ use std::io;
 use titik::crossterm::Result;
 use titik::{
     Button, Callback, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio,
-    Renderer, Slider, SvgImage, TabBox, TextArea, TextInput, Widget,
+    Renderer, Slider, TabBox, TextArea, TextInput, Widget,
 };
 
 fn main() -> Result<()> {

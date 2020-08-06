@@ -52,8 +52,8 @@ pub use renderer::{Dispatch, Renderer};
 pub use stretch;
 pub use value::Value;
 pub use widget::{
-    Button, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio, Slider,
-    SvgImage, TabBox, TextArea, TextInput, Widget,
+    Button, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio, Slider, TabBox,
+    TextArea, TextInput, Widget,
 };
 
 mod area_buffer;

@@ -14,11 +14,9 @@ use stretch::{
     node::{Node, Stretch},
     style::Style,
 };
-pub use svg_image::SvgImage;
 pub use tab_box::TabBox;
 pub use text_area::TextArea;
 pub use text_input::TextInput;
-pub use traits::ImageTrait;
 
 mod button;
 mod checkbox;
@@ -28,11 +26,9 @@ mod image_control;
 mod list_box;
 mod radio;
 mod slider;
-mod svg_image;
 mod tab_box;
 mod text_area;
 mod text_input;
-mod traits;
 
 /// All widgets must implement the Widget trait
 pub trait Widget<MSG>
