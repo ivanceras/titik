@@ -122,8 +122,12 @@ where
                 height: if let Some(height) = self.height {
                     Dimension::Points(height)
                 } else {
-                    Dimension::Percent(1.0)
+                    Dimension::Auto
                 },
+            },
+            min_size: Size {
+                height: Dimension::Points(3.0),
+                ..Default::default()
             },
             border: Rect {
                 top: Dimension::Points(self.border_top()),

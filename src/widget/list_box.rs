@@ -138,18 +138,6 @@ where
                     Dimension::Percent(1.0)
                 },
             },
-            min_size: Size {
-                width: if let Some(width) = self.width {
-                    Dimension::Points(width)
-                } else {
-                    Dimension::Auto
-                },
-                height: if let Some(height) = self.height {
-                    Dimension::Points(height)
-                } else {
-                    Dimension::Points(1.0)
-                },
-            },
             ..Default::default()
         }
     }

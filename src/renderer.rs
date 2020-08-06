@@ -168,7 +168,6 @@ impl<'a, MSG> Renderer<'a, MSG> {
                         }
                     }
                     Event::Resize(width, height) => {
-                        eprintln!("resizing the terminal..");
                         self.terminal_size = (width, height);
                         self.recompute_layout();
                     }

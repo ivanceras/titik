@@ -107,9 +107,9 @@ fn build_ui() -> Box<dyn Widget<()>> {
         eprintln!("btn1 is clicked");
     }));
 
-    //root_node.add_child(Box::new(btn1));
+    root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(slider));
-    //root_node.add_child(Box::new(btn2));
+    root_node.add_child(Box::new(btn2));
     tab1.add_child(Box::new(gb1));
     let mut row = FlexBox::new();
     row.horizontal();

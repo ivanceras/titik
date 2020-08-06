@@ -275,6 +275,10 @@ where
                     Dimension::Percent(1.0)
                 },
             },
+            min_size: Size {
+                height: Dimension::Points(3.0),
+                ..Default::default()
+            },
             border: Rect {
                 top: Dimension::Points(self.border_top()),
                 bottom: Dimension::Points(self.border_bottom()),
