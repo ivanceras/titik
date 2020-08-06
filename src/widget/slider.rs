@@ -7,7 +7,7 @@ use std::{any::Any, fmt};
 use stretch::result::Layout;
 use stretch::{
     geometry::Size,
-    style::{Dimension, Style},
+    style::{Dimension, PositionType, Style},
 };
 
 /// A slider with value from 0.0 to 1.0
@@ -66,6 +66,7 @@ where
     }
     fn style(&self) -> Style {
         Style {
+            position_type: PositionType::Relative,
             size: Size {
                 width: Dimension::Percent(1.0),
                 height: Dimension::Points(1.0),

@@ -10,7 +10,7 @@ use std::{any::Any, fmt, fmt::Debug};
 use stretch::{
     geometry::{Rect, Size},
     result::Layout,
-    style::{Dimension, Style},
+    style::{Dimension, PositionType, Style},
 };
 
 /// A button widget
@@ -113,6 +113,7 @@ where
     }
     fn style(&self) -> Style {
         Style {
+            position_type: PositionType::Relative,
             size: Size {
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)

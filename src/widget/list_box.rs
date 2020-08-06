@@ -5,7 +5,7 @@ use std::{any::Any, fmt};
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{Dimension, FlexDirection, Style},
+    style::{Dimension, FlexDirection, PositionType, Style},
 };
 
 /// a flex box
@@ -126,6 +126,7 @@ where
     }
     fn style(&self) -> Style {
         Style {
+            position_type: PositionType::Relative,
             size: Size {
                 width: if let Some(width) = self.width {
                     Dimension::Points(width)

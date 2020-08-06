@@ -121,6 +121,7 @@ where
     }
     fn style(&self) -> Style {
         Style {
+            position_type: PositionType::Relative,
             flex_direction: self.flex_direction,
             size: Size {
                 width: if let Some(width) = self.width {

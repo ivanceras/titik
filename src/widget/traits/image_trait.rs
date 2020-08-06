@@ -11,7 +11,7 @@ use image::{self, DynamicImage, GenericImageView};
 use stretch::result::Layout;
 use stretch::{
     geometry::Size,
-    style::{Dimension, Style},
+    style::{Dimension, PositionType, Style},
 };
 
 pub trait ImageTrait {
@@ -21,6 +21,7 @@ pub trait ImageTrait {
 
     fn image_style(&self) -> Style {
         Style {
+            position_type: PositionType::Relative,
             size: Size {
                 width: if let Some(width) = self.width() {
                     Dimension::Points(width)

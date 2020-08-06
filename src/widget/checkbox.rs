@@ -5,7 +5,7 @@ use std::{any::Any, fmt, fmt::Debug};
 use stretch::{
     geometry::Size,
     result::Layout,
-    style::{Dimension, Style},
+    style::{Dimension, PositionType, Style},
 };
 
 /// A checkbox widget
@@ -69,6 +69,7 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
 
     fn style(&self) -> Style {
         Style {
+            position_type: PositionType::Relative,
             size: Size {
                 width: Dimension::Points((self.label.len() + 3) as f32),
                 height: Dimension::Points(1.0),
