@@ -80,8 +80,6 @@ fn set_node_layout_from_stretch_node<MSG>(
     let (parent_offset_x, parent_offset_y) = parent_offset;
     let (child_offset_x, child_offset_y) = widget_node.get_offset();
 
-    eprintln!("widget offset: ({},{})", child_offset_x, child_offset_y);
-
     layout.location.x += parent_loc_x + parent_offset_x;
     layout.location.y += parent_loc_y + parent_offset_y;
 
