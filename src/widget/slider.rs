@@ -121,6 +121,14 @@ where
                 self.value = value;
                 vec![]
             }
+            Event::Mouse(MouseEvent::Drag(_btn, x, _y, _modifier)) => {
+                let cursor_loc = x as i32 - layout.location.x.round() as i32;
+                let width = layout.size.width;
+                let value = cursor_loc as f32 / width;
+                eprintln!("value: {}", value);
+                self.value = value;
+                vec![]
+            }
             _ => vec![],
         }
     }
