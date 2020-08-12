@@ -53,7 +53,7 @@ pub use stretch;
 pub use value::Value;
 pub use widget::{
     Button, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio, Slider, TabBox,
-    TextArea, TextInput, Widget,
+    TextArea, TextInput, TextLabel, Widget,
 };
 
 mod area_buffer;

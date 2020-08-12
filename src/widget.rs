@@ -17,6 +17,7 @@ use stretch::{
 pub use tab_box::TabBox;
 pub use text_area::TextArea;
 pub use text_input::TextInput;
+pub use text_label::TextLabel;
 
 mod button;
 mod checkbox;
@@ -29,6 +30,7 @@ mod slider;
 mod tab_box;
 mod text_area;
 mod text_input;
+mod text_label;
 
 /// All widgets must implement the Widget trait
 pub trait Widget<MSG>

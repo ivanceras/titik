@@ -11,46 +11,40 @@ use stretch::{
 
 /// A one line text input
 #[derive(Default, Debug)]
-pub struct TextInput {
+pub struct TextLabel {
     layout: Option<Layout>,
-    input_buffer: InputBuffer,
+    value: String,
     is_rounded: bool,
     has_border: bool,
-    focused: bool,
     width: Option<f32>,
     height: Option<f32>,
     id: Option<String>,
 }
 
-impl TextInput {
+impl TextLabel {
     /// creates a new text input with initial value
     pub fn new<S>(value: S) -> Self
     where
         S: ToString,
     {
-        TextInput {
+        TextLabel {
             layout: None,
-            input_buffer: InputBuffer::new_with_value(value),
+            value: value.to_string(),
             is_rounded: false,
-            has_border: true,
+            has_border: false,
             id: None,
             ..Default::default()
         }
     }
 
-    /// process the key event for this text input
-    pub fn process_key(&mut self, key_event: KeyEvent) {
-        self.input_buffer.process_key_event(key_event);
-    }
-
     /// set the value of the buffer
     pub fn set_value<S: ToString>(&mut self, value: S) {
-        self.input_buffer = InputBuffer::new_with_value(value);
+        self.value = value.to_string();
     }
 
     /// returns a reference to the text value of this text input widget
     pub fn get_value(&self) -> &str {
-        self.input_buffer.get_content()
+        &self.value
     }
 
     /// set whether to use rounded corner when drawing the border of the text input
@@ -114,7 +108,7 @@ impl TextInput {
     }
 }
 
-impl<MSG> Widget<MSG> for TextInput {
+impl<MSG> Widget<MSG> for TextLabel {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -167,7 +161,7 @@ impl<MSG> Widget<MSG> for TextInput {
 
         if self.has_border {
             let border = Border {
-                use_thick_border: self.focused,
+                use_thick_border: false,
                 has_top: true,
                 has_bottom: true,
                 has_left: true,
@@ -195,22 +189,7 @@ impl<MSG> Widget<MSG> for TextInput {
             );
         }
 
-        let cursor_loc_x = self.input_buffer.get_cursor_location() as f32;
-        if self.focused {
-            vec![
-                Cmd::ShowCursor,
-                Cmd::MoveTo(
-                    (left + cursor_loc_x + self.border_left()) as usize,
-                    (top + self.border_top()) as usize,
-                ),
-            ]
-        } else {
-            vec![]
-        }
-    }
-
-    fn set_focused(&mut self, focused: bool) {
-        self.focused = focused;
+        vec![]
     }
 
     fn as_any(&self) -> &dyn Any {
@@ -226,20 +205,8 @@ impl<MSG> Widget<MSG> for TextInput {
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        let layout = self.layout.expect("must have a layout set");
-        match event {
-            Event::Key(ke) => {
-                self.process_key(ke);
-                vec![]
-            }
-            Event::Mouse(MouseEvent::Down(_btn, x, _y, _modifier)) => {
-                let cursor_loc = x as i32 - layout.location.x.round() as i32;
-                self.input_buffer.set_cursor_loc(cursor_loc as usize);
-                vec![]
-            }
-            _ => vec![],
-        }
+    fn process_event(&mut self, _event: Event) -> Vec<MSG> {
+        vec![]
     }
 
     fn set_id(&mut self, id: &str) {

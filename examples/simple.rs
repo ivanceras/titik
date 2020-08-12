@@ -2,7 +2,7 @@ use std::io;
 use titik::crossterm::Result;
 use titik::{
     Button, Callback, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio,
-    Renderer, Slider, TabBox, TextArea, TextInput, Widget,
+    Renderer, Slider, TabBox, TextArea, TextInput, TextLabel, Widget,
 };
 
 fn main() -> Result<()> {
@@ -23,6 +23,7 @@ fn main() -> Result<()> {
     let btn2 = Button::<()>::new("btn 2");
     let cb1 = Checkbox::<()>::new("cb 1");
     let cb2 = Checkbox::<()>::new("cb 2");
+    let label1 = TextLabel::new("label1");
 
     let rb1 = Radio::<()>::new("Radio1");
     let rb2 = Radio::<()>::new("Radio2");
@@ -107,6 +108,7 @@ fn main() -> Result<()> {
     column.add_child(Box::new(rb1));
     column.add_child(Box::new(rb2));
     column.add_child(Box::new(input1));
+    column.add_child(Box::new(label1));
 
     row.add_child(Box::new(btn1));
     row.add_child(Box::new(btn2));
