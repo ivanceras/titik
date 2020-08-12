@@ -15,6 +15,15 @@
  ╭──────────────╮
  │ Button       │ border: 1px, rounded,
  ╰──────────────╯
+
+ ╭──┬───────────╮
+ │Ⴍ │SearchInput│ border: 1px, rounded,
+ ╰──┴───────────╯
+
+ ┏━━┳━━━━━━━━━━━┓
+ ┃Ⴍ ┃SearchInput┃ border: 2px, focused
+ ┗━━┻━━━━━━━━━━━┛
+
  ┏━━━━━━━━━━━━━━┓
  ┃ Button       ┃ border: 2px, rounded(will be cancelled)
  ┗━━━━━━━━━━━━━━┛
