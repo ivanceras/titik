@@ -10,7 +10,7 @@ pub use crossterm::{
 use std::io::{self};
 
 use titik::{
-    Button, Callback, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio,
+    Button, Callback, Checkbox, FlexBox, GroupBox, Image, Link, ListBox, Radio,
     Renderer, Slider, TabBox, TextArea, TextInput, Widget,
 };
 
@@ -41,6 +41,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     let cb2 = Checkbox::new("Checkbox2");
     let rb1 = Radio::new("Radio1");
     let rb2 = Radio::new("Radio2");
+    let link1 = Link::new("https://github.com", "Github");
 
     let mut list_box1 = ListBox::new();
     list_box1.set_list(vec![
@@ -58,6 +59,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     gb1.add_child(Box::new(cb2));
     gb1.add_child(Box::new(rb1));
     gb1.add_child(Box::new(rb2));
+    gb1.add_child(Box::new(link1));
 
     let input1 = TextInput::new("Hello world!");
 

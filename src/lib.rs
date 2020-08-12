@@ -51,10 +51,7 @@ pub use mt_dom::{self, Callback};
 pub use renderer::{Dispatch, Renderer};
 pub use stretch;
 pub use value::Value;
-pub use widget::{
-    Button, Checkbox, FlexBox, GroupBox, Image, ListBox, Radio, Slider, TabBox,
-    TextArea, TextInput, TextLabel, Widget,
-};
+pub use widget::*;
 
 mod area_buffer;
 mod buffer;
