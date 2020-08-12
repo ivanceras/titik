@@ -41,7 +41,8 @@ fn build_ui() -> Box<dyn Widget<()>> {
     let cb2 = Checkbox::new("Checkbox2");
     let rb1 = Radio::new("Radio1");
     let rb2 = Radio::new("Radio2");
-    let link1 = Link::new("https://github.com", "Github");
+    let mut link1 = Link::new("https://github.com", "Github");
+    link1.set_border(true);
 
     let mut list_box1 = ListBox::new();
     list_box1.set_list(vec![

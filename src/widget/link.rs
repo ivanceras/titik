@@ -45,6 +45,11 @@ impl Link {
         self.label = label.to_string();
     }
 
+    /// set if there is an border in of this link
+    pub fn set_border(&mut self, has_border: bool) {
+        self.has_border = has_border;
+    }
+
     /// set the uri of the link
     pub fn set_uri<S: ToString>(&mut self, uri: S) {
         self.uri = uri.to_string();
