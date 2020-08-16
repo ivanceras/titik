@@ -153,7 +153,7 @@ mod tests {
         btn.set_size(Some(20.0), Some(10.0));
         control.add_child(boxed::Box::new(btn));
 
-        let layout_tree = crate::layout::compute_layout(
+        crate::layout::compute_node_layout(
             &mut control,
             Size {
                 width: Number::Defined(100.0),
@@ -161,7 +161,9 @@ mod tests {
             },
         );
 
-        let layout1 = layout_tree.children_layout[1].layout;
+        let layout1 = control.children().expect("must have children")[1]
+            .layout()
+            .expect("must have layout");
         assert_eq!(
             layout1.size,
             Size {
@@ -197,7 +199,7 @@ mod tests {
 
         control.add_child(boxed::Box::new(hrow));
 
-        let layout_tree = crate::layout::compute_layout(
+        crate::layout::compute_node_layout(
             &mut control,
             Size {
                 width: Number::Defined(100.0),
@@ -205,10 +207,11 @@ mod tests {
             },
         );
 
-        println!("{:#?}", layout_tree);
-
-        let layout_btn2 =
-            layout_tree.children_layout[1].children_layout[1].layout;
-        assert_eq!(layout_btn2.location, Point { x: 20.0, y: 0.0 });
+        let layout_btn2 = control.children().expect("must have children")[1]
+            .children()
+            .expect("must have grand children")[1]
+            .layout()
+            .expect("must have a layout");
+        assert_eq!(layout_btn2.location, Point { x: 20.0, y: 17.0 });
     }
 }
