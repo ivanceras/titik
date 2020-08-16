@@ -55,6 +55,7 @@ pub use widget::*;
 
 mod area_buffer;
 mod buffer;
+mod callback;
 mod cmd;
 pub mod command;
 pub mod event;
