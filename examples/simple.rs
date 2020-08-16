@@ -116,7 +116,7 @@ fn main() -> Result<()> {
     //row.add_child(Box::new(list_box1));
     column.add_child(Box::new(row));
     root_node.add_child(Box::new(column));
-    let mut renderer = Renderer::new(&mut stdout, None, &mut root_node);
+    let mut renderer = Renderer::new(&mut stdout, &mut root_node);
     renderer.run()?;
     Ok(())
 }

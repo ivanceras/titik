@@ -49,7 +49,7 @@ pub use find_node::{
 };
 pub use input_buffer::InputBuffer;
 pub use mt_dom;
-pub use renderer::{Dispatch, Renderer};
+pub use renderer::Renderer;
 pub use stretch;
 pub use value::Value;
 pub use widget::*;

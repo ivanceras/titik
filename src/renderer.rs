@@ -14,18 +14,9 @@ pub use crossterm::{
 use std::io::Write;
 use stretch::{geometry::Size, number::Number};
 
-/// A Dispatch trait which the implementing APP will update
-/// its own state based on the supplied msg.
-pub trait Dispatch {
-    /// dispatch the msg and passed the root node for the implementing
-    /// app to access it and change the state of the UI.
-    fn dispatch(&self, root_node: &mut dyn Widget);
-}
-
 /// This provides the render loop of the terminal UI
 pub struct Renderer<'a> {
     write: &'a mut dyn Write,
-    program: Option<&'a dyn Dispatch>,
     root_node: &'a mut dyn Widget,
     terminal_size: (u16, u16),
     focused_widget_idx: Option<usize>,
@@ -35,7 +26,6 @@ impl<'a> Renderer<'a> {
     /// create a new renderer with the supplied root_node
     pub fn new(
         write: &'a mut dyn Write,
-        program: Option<&'a dyn Dispatch>,
         root_node: &'a mut dyn Widget,
     ) -> Self {
         let (width, height) =
@@ -50,7 +40,6 @@ impl<'a> Renderer<'a> {
         );
         Renderer {
             write,
-            program,
             root_node,
             terminal_size: (width, height),
             focused_widget_idx: None,
@@ -67,17 +56,6 @@ impl<'a> Renderer<'a> {
             },
         );
     }
-
-    /*
-    fn dispatch_msg(&mut self, msgs: Vec) {
-        if let Some(program) = self.program {
-            for msg in msgs {
-                program.dispatch(msg, self.root_node);
-            }
-        }
-        self.recompute_layout();
-    }
-    */
 
     fn draw_widget(buf: &mut Buffer, widget: &dyn Widget) -> Result<Vec<Cmd>> {
         let mut cmds = widget.draw(buf);

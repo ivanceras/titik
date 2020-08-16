@@ -125,7 +125,7 @@ fn build_ui() -> Box<dyn Widget> {
 fn main() -> Result<()> {
     let mut stdout = io::stdout();
     let mut root_node = build_ui();
-    let mut renderer = Renderer::new(&mut stdout, None, root_node.as_mut());
+    let mut renderer = Renderer::new(&mut stdout, root_node.as_mut());
     renderer.run()?;
     Ok(())
 }
