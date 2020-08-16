@@ -114,7 +114,7 @@ impl TextInput {
     }
 }
 
-impl<MSG> Widget<MSG> for TextInput {
+impl Widget for TextInput {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -226,19 +226,17 @@ impl<MSG> Widget<MSG> for TextInput {
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) {
         let layout = self.layout.expect("must have a layout set");
         match event {
             Event::Key(ke) => {
                 self.process_key(ke);
-                vec![]
             }
             Event::Mouse(MouseEvent::Down(_btn, x, _y, _modifier)) => {
                 let cursor_loc = x as i32 - layout.location.x.round() as i32;
                 self.input_buffer.set_cursor_loc(cursor_loc as usize);
-                vec![]
             }
-            _ => vec![],
+            _ => (),
         }
     }
 

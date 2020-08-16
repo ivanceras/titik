@@ -14,7 +14,7 @@ use titik::{
     Renderer, Slider, TabBox, TextArea, TextInput, Widget,
 };
 
-fn build_ui() -> Box<dyn Widget<()>> {
+fn build_ui() -> Box<dyn Widget> {
     println!("building the ui");
     let mut root_node = FlexBox::new();
     root_node.set_scroll_top(0.0);
@@ -67,7 +67,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     let input2 =
         TextInput::new("The quick brown fox jumps over the lazy dog...");
 
-    let mut text_area1: TextArea<()> = TextArea::new(
+    let mut text_area1: TextArea = TextArea::new(
         "This is a text area\
             \n1. With a line that is a bit long.. but not very long....\
             \n2. and another line\
@@ -92,13 +92,12 @@ fn build_ui() -> Box<dyn Widget<()>> {
     );
     //text_area1.set_size(Some(60.0), Some(10.0));
 
-    let mut btn2: Button<()> = Button::new("Button2");
+    let mut btn2: Button = Button::new("Button2");
     btn2.set_rounded(true);
     btn2.set_id("btn2");
-    let mut img: Image<()> =
-        Image::new(include_bytes!("../horse.jpg").to_vec());
+    let mut img: Image = Image::new(include_bytes!("../horse.jpg").to_vec());
 
-    let mut btn1: Button<()> = Button::new("Button 1");
+    let mut btn1: Button = Button::new("Button 1");
     btn1.set_id("btn1");
 
     btn1.add_click_listener(Callback::from(|_| {

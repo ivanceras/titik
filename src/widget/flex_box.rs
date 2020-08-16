@@ -12,9 +12,9 @@ use stretch::{
 
 /// a flex box
 #[derive(Default, Debug)]
-pub struct FlexBox<MSG> {
+pub struct FlexBox {
     layout: Option<Layout>,
-    children: Vec<Box<dyn Widget<MSG>>>,
+    children: Vec<Box<dyn Widget>>,
     width: Option<f32>,
     height: Option<f32>,
     flex_direction: FlexDirection,
@@ -29,7 +29,7 @@ pub struct FlexBox<MSG> {
     is_expand_width: bool,
 }
 
-impl<MSG> FlexBox<MSG> {
+impl FlexBox {
     ///create a new flexbox
     pub fn new() -> Self {
         FlexBox {
@@ -123,10 +123,7 @@ impl<MSG> FlexBox<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for FlexBox<MSG>
-where
-    MSG: fmt::Debug + 'static,
-{
+impl Widget for FlexBox {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -192,28 +189,28 @@ where
         vec![]
     }
 
-    fn add_child(&mut self, child: Box<dyn Widget<MSG>>) -> bool {
+    fn add_child(&mut self, child: Box<dyn Widget>) -> bool {
         self.children.push(child);
         true
     }
 
-    fn children(&self) -> Option<&[Box<dyn Widget<MSG>>]> {
+    fn children(&self) -> Option<&[Box<dyn Widget>]> {
         Some(&self.children)
     }
 
-    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget<MSG>>]> {
+    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget>]> {
         Some(&mut self.children)
     }
 
     // TODO: use remove_item when it will be stabilized
-    fn take_child(&mut self, index: usize) -> Option<Box<dyn Widget<MSG>>> {
+    fn take_child(&mut self, index: usize) -> Option<Box<dyn Widget>> {
         Some(self.children.remove(index))
     }
 
     fn child_mut<'a>(
         &'a mut self,
         index: usize,
-    ) -> Option<&'a mut Box<dyn Widget<MSG>>> {
+    ) -> Option<&'a mut Box<dyn Widget>> {
         self.children.get_mut(index)
     }
 

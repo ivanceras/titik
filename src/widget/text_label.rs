@@ -108,7 +108,7 @@ impl TextLabel {
     }
 }
 
-impl<MSG> Widget<MSG> for TextLabel {
+impl Widget for TextLabel {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -205,9 +205,7 @@ impl<MSG> Widget<MSG> for TextLabel {
         self.height = height;
     }
 
-    fn process_event(&mut self, _event: Event) -> Vec<MSG> {
-        vec![]
-    }
+    fn process_event(&mut self, _event: Event) {}
 
     fn set_id(&mut self, id: &str) {
         self.id = Some(id.to_string());

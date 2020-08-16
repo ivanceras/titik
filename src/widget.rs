@@ -35,7 +35,7 @@ mod text_input;
 mod text_label;
 
 /// All widgets must implement the Widget trait
-pub trait Widget<MSG>
+pub trait Widget
 where
     Self: fmt::Debug,
 {
@@ -55,25 +55,22 @@ where
 
     /// add a child to this widget
     /// returns true if it can accept a child, false otherwise
-    fn add_child(&mut self, _child: Box<dyn Widget<MSG>>) -> bool {
+    fn add_child(&mut self, _child: Box<dyn Widget>) -> bool {
         false
     }
 
     /// get a referemce tp the children of this widget
-    fn children(&self) -> Option<&[Box<dyn Widget<MSG>>]> {
+    fn children(&self) -> Option<&[Box<dyn Widget>]> {
         None
     }
 
     /// get a mutable reference to the children of this widget
-    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget<MSG>>]> {
+    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget>]> {
         None
     }
 
     /// return a mutable reference to a child at index location
-    fn child_mut(
-        &mut self,
-        _index: usize,
-    ) -> Option<&mut Box<dyn Widget<MSG>>> {
+    fn child_mut(&mut self, _index: usize) -> Option<&mut Box<dyn Widget>> {
         None
     }
 
@@ -117,12 +114,10 @@ where
     }
 
     /// this process the event and all callbacks attached to the widgets will be dispatched.
-    fn process_event(&mut self, _event: Event) -> Vec<MSG> {
-        vec![]
-    }
+    fn process_event(&mut self, _event: Event) {}
 
     ///  take the children at this index location
-    fn take_child(&mut self, _index: usize) -> Option<Box<dyn Widget<MSG>>> {
+    fn take_child(&mut self, _index: usize) -> Option<Box<dyn Widget>> {
         None
     }
 

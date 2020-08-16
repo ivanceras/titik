@@ -1,3 +1,5 @@
+use std::fmt;
+
 pub struct Callback<EVENT>(Box<dyn FnMut(EVENT)>);
 
 impl<EVENT, F> From<F> for Callback<EVENT>
@@ -9,9 +11,24 @@ where
     }
 }
 
-impl<EVENT> Callback<EVENT> {
-    fn emit(&mut self, event: EVENT) {
+impl<EVENT> Callback<EVENT>
+where
+    EVENT: PartialEq + Clone,
+{
+    pub fn emit(&mut self, event: EVENT) {
         (self.0)(event)
+    }
+}
+
+impl<EVENT> fmt::Debug for Callback<EVENT> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "||{{..}}")
+    }
+}
+
+impl<EVENT> PartialEq for Callback<EVENT> {
+    fn eq(&self, _rhs: &Self) -> bool {
+        true
     }
 }
 

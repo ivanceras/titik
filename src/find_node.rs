@@ -1,11 +1,11 @@
 use crate::Widget;
 
 /// Traverse the node tree until the node_idx is found
-fn find_node<'a, MSG>(
-    node: &'a dyn Widget<MSG>,
+fn find_node<'a>(
+    node: &'a dyn Widget,
     node_idx: usize,
     cur_index: &mut usize,
-) -> Option<&'a dyn Widget<MSG>> {
+) -> Option<&'a dyn Widget> {
     if let Some(children) = node.children() {
         children.iter().find_map(|child| {
             *cur_index += 1;
@@ -18,11 +18,11 @@ fn find_node<'a, MSG>(
     }
 }
 
-fn find_node_mut<'a, MSG>(
-    node: &'a mut dyn Widget<MSG>,
+fn find_node_mut<'a>(
+    node: &'a mut dyn Widget,
     node_idx: usize,
     cur_index: &mut usize,
-) -> Option<&'a mut dyn Widget<MSG>> {
+) -> Option<&'a mut dyn Widget> {
     if node_idx == *cur_index {
         return Some(node);
     } else if let Some(children) = node.children_mut() {
@@ -36,27 +36,27 @@ fn find_node_mut<'a, MSG>(
 }
 
 /// Get the widget with the node_idx by traversing to through the root_widget specified
-pub fn find_widget<MSG>(
-    root_widget: &dyn Widget<MSG>,
+pub fn find_widget(
+    root_widget: &dyn Widget,
     node_idx: usize,
-) -> Option<&dyn Widget<MSG>> {
+) -> Option<&dyn Widget> {
     find_node(root_widget, node_idx, &mut 0)
 }
 
 /// returns a mutable reference to the widget from the root_widget tree matching the supplied node
 /// index
-pub fn find_widget_mut<MSG>(
-    root_widget: &mut dyn Widget<MSG>,
+pub fn find_widget_mut(
+    root_widget: &mut dyn Widget,
     node_idx: usize,
-) -> Option<&mut dyn Widget<MSG>> {
+) -> Option<&mut dyn Widget> {
     find_node_mut(root_widget, node_idx, &mut 0)
 }
 
 /// returns a reference to the widget from the root widget tree matching the supplied id
-pub fn find_widget_by_id<'a, MSG>(
-    root_widget: &'a dyn Widget<MSG>,
+pub fn find_widget_by_id<'a>(
+    root_widget: &'a dyn Widget,
     id: &str,
-) -> Option<&'a dyn Widget<MSG>> {
+) -> Option<&'a dyn Widget> {
     let matched_root = if let Some(node_id) = root_widget.get_id() {
         if node_id == id {
             Some(root_widget)
@@ -78,10 +78,10 @@ pub fn find_widget_by_id<'a, MSG>(
 }
 
 /// returns a mutable reference to the widget from the root widget tree matching the supplied id
-pub fn find_widget_by_id_mut<'a, MSG>(
-    root_widget: &'a mut dyn Widget<MSG>,
+pub fn find_widget_by_id_mut<'a>(
+    root_widget: &'a mut dyn Widget,
     id: &str,
-) -> Option<&'a mut dyn Widget<MSG>> {
+) -> Option<&'a mut dyn Widget> {
     let matched_root = if let Some(node_id) = root_widget.get_id() {
         if node_id == id {
             true
@@ -103,17 +103,14 @@ pub fn find_widget_by_id_mut<'a, MSG>(
 }
 
 /// set the node with idx to be in focused
-pub fn set_focused_node<'a, MSG>(
-    node: &'a mut dyn Widget<MSG>,
-    node_idx: usize,
-) {
+pub fn set_focused_node<'a>(node: &'a mut dyn Widget, node_idx: usize) {
     set_focused_widget(node, node_idx, &mut 0)
 }
 
 /// Set the node at node_idx as focused, while the rest
 /// should be set to false
-fn set_focused_widget<'a, MSG>(
-    node: &'a mut dyn Widget<MSG>,
+fn set_focused_widget<'a>(
+    node: &'a mut dyn Widget,
     node_idx: usize,
     cur_index: &mut usize,
 ) {

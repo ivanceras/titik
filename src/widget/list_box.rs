@@ -10,19 +10,19 @@ use stretch::{
 
 /// a flex box
 #[derive(Default, Debug)]
-pub struct ListBox<MSG> {
+pub struct ListBox {
     layout: Option<Layout>,
     list: Vec<String>,
     width: Option<f32>,
     height: Option<f32>,
     flex_direction: FlexDirection,
     scroll_top: f32,
-    on_input: Vec<Callback<Event, MSG>>,
+    on_input: Vec<Callback<Event>>,
     id: Option<String>,
     use_divider: bool,
 }
 
-impl<MSG> ListBox<MSG> {
+impl ListBox {
     ///create a new flexbox
     pub fn new() -> Self {
         ListBox {
@@ -114,10 +114,7 @@ impl<MSG> ListBox<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for ListBox<MSG>
-where
-    MSG: fmt::Debug + 'static,
-{
+impl Widget for ListBox {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }

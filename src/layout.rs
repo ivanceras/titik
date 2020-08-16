@@ -6,8 +6,8 @@ use stretch::Stretch;
 
 /// calculate the layout of the nodes utilizing the styles set on each of the widget
 /// and its children widget styles
-pub(crate) fn compute_node_layout<MSG>(
-    widget_node: &mut dyn Widget<MSG>,
+pub(crate) fn compute_node_layout(
+    widget_node: &mut dyn Widget,
     parent_size: Size<Number>,
 ) {
     let mut stretch = Stretch::new();
@@ -25,8 +25,8 @@ pub(crate) fn compute_node_layout<MSG>(
     )
 }
 
-pub(crate) fn node_hit_at<MSG>(
-    node: &dyn Widget<MSG>,
+pub(crate) fn node_hit_at(
+    node: &dyn Widget,
     x: f32,
     y: f32,
     cur_node_idx: &mut usize,
@@ -51,9 +51,9 @@ pub(crate) fn node_hit_at<MSG>(
     hits
 }
 
-fn build_stretch_node_recursive<MSG>(
+fn build_stretch_node_recursive(
     stretch: &mut Stretch,
-    widget_node: &dyn Widget<MSG>,
+    widget_node: &dyn Widget,
 ) -> Option<stretch::node::Node> {
     let children_styles = if let Some(children) = widget_node.children() {
         children
@@ -67,8 +67,8 @@ fn build_stretch_node_recursive<MSG>(
     stretch.new_node(node_style, &children_styles).ok()
 }
 
-fn set_node_layout_from_stretch_node<MSG>(
-    widget_node: &mut dyn Widget<MSG>,
+fn set_node_layout_from_stretch_node(
+    widget_node: &mut dyn Widget,
     stretch_node: stretch::node::Node,
     stretch: &Stretch,
     parent_loc: (f32, f32),

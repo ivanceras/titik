@@ -1,8 +1,7 @@
 use crate::Event;
 use crate::{
     buffer::{Buffer, Cell},
-    mt_dom::Callback,
-    Cmd, Widget,
+    Callback, Cmd, Widget,
 };
 use crossterm::event::MouseEvent;
 use ito_canvas::unicode_canvas::{Border, Canvas};
@@ -14,22 +13,19 @@ use stretch::{
 };
 
 /// A button widget
-#[derive(PartialEq, Clone)]
-pub struct Button<MSG>
-where
-    MSG: 'static,
-{
+#[derive(PartialEq)]
+pub struct Button {
     layout: Option<Layout>,
     label: String,
     is_rounded: bool,
     width: Option<f32>,
     height: Option<f32>,
     focused: bool,
-    on_click: Vec<Callback<Event, MSG>>,
+    on_click: Vec<Callback<Event>>,
     id: Option<String>,
 }
 
-impl<MSG> Default for Button<MSG> {
+impl Default for Button {
     fn default() -> Self {
         Button {
             layout: None,
@@ -44,7 +40,7 @@ impl<MSG> Default for Button<MSG> {
     }
 }
 
-impl<MSG> Debug for Button<MSG> {
+impl Debug for Button {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("Button")
             .field("label", &self.label)
@@ -53,10 +49,7 @@ impl<MSG> Debug for Button<MSG> {
     }
 }
 
-impl<MSG> Button<MSG>
-where
-    MSG: 'static,
-{
+impl Button {
     /// create a new button with label
     pub fn new<S>(label: S) -> Self
     where
@@ -80,7 +73,7 @@ where
     }
 
     /// add to the click listener of this button
-    pub fn add_click_listener(&mut self, cb: Callback<Event, MSG>) {
+    pub fn add_click_listener(&mut self, cb: Callback<Event>) {
         self.on_click.push(cb);
     }
 
@@ -101,10 +94,7 @@ where
     }
 }
 
-impl<MSG> Widget<MSG> for Button<MSG>
-where
-    MSG: 'static,
-{
+impl Widget for Button {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -196,14 +186,11 @@ where
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) {
         if event.is_mouse_click() {
             self.on_click
-                .iter()
-                .map(|cb| cb.emit(event.clone()))
-                .collect()
-        } else {
-            vec![]
+                .iter_mut()
+                .for_each(|cb| cb.emit(event.clone()));
         }
     }
 

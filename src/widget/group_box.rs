@@ -13,9 +13,9 @@ use stretch::{
 /// Group elements together
 /// Radio buttons in the same group will have an exclusive behavior
 #[derive(Default, Debug)]
-pub struct GroupBox<MSG> {
+pub struct GroupBox {
     layout: Option<Layout>,
-    children: Vec<Box<dyn Widget<MSG>>>,
+    children: Vec<Box<dyn Widget>>,
     width: Option<f32>,
     height: Option<f32>,
     flex_direction: FlexDirection,
@@ -27,7 +27,7 @@ pub struct GroupBox<MSG> {
     label: Option<String>,
 }
 
-impl<MSG> GroupBox<MSG> {
+impl GroupBox {
     /// create a new groupbox
     pub fn new() -> Self {
         GroupBox {
@@ -109,10 +109,7 @@ impl<MSG> GroupBox<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for GroupBox<MSG>
-where
-    MSG: fmt::Debug + 'static,
-{
+impl Widget for GroupBox {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -180,28 +177,28 @@ where
         vec![]
     }
 
-    fn add_child(&mut self, child: Box<dyn Widget<MSG>>) -> bool {
+    fn add_child(&mut self, child: Box<dyn Widget>) -> bool {
         self.children.push(child);
         true
     }
 
-    fn children(&self) -> Option<&[Box<dyn Widget<MSG>>]> {
+    fn children(&self) -> Option<&[Box<dyn Widget>]> {
         Some(&self.children)
     }
 
-    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget<MSG>>]> {
+    fn children_mut(&mut self) -> Option<&mut [Box<dyn Widget>]> {
         Some(&mut self.children)
     }
 
     // TODO: use remove_item when it will be stabilized
-    fn take_child(&mut self, index: usize) -> Option<Box<dyn Widget<MSG>>> {
+    fn take_child(&mut self, index: usize) -> Option<Box<dyn Widget>> {
         Some(self.children.remove(index))
     }
 
     fn child_mut<'a>(
         &'a mut self,
         index: usize,
-    ) -> Option<&'a mut Box<dyn Widget<MSG>>> {
+    ) -> Option<&'a mut Box<dyn Widget>> {
         self.children.get_mut(index)
     }
 

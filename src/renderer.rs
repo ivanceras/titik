@@ -16,27 +16,27 @@ use stretch::{geometry::Size, number::Number};
 
 /// A Dispatch trait which the implementing APP will update
 /// its own state based on the supplied msg.
-pub trait Dispatch<MSG> {
+pub trait Dispatch {
     /// dispatch the msg and passed the root node for the implementing
     /// app to access it and change the state of the UI.
-    fn dispatch(&self, msg: MSG, root_node: &mut dyn Widget<MSG>);
+    fn dispatch(&self, root_node: &mut dyn Widget);
 }
 
 /// This provides the render loop of the terminal UI
-pub struct Renderer<'a, MSG> {
+pub struct Renderer<'a> {
     write: &'a mut dyn Write,
-    program: Option<&'a dyn Dispatch<MSG>>,
-    root_node: &'a mut dyn Widget<MSG>,
+    program: Option<&'a dyn Dispatch>,
+    root_node: &'a mut dyn Widget,
     terminal_size: (u16, u16),
     focused_widget_idx: Option<usize>,
 }
 
-impl<'a, MSG> Renderer<'a, MSG> {
+impl<'a> Renderer<'a> {
     /// create a new renderer with the supplied root_node
     pub fn new(
         write: &'a mut dyn Write,
-        program: Option<&'a dyn Dispatch<MSG>>,
-        root_node: &'a mut dyn Widget<MSG>,
+        program: Option<&'a dyn Dispatch>,
+        root_node: &'a mut dyn Widget,
     ) -> Self {
         let (width, height) =
             terminal::size().expect("must get the terminal size");
@@ -68,7 +68,8 @@ impl<'a, MSG> Renderer<'a, MSG> {
         );
     }
 
-    fn dispatch_msg(&mut self, msgs: Vec<MSG>) {
+    /*
+    fn dispatch_msg(&mut self, msgs: Vec) {
         if let Some(program) = self.program {
             for msg in msgs {
                 program.dispatch(msg, self.root_node);
@@ -76,14 +77,9 @@ impl<'a, MSG> Renderer<'a, MSG> {
         }
         self.recompute_layout();
     }
+    */
 
-    fn draw_widget(
-        buf: &mut Buffer,
-        widget: &dyn Widget<MSG>,
-    ) -> Result<Vec<Cmd>>
-    where
-        MSG: 'a,
-    {
+    fn draw_widget(buf: &mut Buffer, widget: &dyn Widget) -> Result<Vec<Cmd>> {
         let mut cmds = widget.draw(buf);
         if let Some(children) = widget.children() {
             for child in children {
@@ -139,16 +135,13 @@ impl<'a, MSG> Renderer<'a, MSG> {
                             // send the keypresses to the focused widget
                             if let Some(idx) = self.focused_widget_idx.as_ref()
                             {
-                                let active_widget: Option<
-                                    &mut dyn Widget<MSG>,
-                                > = find_node::find_widget_mut(
-                                    self.root_node,
-                                    *idx,
-                                );
+                                let active_widget: Option<&mut dyn Widget> =
+                                    find_node::find_widget_mut(
+                                        self.root_node,
+                                        *idx,
+                                    );
                                 if let Some(focused_widget) = active_widget {
-                                    let msgs = focused_widget
-                                        .process_event(event.clone());
-                                    self.dispatch_msg(msgs);
+                                    focused_widget.process_event(event.clone());
                                 }
                             }
                         }
@@ -185,12 +178,11 @@ impl<'a, MSG> Renderer<'a, MSG> {
                         &mut 0,
                     );
                     for hit in hits.iter().rev() {
-                        let mut hit_widget: Option<&mut dyn Widget<MSG>> =
+                        let mut hit_widget: Option<&mut dyn Widget> =
                             find_node::find_widget_mut(self.root_node, *hit);
 
                         if let Some(hit_widget) = &mut hit_widget {
-                            let msgs = hit_widget.process_event(event.clone());
-                            self.dispatch_msg(msgs);
+                            hit_widget.process_event(event.clone());
                         }
                     }
                 }

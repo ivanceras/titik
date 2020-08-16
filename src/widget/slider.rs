@@ -12,16 +12,16 @@ use stretch::{
 
 /// A slider with value from 0.0 to 1.0
 #[derive(Debug)]
-pub struct Slider<MSG> {
+pub struct Slider {
     layout: Option<Layout>,
     value: f32,
     width: Option<f32>,
     id: Option<String>,
     use_thick_track: bool,
-    on_input: Vec<Callback<Event, MSG>>,
+    on_input: Vec<Callback<Event>>,
 }
 
-impl<MSG> Default for Slider<MSG> {
+impl Default for Slider {
     fn default() -> Self {
         Slider {
             layout: None,
@@ -34,7 +34,7 @@ impl<MSG> Default for Slider<MSG> {
     }
 }
 
-impl<MSG> Slider<MSG> {
+impl Slider {
     /// create a new slider with value
     pub fn new(value: f32) -> Self {
         Slider {
@@ -54,10 +54,7 @@ impl<MSG> Slider<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for Slider<MSG>
-where
-    MSG: fmt::Debug + 'static,
-{
+impl Widget for Slider {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -110,7 +107,7 @@ where
         self.width = width;
     }
 
-    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) {
         let layout = self.layout.expect("must have a layout");
         match event {
             Event::Mouse(MouseEvent::Down(_btn, x, _y, _modifier)) => {
@@ -119,7 +116,6 @@ where
                 let value = cursor_loc as f32 / width;
                 eprintln!("value: {}", value);
                 self.value = value;
-                vec![]
             }
             Event::Mouse(MouseEvent::Drag(_btn, x, _y, _modifier)) => {
                 let cursor_loc = x as i32 - layout.location.x.round() as i32;
@@ -127,9 +123,8 @@ where
                 let value = cursor_loc as f32 / width;
                 eprintln!("value: {}", value);
                 self.value = value;
-                vec![]
             }
-            _ => vec![],
+            _ => (),
         }
     }
 

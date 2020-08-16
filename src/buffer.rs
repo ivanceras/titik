@@ -1,23 +1,13 @@
 use crate::symbol;
 use crossterm::{
-    cursor,
-    queue,
+    cursor, queue,
     style::{
-        Attribute,
-        Attributes,
-        Color,
-        Print,
-        ResetColor,
-        SetAttributes,
-        SetBackgroundColor,
-        SetForegroundColor,
+        Attribute, Attributes, Color, Print, ResetColor, SetAttributes,
+        SetBackgroundColor, SetForegroundColor,
     },
 };
 use ito_canvas::unicode_canvas::Canvas;
-use std::{
-    fmt,
-    io::Write,
-};
+use std::{fmt, io::Write};
 use unicode_width::UnicodeWidthStr;
 
 /// Cell contains the attributes of the char used in the buffer.

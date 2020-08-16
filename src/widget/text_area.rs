@@ -16,7 +16,7 @@ use stretch::{
 /// A textarea is a 2 dimensional editor
 /// where each line is separated by \n.
 #[derive(Debug)]
-pub struct TextArea<MSG> {
+pub struct TextArea {
     layout: Option<Layout>,
     area_buffer: AreaBuffer,
     focused: bool,
@@ -25,13 +25,13 @@ pub struct TextArea<MSG> {
     scroll_top: f32,
     scroll_left: f32,
     id: Option<String>,
-    on_input: Vec<Callback<Event, MSG>>,
+    on_input: Vec<Callback<Event>>,
     has_border: bool,
     is_rounded_border: bool,
     is_thick_border: bool,
 }
 
-impl<MSG> TextArea<MSG> {
+impl TextArea {
     /// create a new text area with initial value
     pub fn new<S>(value: S) -> Self
     where
@@ -54,7 +54,7 @@ impl<MSG> TextArea<MSG> {
     }
 
     /// attach an listener to the input event of this textarea
-    pub fn add_input_listener(&mut self, cb: Callback<Event, MSG>) {
+    pub fn add_input_listener(&mut self, cb: Callback<Event>) {
         self.on_input.push(cb);
     }
 
@@ -231,10 +231,7 @@ impl<MSG> TextArea<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for TextArea<MSG>
-where
-    MSG: fmt::Debug + 'static,
-{
+impl Widget for TextArea {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -325,7 +322,7 @@ where
         self.height = height;
     }
 
-    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) {
         let layout = self.layout.expect("must have a layout");
         match event {
             Event::Key(ke) => {
@@ -334,9 +331,8 @@ where
                     Value::from(self.get_content()),
                 ));
                 self.on_input
-                    .iter()
-                    .map(|cb| cb.emit(s_event.clone()))
-                    .collect()
+                    .iter_mut()
+                    .for_each(|cb| cb.emit(s_event.clone()));
             }
             Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
                 let mut x = x as f32 - layout.location.x.round();
@@ -364,7 +360,6 @@ where
 
                 self.area_buffer
                     .set_cursor_loc(cursor_x as usize, cursor_y as usize);
-                vec![]
             }
             Event::Mouse(MouseEvent::ScrollUp(_x, _y, modifier)) => {
                 if modifier.contains(KeyModifiers::SHIFT) {
@@ -376,7 +371,6 @@ where
                         self.scroll_top -= 4.0;
                     }
                 }
-                vec![]
             }
             Event::Mouse(MouseEvent::ScrollDown(_x, _y, modifier)) => {
                 if modifier.contains(KeyModifiers::SHIFT) {
@@ -388,9 +382,8 @@ where
                         self.scroll_top += 4.0;
                     }
                 }
-                vec![]
             }
-            _ => vec![],
+            _ => (),
         }
     }
 

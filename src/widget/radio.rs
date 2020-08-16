@@ -10,15 +10,15 @@ use stretch::{
 
 /// Radio button widget
 #[derive(Default, PartialEq)]
-pub struct Radio<MSG> {
+pub struct Radio {
     layout: Option<Layout>,
     label: String,
     is_checked: bool,
     id: Option<String>,
-    on_input: Vec<Callback<Event, MSG>>,
+    on_input: Vec<Callback<Event>>,
 }
 
-impl<MSG> Radio<MSG> {
+impl Radio {
     /// create a new radio button with label
     pub fn new<S>(label: S) -> Self
     where
@@ -44,7 +44,7 @@ impl<MSG> Radio<MSG> {
     }
 }
 
-impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
+impl Widget for Radio {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -94,13 +94,12 @@ impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
 
     fn set_size(&mut self, _width: Option<f32>, _height: Option<f32>) {}
 
-    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) {
         match event {
             Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
                 self.is_checked = !self.is_checked;
-                vec![]
             }
-            _ => vec![],
+            _ => (),
         }
     }
 
@@ -113,7 +112,7 @@ impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
     }
 }
 
-impl<MSG> fmt::Debug for Radio<MSG> {
+impl fmt::Debug for Radio {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("Radio")
             .field("label", &self.label)

@@ -10,7 +10,7 @@ use stretch::{
 };
 
 /// Image widget, supported formats: jpg, png
-pub struct Image<MSG> {
+pub struct Image {
     layout: Option<Layout>,
     image: DynamicImage,
     /// the width of cells used for this image
@@ -19,10 +19,9 @@ pub struct Image<MSG> {
     /// style layout
     height: Option<f32>,
     id: Option<String>,
-    _phantom_msg: PhantomData<MSG>,
 }
 
-impl<MSG> Image<MSG> {
+impl Image {
     /// create a new image widget
     pub fn new(bytes: Vec<u8>) -> Self {
         Image {
@@ -32,7 +31,6 @@ impl<MSG> Image<MSG> {
             width: None,
             height: None,
             id: None,
-            _phantom_msg: PhantomData,
         }
     }
 
@@ -74,10 +72,7 @@ impl<MSG> Image<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for Image<MSG>
-where
-    MSG: 'static,
-{
+impl Widget for Image {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -149,7 +144,7 @@ where
     }
 }
 
-impl<MSG> fmt::Debug for Image<MSG> {
+impl fmt::Debug for Image {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Image")
     }

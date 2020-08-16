@@ -7,30 +7,30 @@ use titik::{
 
 fn main() -> Result<()> {
     let mut stdout = io::stdout();
-    let mut root_node = FlexBox::<()>::new();
+    let mut root_node = FlexBox::new();
     root_node.set_border(false);
     root_node.set_thick_border(true);
     let mut column = FlexBox::new();
     column.vertical();
     column.set_border(false);
     column.set_thick_border(false);
-    let mut row = FlexBox::<()>::new();
+    let mut row = FlexBox::new();
     row.horizontal();
     row.set_border(false);
     row.set_thick_border(false);
     row.set_rounded(true);
-    let btn1 = Button::<()>::new("btn 1");
-    let btn2 = Button::<()>::new("btn 2");
-    let cb1 = Checkbox::<()>::new("cb 1");
-    let cb2 = Checkbox::<()>::new("cb 2");
+    let btn1 = Button::new("btn 1");
+    let btn2 = Button::new("btn 2");
+    let cb1 = Checkbox::new("cb 1");
+    let cb2 = Checkbox::new("cb 2");
     let label1 = TextLabel::new("label1");
 
-    let rb1 = Radio::<()>::new("Radio1");
-    let rb2 = Radio::<()>::new("Radio2");
+    let rb1 = Radio::new("Radio1");
+    let rb2 = Radio::new("Radio2");
 
     let input1 = TextInput::new("Hello");
 
-    let mut list_box1 = ListBox::<()>::new();
+    let mut list_box1 = ListBox::new();
     list_box1.set_use_divider(true);
     list_box1.set_list(vec![
         "Item1".into(),
@@ -116,7 +116,7 @@ fn main() -> Result<()> {
     //row.add_child(Box::new(list_box1));
     column.add_child(Box::new(row));
     root_node.add_child(Box::new(column));
-    let mut renderer = Renderer::<()>::new(&mut stdout, None, &mut root_node);
+    let mut renderer = Renderer::new(&mut stdout, None, &mut root_node);
     renderer.run()?;
     Ok(())
 }

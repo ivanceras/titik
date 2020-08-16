@@ -10,15 +10,15 @@ use stretch::{
 
 /// A checkbox widget
 #[derive(PartialEq)]
-pub struct Checkbox<MSG> {
+pub struct Checkbox {
     layout: Option<Layout>,
     label: String,
     is_checked: bool,
     id: Option<String>,
-    on_input: Vec<Callback<Event, MSG>>,
+    on_input: Vec<Callback<Event>>,
 }
 
-impl<MSG> Default for Checkbox<MSG> {
+impl Default for Checkbox {
     fn default() -> Self {
         Checkbox {
             layout: None,
@@ -30,7 +30,7 @@ impl<MSG> Default for Checkbox<MSG> {
     }
 }
 
-impl<MSG> Checkbox<MSG> {
+impl Checkbox {
     /// create a new checkbox with label
     pub fn new<S>(label: S) -> Self
     where
@@ -54,12 +54,12 @@ impl<MSG> Checkbox<MSG> {
 
     /// attach a listener to this checkbox which will be triggered
     /// when the check status is changed
-    pub fn add_input_listener(&mut self, cb: Callback<Event, MSG>) {
+    pub fn add_input_listener(&mut self, cb: Callback<Event>) {
         self.on_input.push(cb);
     }
 }
 
-impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
+impl Widget for Checkbox {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -110,16 +110,15 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
 
     fn set_size(&mut self, _width: Option<f32>, _height: Option<f32>) {}
 
-    fn process_event(&mut self, event: Event) -> Vec<MSG> {
+    fn process_event(&mut self, event: Event) {
         match event {
             Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
                 self.is_checked = !self.is_checked;
                 self.on_input
-                    .iter()
-                    .map(|cb| cb.emit(event.clone()))
-                    .collect()
+                    .iter_mut()
+                    .for_each(|cb| cb.emit(event.clone()));
             }
-            _ => vec![],
+            _ => (),
         }
     }
 
@@ -132,7 +131,7 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
     }
 }
 
-impl<MSG> Debug for Checkbox<MSG> {
+impl Debug for Checkbox {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("Checkbox")
             .field("label", &self.label)
