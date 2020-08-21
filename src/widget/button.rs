@@ -73,8 +73,8 @@ impl Button {
     }
 
     /// add to the click listener of this button
-    pub fn add_click_listener(&mut self, cb: Callback<Event>) {
-        self.on_click.push(cb);
+    pub fn add_click_listener<F: Fn(Event) + 'static>(&mut self, f: F) {
+        self.on_click.push(Callback::from(f));
     }
 
     fn border_top(&self) -> f32 {
