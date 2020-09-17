@@ -42,6 +42,8 @@
        - [ ] vertical
        - [ ] horizontal
    - [ ] scatter point charts
+- [ ] All widget will have to be wrapped with `Rc<Mutex<_>>` in order
+ for it to have multiple owner that can modify the UI
 
 ## Document
 - [ ] document each function in the widget interface
