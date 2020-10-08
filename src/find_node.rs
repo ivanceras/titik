@@ -129,6 +129,73 @@ fn set_focused_widget<'a, MSG>(
     }
 }
 
+/// remove the widget at this node_idx
+pub fn remove_widget<MSG>(
+    root_widget: &mut dyn Widget<MSG>,
+    node_idx: usize,
+) -> bool {
+    remove_widget_recursive(root_widget, node_idx, &mut 0)
+}
+
+fn remove_widget_recursive<MSG>(
+    widget: &mut dyn Widget<MSG>,
+    node_idx: usize,
+    cur_node_idx: &mut usize,
+) -> bool {
+    if let Some(children) = widget.children_mut() {
+        let mut this_cur_node_idx = *cur_node_idx;
+        let mut to_be_remove = None;
+        // look ahead for remove
+        for (idx, child) in children.iter().enumerate() {
+            this_cur_node_idx += 1;
+            if node_idx == this_cur_node_idx {
+                to_be_remove = Some(idx);
+            } else {
+                increment_node_idx_to_descendant_count(
+                    child.as_ref(),
+                    &mut this_cur_node_idx,
+                );
+            }
+        }
+
+        if let Some(remove_idx) = to_be_remove {
+            widget
+                .take_child(remove_idx)
+                .expect("must be able to remove child");
+            true
+        } else {
+            for child in children {
+                *cur_node_idx += 1;
+                if remove_widget_recursive(
+                    child.as_mut(),
+                    node_idx,
+                    cur_node_idx,
+                ) {
+                    return true;
+                }
+            }
+            false
+        }
+    } else {
+        false
+    }
+}
+
+pub fn increment_node_idx_to_descendant_count<MSG>(
+    node: &dyn Widget<MSG>,
+    cur_node_idx: &mut usize,
+) {
+    if let Some(children) = node.children() {
+        for child in children {
+            *cur_node_idx += 1;
+            increment_node_idx_to_descendant_count(
+                child.as_ref(),
+                cur_node_idx,
+            );
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

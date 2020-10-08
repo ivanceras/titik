@@ -45,6 +45,7 @@ pub use crossterm;
 pub use event::Event;
 pub use find_node::{
     find_widget, find_widget_by_id, find_widget_by_id_mut, find_widget_mut,
+    remove_widget,
 };
 pub use input_buffer::InputBuffer;
 pub use mt_dom::{self, Callback};
