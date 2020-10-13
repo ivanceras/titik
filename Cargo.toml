@@ -1,6 +1,6 @@
 [package]
 name = "titik"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Jovansonlee Cesar <ivanceras@gmail.com>"]
 license = "MIT"
 description = "A cross platform text ui widget"
@@ -12,16 +12,12 @@ edition = "2018"
 
 [dependencies]
 crossterm = "0.16.0"
-stretch = "0.3.2"
+stretch = { package = "expanse", version = "0.3.3" }
 image = "0.23.0"
 unicode-width = "0.1.7"
 mt-dom = { version = "0.6"}
 itertools = "0.9.0"
 lazy_static = "1.4.0"
-ito-canvas = { path = "../ito-canvas", version= "0.1.0"}
+ito-canvas = { version= "0.1"}
 
 
-[patch.crates-io]
-stretch = { path = "../stretch" }
-#ito-canvas = { path = "../ito-canvas" }
-#mt-dom = { path = "../mt-dom" }

@@ -117,7 +117,6 @@ where
                 let cursor_loc = x as i32 - layout.location.x.round() as i32;
                 let width = layout.size.width;
                 let value = cursor_loc as f32 / width;
-                eprintln!("value: {}", value);
                 self.value = value;
                 vec![]
             }
@@ -125,7 +124,6 @@ where
                 let cursor_loc = x as i32 - layout.location.x.round() as i32;
                 let width = layout.size.width;
                 let value = cursor_loc as f32 / width;
-                eprintln!("value: {}", value);
                 self.value = value;
                 vec![]
             }

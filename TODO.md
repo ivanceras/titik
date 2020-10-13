@@ -16,7 +16,7 @@
       - [ ] event listener
         - [ ] on input
 - [ ] scrollbars
-- [ ] slider
+- [x] slider
     - [ ] event listener
        - [ ] on input
 - [x] text
