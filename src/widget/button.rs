@@ -5,13 +5,13 @@ use crate::{
     Cmd, Widget,
 };
 use crossterm::event::MouseEvent;
-use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::{any::Any, fmt, fmt::Debug};
-use stretch::{
+use expanse::{
     geometry::{Rect, Size},
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt, fmt::Debug};
 
 /// A button widget
 #[derive(PartialEq, Clone)]

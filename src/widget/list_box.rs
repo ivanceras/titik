@@ -1,12 +1,12 @@
 use crate::{buffer::Buffer, Callback, Cmd, Widget};
 use crossterm::event::Event;
-use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::{any::Any, fmt};
-use stretch::{
+use expanse::{
     geometry::Size,
     result::Layout,
     style::{Dimension, FlexDirection, PositionType, Style},
 };
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt};
 
 /// a flex box
 #[derive(Default, Debug)]

@@ -1,12 +1,12 @@
 use crate::Event;
 use crate::{buffer::Buffer, symbol, Callback, Cmd, Widget};
 use crossterm::event::MouseEvent;
-use std::{any::Any, fmt};
-use stretch::{
+use expanse::{
     geometry::Size,
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
+use std::{any::Any, fmt};
 
 /// Radio button widget
 #[derive(Default, PartialEq)]

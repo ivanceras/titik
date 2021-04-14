@@ -1,5 +1,5 @@
+use expanse::style::Style;
 use std::fmt;
-use stretch::style::Style;
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum Value {

@@ -5,13 +5,13 @@ use crate::{
     symbol::bar, Callback, Cmd, Widget,
 };
 use crossterm::event::{KeyEvent, KeyModifiers, MouseEvent};
-use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::{any::Any, fmt};
-use stretch::{
+use expanse::{
     geometry::Size,
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt};
 
 /// A textarea is a 2 dimensional editor
 /// where each line is separated by \n.

@@ -1,14 +1,14 @@
 use crate::{buffer::Buffer, Cmd, Widget};
-use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::{any::Any, fmt};
-use stretch::result::Layout;
-use stretch::{
+use expanse::result::Layout;
+use expanse::{
     geometry::{Rect, Size},
     style::{
         AlignContent, AlignItems, AlignSelf, Dimension, FlexDirection,
         FlexWrap, JustifyContent, Overflow, PositionType, Style,
     },
 };
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt};
 
 /// a flex box
 #[derive(Default, Debug)]

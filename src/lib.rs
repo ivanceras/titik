@@ -43,6 +43,7 @@ pub use buffer::{Buffer, Cell};
 pub use cmd::Cmd;
 pub use crossterm;
 pub use event::Event;
+pub use expanse;
 pub use find_node::{
     find_widget, find_widget_by_id, find_widget_by_id_mut, find_widget_mut,
     remove_widget,
@@ -50,7 +51,6 @@ pub use find_node::{
 pub use input_buffer::InputBuffer;
 pub use mt_dom::{self, Callback};
 pub use renderer::{Dispatch, Renderer};
-pub use stretch;
 pub use value::Value;
 pub use widget::*;
 

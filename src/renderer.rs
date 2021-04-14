@@ -11,8 +11,8 @@ pub use crossterm::{
     terminal::{self, ClearType},
     Command, Result,
 };
+use expanse::{geometry::Size, number::Number};
 use std::io::Write;
-use stretch::{geometry::Size, number::Number};
 
 /// A Dispatch trait which the implementing APP will update
 /// its own state based on the supplied msg.

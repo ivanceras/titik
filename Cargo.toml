@@ -12,7 +12,7 @@ edition = "2018"
 
 [dependencies]
 crossterm = "0.16.0"
-stretch = { package = "expanse", version = "0.3.3" }
+expanse = "0.3.3"
 image = "0.23.0"
 unicode-width = "0.1.7"
 mt-dom = { version = "0.6"}

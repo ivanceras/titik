@@ -1,13 +1,13 @@
 use crate::Event;
 use crate::{buffer::Buffer, Cmd, InputBuffer, Widget};
 use crossterm::event::{KeyEvent, MouseEvent};
-use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::any::Any;
-use stretch::{
+use expanse::{
     geometry::Size,
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::any::Any;
 
 /// A one line text input
 #[derive(Default, Debug)]

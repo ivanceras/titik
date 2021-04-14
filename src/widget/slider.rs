@@ -2,13 +2,13 @@ use crate::Callback;
 use crate::Event;
 use crate::{buffer::Buffer, cmd::Cmd, symbol, Widget};
 use crossterm::event::MouseEvent;
-use ito_canvas::unicode_canvas::Canvas;
-use std::{any::Any, fmt};
-use stretch::result::Layout;
-use stretch::{
+use expanse::result::Layout;
+use expanse::{
     geometry::Size,
     style::{Dimension, PositionType, Style},
 };
+use ito_canvas::unicode_canvas::Canvas;
+use std::{any::Any, fmt};
 
 /// A slider with value from 0.0 to 1.0
 #[derive(Debug)]

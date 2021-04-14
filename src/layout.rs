@@ -1,8 +1,8 @@
 use crate::Widget;
+use expanse::geometry::Size;
+use expanse::number::Number;
+use expanse::Stretch;
 use mt_dom::attr;
-use stretch::geometry::Size;
-use stretch::number::Number;
-use stretch::Stretch;
 
 /// calculate the layout of the nodes utilizing the styles set on each of the widget
 /// and its children widget styles
@@ -54,7 +54,7 @@ pub(crate) fn node_hit_at<MSG>(
 fn build_stretch_node_recursive<MSG>(
     stretch: &mut Stretch,
     widget_node: &dyn Widget<MSG>,
-) -> Option<stretch::node::Node> {
+) -> Option<expanse::node::Node> {
     let children_styles = if let Some(children) = widget_node.children() {
         children
             .iter()
@@ -69,7 +69,7 @@ fn build_stretch_node_recursive<MSG>(
 
 fn set_node_layout_from_stretch_node<MSG>(
     widget_node: &mut dyn Widget<MSG>,
-    stretch_node: stretch::node::Node,
+    stretch_node: expanse::node::Node,
     stretch: &Stretch,
     parent_loc: (f32, f32),
     parent_offset: (f32, f32),
@@ -86,7 +86,7 @@ fn set_node_layout_from_stretch_node<MSG>(
     layout.size.width -= parent_offset_x;
     layout.size.height -= parent_offset_y;
 
-    let stretch_node_children: Vec<stretch::node::Node> =
+    let stretch_node_children: Vec<expanse::node::Node> =
         stretch.children(stretch_node).expect("must get children");
 
     let widget_children = widget_node.children_mut().unwrap_or(&mut []);

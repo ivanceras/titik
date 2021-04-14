@@ -1,13 +1,13 @@
 use crate::symbol::bar;
 use crate::{buffer::Buffer, buffer::Cell, Cmd, Widget};
 use crossterm::style::Color;
-use image::{self, DynamicImage, GenericImageView};
-use std::{any::Any, fmt, marker::PhantomData};
-use stretch::result::Layout;
-use stretch::{
+use expanse::result::Layout;
+use expanse::{
     geometry::Size,
     style::{Dimension, PositionType, Style},
 };
+use image::{self, DynamicImage, GenericImageView};
+use std::{any::Any, fmt, marker::PhantomData};
 
 /// Image widget, supported formats: jpg, png
 pub struct Image<MSG> {

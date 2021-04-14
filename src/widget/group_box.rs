@@ -1,7 +1,5 @@
 use crate::{buffer::Buffer, Cmd, Widget};
-use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::{any::Any, fmt};
-use stretch::{
+use expanse::{
     geometry::{Rect, Size},
     result::Layout,
     style::{
@@ -9,6 +7,8 @@ use stretch::{
         FlexWrap, JustifyContent, Overflow, PositionType, Style,
     },
 };
+use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::{any::Any, fmt};
 
 /// Group elements together
 /// Radio buttons in the same group will have an exclusive behavior
