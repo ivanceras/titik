@@ -137,8 +137,8 @@ where
 mod tests {
     use super::*;
     use crate::*;
+    use expanse::{geometry::*, number::Number};
     use std::boxed;
-    use stretch::{geometry::*, number::Number};
 
     #[test]
     fn layout() {
