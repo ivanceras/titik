@@ -107,21 +107,13 @@ impl Event {
     /// extract the x and y location of a mouse event
     pub fn extract_location(&self) -> Option<(u16, u16)> {
         match self {
-            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                Some((*x, *y))
-            }
-            Event::Mouse(MouseEvent::Up(_btn, x, y, _modifier)) => {
-                Some((*x, *y))
-            }
-            Event::Mouse(MouseEvent::Drag(_btn, x, y, _modifier)) => {
-                Some((*x, *y))
-            }
-            Event::Mouse(MouseEvent::ScrollDown(x, y, _modifier)) => {
-                Some((*x, *y))
-            }
-            Event::Mouse(MouseEvent::ScrollUp(x, y, _modifier)) => {
-                Some((*x, *y))
-            }
+            Event::Mouse(me) => match me {
+                MouseEvent::Down(_btn, x, y, _modifier) => Some((*x, *y)),
+                MouseEvent::Up(_btn, x, y, _modifier) => Some((*x, *y)),
+                MouseEvent::Drag(_btn, x, y, _modifier) => Some((*x, *y)),
+                MouseEvent::ScrollDown(x, y, _modifier) => Some((*x, *y)),
+                MouseEvent::ScrollUp(x, y, _modifier) => Some((*x, *y)),
+            },
             Event::Key(_) => None,
             Event::Resize(_, _) => None,
             Event::InputEvent(_) => None,
