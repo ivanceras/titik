@@ -8,7 +8,7 @@ use expanse::{
     style::{Dimension, PositionType, Style},
 };
 use ito_canvas::unicode_canvas::Canvas;
-use std::{any::Any, fmt};
+use std::fmt;
 
 /// A slider with value from 0.0 to 1.0
 #[derive(Debug)]
@@ -96,14 +96,6 @@ where
         let slider_loc = (self.value * width as f32) as usize;
         buf.set_symbol(loc_x + slider_loc, loc_y, symbol::MIDDLE_BLOCK);
         vec![]
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 
     fn set_size(&mut self, width: Option<f32>, _height: Option<f32>) {

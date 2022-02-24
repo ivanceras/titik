@@ -91,14 +91,6 @@ impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
         vec![]
     }
 
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
-    }
-
     fn set_size(&mut self, _width: Option<f32>, _height: Option<f32>) {}
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {

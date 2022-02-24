@@ -6,7 +6,7 @@ use expanse::{
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
-use std::{any::Any, fmt, fmt::Debug};
+use std::{fmt, fmt::Debug};
 
 /// A checkbox widget
 #[derive(PartialEq)]
@@ -105,14 +105,6 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
             buf.set_symbol(loc_x + 3 + t, loc_y, ch);
         }
         vec![]
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 
     fn set_size(&mut self, _width: Option<f32>, _height: Option<f32>) {}

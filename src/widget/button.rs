@@ -11,7 +11,8 @@ use expanse::{
     style::{Dimension, PositionType, Style},
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::{any::Any, fmt, fmt::Debug};
+use std::marker::PhantomData;
+use std::{fmt, fmt::Debug};
 
 /// A button widget
 #[derive(PartialEq, Clone)]
@@ -22,7 +23,8 @@ pub struct Button<MSG> {
     width: Option<f32>,
     height: Option<f32>,
     focused: bool,
-    on_click: Vec<Callback<Event, MSG>>,
+    //on_click: Vec<Callback<Event, MSG>>,
+    _phantom: PhantomData<MSG>,
     id: Option<String>,
 }
 
@@ -35,7 +37,8 @@ impl<MSG> Default for Button<MSG> {
             width: None,
             height: None,
             focused: false,
-            on_click: vec![],
+            //on_click: vec![],
+            _phantom: PhantomData,
             id: None,
         }
     }
@@ -73,16 +76,18 @@ impl<MSG> Button<MSG> {
         self.is_rounded = rounded;
     }
 
+    /*
     /// add to the click listener of this button
     pub fn add_click_listener(&mut self, cb: Callback<Event, MSG>) {
         self.on_click.push(cb);
     }
+    */
 
     pub fn on_click<F>(&mut self, f: F)
     where
         F: FnMut(Event) -> MSG + 'static,
     {
-        self.on_click.push(f.into());
+        //self.on_click.push(f.into());
     }
 
     fn border_top(&self) -> f32 {
@@ -103,8 +108,10 @@ impl<MSG> Button<MSG> {
 }
 
 impl<MSG> Widget<MSG> for Button<MSG>
+/*
 where
     MSG: 'static,
+*/
 {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
@@ -184,14 +191,6 @@ where
         self.focused = focused;
     }
 
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
-    }
-
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
         self.width = width;
         self.height = height;
@@ -199,10 +198,13 @@ where
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
         if event.is_mouse_click() {
+            /*
             self.on_click
                 .iter_mut()
                 .map(|cb| cb.emit(event.clone()))
                 .collect()
+            */
+            vec![]
         } else {
             vec![]
         }

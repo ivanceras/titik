@@ -11,7 +11,7 @@ use expanse::{
     style::{Dimension, PositionType, Style},
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::{any::Any, fmt};
+use std::fmt;
 
 /// A textarea is a 2 dimensional editor
 /// where each line is separated by \n.
@@ -310,14 +310,6 @@ where
 
     fn set_focused(&mut self, focused: bool) {
         self.focused = focused;
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {

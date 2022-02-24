@@ -16,7 +16,7 @@ pub use link::Link;
 pub use list_box::ListBox;
 pub use radio::Radio;
 pub use slider::Slider;
-use std::{any::Any, fmt};
+use std::fmt;
 pub use tab_box::TabBox;
 pub use text_area::TextArea;
 pub use text_input::TextInput;
@@ -101,22 +101,8 @@ where
     /// set the widget as focused
     fn set_focused(&mut self, _focused: bool) {}
 
-    /// get an Any reference
-    fn as_any(&self) -> &dyn Any;
-
-    /// get an Any mutable reference for casting purposed
-    fn as_any_mut(&mut self) -> &mut dyn Any;
-
     /// set the size of the widget
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>);
-
-    /// get a mutable reference of this widget
-    fn as_mut(&mut self) -> Option<&mut Self>
-    where
-        Self: Sized + 'static,
-    {
-        self.as_any_mut().downcast_mut::<Self>()
-    }
 
     /// this process the event and all callbacks attached to the widgets will be dispatched.
     fn process_event(&mut self, _event: Event) -> Vec<MSG> {

@@ -8,7 +8,7 @@ use expanse::{
     },
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::{any::Any, fmt};
+use std::fmt;
 
 /// a flex box
 #[derive(Default, Debug)]
@@ -215,14 +215,6 @@ where
         index: usize,
     ) -> Option<&'a mut Box<dyn Widget<MSG>>> {
         self.children.get_mut(index)
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 
     fn set_size(&mut self, width: Option<f32>, height: Option<f32>) {
