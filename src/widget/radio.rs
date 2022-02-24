@@ -6,7 +6,7 @@ use expanse::{
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
-use std::{any::Any, fmt};
+use std::fmt;
 
 /// Radio button widget
 #[derive(Default, PartialEq)]
