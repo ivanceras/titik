@@ -15,7 +15,6 @@ use titik::{
 };
 
 fn build_ui() -> Box<dyn Widget<()>> {
-    println!("building the ui");
     let mut root_node = FlexBox::new();
     root_node.set_scroll_top(0.0);
     root_node.vertical();
@@ -101,9 +100,9 @@ fn build_ui() -> Box<dyn Widget<()>> {
     let mut btn1: Button<()> = Button::new("Button 1");
     btn1.set_id("btn1");
 
-    btn1.add_click_listener(Callback::from(|_| {
-        eprintln!("btn1 is clicked");
-    }));
+    btn1.on_click(|_| {
+        println!("btn1 is clicked");
+    });
 
     root_node.add_child(Box::new(btn1));
     root_node.add_child(Box::new(slider));

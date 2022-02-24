@@ -26,6 +26,12 @@ impl From<InputEvent> for Event {
     }
 }
 
+impl From<KeyEvent> for Event {
+    fn from(ke: KeyEvent) -> Self {
+        Self::Key(ke)
+    }
+}
+
 impl Event {
     pub fn from_crossterm(c_event: crossterm::event::Event) -> Self {
         match c_event {

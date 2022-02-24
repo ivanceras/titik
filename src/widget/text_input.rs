@@ -1,3 +1,4 @@
+use crate::Callback;
 use crate::Event;
 use crate::{buffer::Buffer, Cmd, InputBuffer, Widget};
 use crossterm::event::{KeyEvent, MouseEvent};
@@ -8,10 +9,11 @@ use expanse::{
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::any::Any;
+use std::fmt;
 
 /// A one line text input
 #[derive(Default, Debug)]
-pub struct TextInput {
+pub struct TextInput<MSG> {
     layout: Option<Layout>,
     input_buffer: InputBuffer,
     is_rounded: bool,
@@ -20,9 +22,10 @@ pub struct TextInput {
     width: Option<f32>,
     height: Option<f32>,
     id: Option<String>,
+    on_input: Vec<Callback<Event, MSG>>,
 }
 
-impl TextInput {
+impl<MSG> TextInput<MSG> {
     /// creates a new text input with initial value
     pub fn new<S>(value: S) -> Self
     where
@@ -33,14 +36,21 @@ impl TextInput {
             input_buffer: InputBuffer::new_with_value(value),
             is_rounded: false,
             has_border: true,
+            focused: false,
+            width: None,
+            height: None,
             id: None,
-            ..Default::default()
+            on_input: vec![],
         }
     }
 
     /// process the key event for this text input
-    pub fn process_key(&mut self, key_event: KeyEvent) {
+    pub fn process_key(&mut self, key_event: KeyEvent) -> Vec<MSG> {
         self.input_buffer.process_key_event(key_event);
+        self.on_input
+            .iter_mut()
+            .map(|cb| cb.emit(key_event.into()))
+            .collect()
     }
 
     /// set the value of the buffer
@@ -112,9 +122,19 @@ impl TextInput {
             0
         }
     }
+
+    pub fn on_input<F>(&mut self, f: F)
+    where
+        F: FnMut(Event) -> MSG + 'static,
+    {
+        self.on_input.push(f.into());
+    }
 }
 
-impl<MSG> Widget<MSG> for TextInput {
+impl<MSG> Widget<MSG> for TextInput<MSG>
+where
+    MSG: fmt::Debug + 'static,
+{
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }

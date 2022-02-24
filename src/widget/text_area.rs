@@ -334,7 +334,7 @@ where
                     Value::from(self.get_content()),
                 ));
                 self.on_input
-                    .iter()
+                    .iter_mut()
                     .map(|cb| cb.emit(s_event.clone()))
                     .collect()
             }

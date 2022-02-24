@@ -40,6 +40,7 @@
 //    unused_import_braces
 //)]
 pub use buffer::{Buffer, Cell};
+pub use callback::Callback;
 pub use cmd::Cmd;
 pub use crossterm;
 pub use event::Event;
@@ -49,7 +50,7 @@ pub use find_node::{
     remove_widget,
 };
 pub use input_buffer::InputBuffer;
-pub use mt_dom::{self, Callback};
+pub use mt_dom;
 pub use renderer::{Dispatch, Renderer};
 pub use value::Value;
 pub use widget::*;

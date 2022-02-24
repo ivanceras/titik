@@ -57,6 +57,13 @@ impl<MSG> Checkbox<MSG> {
     pub fn add_input_listener(&mut self, cb: Callback<Event, MSG>) {
         self.on_input.push(cb);
     }
+
+    pub fn on_input<F>(&mut self, f: F)
+    where
+        F: FnMut(Event) -> MSG + 'static,
+    {
+        self.on_input.push(f.into());
+    }
 }
 
 impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
@@ -115,7 +122,7 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
             Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
                 self.is_checked = !self.is_checked;
                 self.on_input
-                    .iter()
+                    .iter_mut()
                     .map(|cb| cb.emit(event.clone()))
                     .collect()
             }

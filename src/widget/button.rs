@@ -1,7 +1,7 @@
+use crate::Callback;
 use crate::Event;
 use crate::{
     buffer::{Buffer, Cell},
-    mt_dom::Callback,
     Cmd, Widget,
 };
 use crossterm::event::MouseEvent;
@@ -82,6 +82,13 @@ where
     /// add to the click listener of this button
     pub fn add_click_listener(&mut self, cb: Callback<Event, MSG>) {
         self.on_click.push(cb);
+    }
+
+    pub fn on_click<F>(&mut self, f: F)
+    where
+        F: FnMut(Event) -> MSG + 'static,
+    {
+        self.on_click.push(f.into());
     }
 
     fn border_top(&self) -> f32 {
@@ -199,7 +206,7 @@ where
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
         if event.is_mouse_click() {
             self.on_click
-                .iter()
+                .iter_mut()
                 .map(|cb| cb.emit(event.clone()))
                 .collect()
         } else {

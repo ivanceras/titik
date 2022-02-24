@@ -15,7 +15,7 @@ crossterm = "0.16.0"
 expanse = "0.3.3"
 image = "0.23.0"
 unicode-width = "0.1.7"
-mt-dom = { version = "0.6"}
+mt-dom = { version = "0.14"}
 itertools = "0.9.0"
 lazy_static = "1.4.0"
 ito-canvas = { version= "0.1"}

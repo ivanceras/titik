@@ -42,6 +42,13 @@ impl<MSG> Radio<MSG> {
     pub fn set_checked(&mut self, checked: bool) {
         self.is_checked = checked;
     }
+
+    pub fn on_input<F>(&mut self, f: F)
+    where
+        F: FnMut(Event) -> MSG + 'static,
+    {
+        self.on_input.push(f.into());
+    }
 }
 
 impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
