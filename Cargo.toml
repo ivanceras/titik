@@ -24,4 +24,4 @@ ito-canvas = { version= "0.1", path = "../ito-canvas"}
 
 
 [features]
-default = ["crossterm_new"]
+default = ["crossterm"]

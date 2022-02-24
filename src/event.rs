@@ -1,10 +1,10 @@
 use crate::Value;
 
 #[cfg(feature = "crossterm_new")]
-use crossterm_new as crossterm;
-
-use crossterm::event::MouseEventKind;
-pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
+use crate::crossterm::event::MouseEventKind;
+pub use crate::crossterm::event::{
+    KeyCode, KeyEvent, KeyModifiers, MouseEvent,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct InputEvent {
@@ -38,17 +38,19 @@ impl From<KeyEvent> for Event {
 }
 
 impl Event {
-    pub fn from_crossterm(c_event: crossterm::event::Event) -> Self {
+    pub fn from_crossterm(c_event: crate::crossterm::event::Event) -> Self {
         match c_event {
-            crossterm::event::Event::Key(ke) => Event::Key(ke),
-            crossterm::event::Event::Mouse(me) => Event::Mouse(me),
-            crossterm::event::Event::Resize(width, height) => {
+            crate::crossterm::event::Event::Key(ke) => Event::Key(ke),
+            crate::crossterm::event::Event::Mouse(me) => Event::Mouse(me),
+            crate::crossterm::event::Event::Resize(width, height) => {
                 Event::Resize(width, height)
             }
         }
     }
+}
 
-    /*
+#[cfg(feature = "crossterm")]
+impl Event {
     pub fn is_mouse_click(&self) -> bool {
         match self {
             Event::Mouse(me) => match me {
@@ -125,8 +127,10 @@ impl Event {
             Event::InputEvent(_) => None,
         }
     }
-    */
+}
 
+#[cfg(feature = "crossterm_new")]
+impl Event {
     pub fn is_mouse_click(&self) -> bool {
         match self {
             Event::Mouse(me) => match me.kind {
