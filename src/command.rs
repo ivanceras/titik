@@ -4,6 +4,7 @@ use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
     style, terminal,
     terminal::ClearType,
+    terminal::DisableLineWrap,
 };
 use std::io::Stdout;
 use std::io::Write;
@@ -30,6 +31,7 @@ pub(crate) fn finalize(w: &mut Stdout) -> crossterm::Result<()> {
         cursor::Show,
         terminal::LeaveAlternateScreen,
         DisableMouseCapture,
+        DisableLineWrap,
     )?;
     terminal::disable_raw_mode()
 }

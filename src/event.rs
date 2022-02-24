@@ -165,7 +165,7 @@ impl Event {
 
     pub fn extract_location(&self) -> Option<(u16, u16)> {
         match self {
-            Event::Mouse(me) => Some((me.row, me.column)),
+            Event::Mouse(me) => Some((me.column, me.row)),
             _ => None,
         }
     }

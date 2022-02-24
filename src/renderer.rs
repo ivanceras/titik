@@ -3,6 +3,7 @@
 use crate::cmd::Cmd;
 use crate::Event;
 use crate::{command, find_node, Buffer, Widget};
+use crossterm::style::Print;
 pub use crossterm::{
     cursor,
     event::{self, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
@@ -94,102 +95,106 @@ impl<'a, MSG> Renderer<'a, MSG> {
     pub fn run(&mut self) -> Result<()> {
         command::init(&mut self.write)?;
         command::reset_top(&mut self.write)?;
+        self.write.flush()?;
         let (width, height) = self.terminal_size;
 
         loop {
             let mut buf = Buffer::new(width as usize, height as usize);
 
             buf.reset();
-            {
-                let cmds = self.root_node.draw_widget(&mut buf)?;
-                buf.render(&mut self.write)?;
+            let cmds = self.root_node.draw_widget(&mut buf)?;
+            buf.render(&mut self.write)?;
 
-                cmds.iter().for_each(|cmd| {
-                    cmd.queue(&mut self.write).expect("must execute")
-                });
-            }
+            cmds.iter().for_each(|cmd| {
+                cmd.queue(&mut self.write).expect("must execute")
+            });
             self.write.flush()?;
 
-            if let Ok(c_event) = event::read() {
-                let event = Event::from_crossterm(c_event);
-                match event {
-                    Event::Key(key_event) => {
-                        // To quite, press any of the following:
-                        //  - CTRL-c
-                        //  - CTRL-q
-                        //  - CTRL-d
-                        //  - CTRL-z
-                        if key_event.modifiers.contains(KeyModifiers::CONTROL) {
-                            match key_event.code {
-                                KeyCode::Char(c) => match c {
-                                    'c' | 'q' | 'd' | 'z' => {
-                                        break;
-                                    }
-                                    _ => (),
-                                },
+            let c_event = event::read()?;
+            //self.debug_print(format!("read an event here...: {:?}", c_event));
+            let event = Event::from_crossterm(c_event);
+            match event {
+                Event::Key(key_event) => {
+                    // To quite, press any of the following:
+                    //  - CTRL-c
+                    //  - CTRL-q
+                    //  - CTRL-d
+                    //  - CTRL-z
+                    if key_event.modifiers.contains(KeyModifiers::CONTROL) {
+                        match key_event.code {
+                            KeyCode::Char(c) => match c {
+                                'c' | 'q' | 'd' | 'z' => {
+                                    break;
+                                }
                                 _ => (),
-                            }
-                        } else {
-                            // send the keypresses to the focused widget
-                            if let Some(idx) = self.focused_widget_idx.as_ref()
-                            {
-                                let active_widget: Option<
-                                    &mut dyn Widget<MSG>,
-                                > = find_node::find_widget_mut(
+                            },
+                            _ => (),
+                        }
+                    } else {
+                        // send the keypresses to the focused widget
+                        if let Some(idx) = self.focused_widget_idx.as_ref() {
+                            let active_widget: Option<&mut dyn Widget<MSG>> =
+                                find_node::find_widget_mut(
                                     self.root_node,
                                     *idx,
                                 );
-                                if let Some(focused_widget) = active_widget {
-                                    let msgs = focused_widget
-                                        .process_event(event.clone());
-                                    self.dispatch_msg(msgs);
-                                }
+                            if let Some(focused_widget) = active_widget {
+                                let msgs =
+                                    focused_widget.process_event(event.clone());
+                                self.dispatch_msg(msgs);
                             }
                         }
                     }
-                    // mouse clicks sets the focused the widget underneath
-                    Event::Mouse(_me) => {
-                        if event.is_mouse_click() {
-                            let (x, y) = event
-                                .extract_location()
-                                .expect("must have a mouse location");
-                            self.focused_widget_idx = self
-                                .root_node
-                                .node_hit_at(x as f32, y as f32, &mut 0)
-                                .pop();
-
-                            if let Some(idx) = self.focused_widget_idx.as_ref()
-                            {
-                                self.root_node.set_focused_node(*idx);
-                            }
-                        }
-                    }
-                    Event::Resize(width, height) => {
-                        self.terminal_size = (width, height);
-                        self.recompute_layout();
-                    }
-                    _ => (),
                 }
-                // any other activities, such as mouse scroll is
-                // sent the widget underneath the location, regardless
-                // if it focused or not.
+                // mouse clicks sets the focused the widget underneath
+                Event::Mouse(_me) => {
+                    if event.is_mouse_click() {
+                        let (x, y) = event
+                            .extract_location()
+                            .expect("must have a mouse location");
+                        self.focused_widget_idx = self
+                            .root_node
+                            .node_hit_at(x as f32, y as f32, &mut 0)
+                            .pop();
 
-                if let Some((x, y)) = event.extract_location() {
-                    let hits =
-                        self.root_node.node_hit_at(x as f32, y as f32, &mut 0);
-                    for hit in hits.iter().rev() {
-                        let mut hit_widget: Option<&mut dyn Widget<MSG>> =
-                            find_node::find_widget_mut(self.root_node, *hit);
-
-                        if let Some(hit_widget) = &mut hit_widget {
-                            let msgs = hit_widget.process_event(event.clone());
-                            self.dispatch_msg(msgs);
+                        if let Some(idx) = self.focused_widget_idx.as_ref() {
+                            self.root_node.set_focused_node(*idx);
                         }
+                    }
+                }
+                Event::Resize(width, height) => {
+                    self.terminal_size = (width, height);
+                    self.recompute_layout();
+                }
+                _ => (),
+            }
+            // any other activities, such as mouse scroll is
+            // sent the widget underneath the location, regardless
+            // if it focused or not.
+
+            if let Some((x, y)) = event.extract_location() {
+                let hits =
+                    self.root_node.node_hit_at(x as f32, y as f32, &mut 0);
+                for hit in hits.iter().rev() {
+                    let mut hit_widget: Option<&mut dyn Widget<MSG>> =
+                        find_node::find_widget_mut(self.root_node, *hit);
+
+                    if let Some(hit_widget) = &mut hit_widget {
+                        let msgs = hit_widget.process_event(event.clone());
+                        self.dispatch_msg(msgs);
                     }
                 }
             }
         }
         command::finalize(&mut self.write)?;
         Ok(())
+    }
+
+    fn debug_print(&mut self, s: String) {
+        /*
+        let (_width, height) = self.terminal_size;
+        queue!(&self.write, cursor::MoveTo(0, height - 2));
+        queue!(&self.write, Print(s));
+        */
     }
 }
