@@ -30,7 +30,7 @@
 //! ```
 //!
 //!
-//#![deny(warnings)]
+#![deny(warnings)]
 //#![deny(
 //    missing_docs,
 //    missing_copy_implementations,
