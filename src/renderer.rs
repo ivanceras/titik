@@ -112,7 +112,6 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
             if let Ok(c_event) = event::read() {
                 let event = Event::from_crossterm(c_event);
-                let location = extract_location(&event);
                 match event {
                     Event::Key(key_event) => {
                         // To quite, press any of the following:
@@ -149,11 +148,16 @@ impl<'a, MSG> Renderer<'a, MSG> {
                         }
                     }
                     // mouse clicks sets the focused the widget underneath
-                    Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                        self.focused_widget_idx = self
-                            .root_node
-                            .node_hit_at(x as f32, y as f32, &mut 0)
-                            .pop();
+                    Event::Mouse(_me) => {
+                        if event.is_mouse_click() {
+                            let (x, y) = event
+                                .extract_location()
+                                .expect("must have a mouse location");
+                            self.focused_widget_idx = self
+                                .root_node
+                                .node_hit_at(x as f32, y as f32, &mut 0)
+                                .pop();
+                        }
 
                         if let Some(idx) = self.focused_widget_idx.as_ref() {
                             self.root_node.set_focused_node(*idx);
@@ -169,7 +173,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                 // sent the widget underneath the location, regardless
                 // if it focused or not.
 
-                if let Some((x, y)) = extract_location(&event) {
+                if let Some((x, y)) = event.extract_location() {
                     let hits =
                         self.root_node.node_hit_at(x as f32, y as f32, &mut 0);
                     for hit in hits.iter().rev() {
@@ -186,19 +190,5 @@ impl<'a, MSG> Renderer<'a, MSG> {
         }
         command::finalize(&mut self.write)?;
         Ok(())
-    }
-}
-
-/// extract the x and y location of a mouse event
-fn extract_location(event: &Event) -> Option<(u16, u16)> {
-    match event {
-        Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => Some((*x, *y)),
-        Event::Mouse(MouseEvent::Up(_btn, x, y, _modifier)) => Some((*x, *y)),
-        Event::Mouse(MouseEvent::Drag(_btn, x, y, _modifier)) => Some((*x, *y)),
-        Event::Mouse(MouseEvent::ScrollDown(x, y, _modifier)) => Some((*x, *y)),
-        Event::Mouse(MouseEvent::ScrollUp(x, y, _modifier)) => Some((*x, *y)),
-        Event::Key(_) => None,
-        Event::Resize(_, _) => None,
-        Event::InputEvent(_) => None,
     }
 }
