@@ -235,6 +235,190 @@ where
     }
 }
 
+impl<MSG> dyn Widget<MSG> {
+    /// Traverse the node tree until the node_idx is found
+    pub fn find_node(
+        &self,
+        node_idx: usize,
+        cur_index: &mut usize,
+    ) -> Option<&Self> {
+        if let Some(children) = self.children() {
+            children.iter().find_map(|child| {
+                *cur_index += 1;
+                child.as_ref().find_node(node_idx, cur_index)
+            })
+        } else if node_idx == *cur_index {
+            return Some(self);
+        } else {
+            None
+        }
+    }
+
+    pub fn find_node_mut(
+        &mut self,
+        node_idx: usize,
+        cur_index: &mut usize,
+    ) -> Option<&mut Self> {
+        if node_idx == *cur_index {
+            return Some(self);
+        } else if let Some(children) = self.children_mut() {
+            children.iter_mut().find_map(|child| {
+                *cur_index += 1;
+                child.as_mut().find_node_mut(node_idx, cur_index)
+            })
+        } else {
+            None
+        }
+    }
+
+    /// Get the widget with the node_idx by traversing to through the root_widget specified
+    pub fn find_widget(&self, node_idx: usize) -> Option<&Self> {
+        self.find_node(node_idx, &mut 0)
+    }
+
+    /// returns a mutable reference to the widget from the root_widget tree matching the supplied node
+    /// index
+    pub fn find_widget_mut(&mut self, node_idx: usize) -> Option<&mut Self> {
+        self.find_node_mut(node_idx, &mut 0)
+    }
+
+    /// returns a reference to the widget from the root widget tree matching the supplied id
+    pub fn find_widget_by_id(&self, id: &str) -> Option<&Self> {
+        let matched_widget = if let Some(node_id) = self.get_id() {
+            if node_id == id {
+                Some(self)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        if matched_widget.is_some() {
+            return matched_widget;
+        } else if let Some(children) = self.children() {
+            children
+                .iter()
+                .find_map(|child| child.as_ref().find_widget_by_id(id))
+        } else {
+            None
+        }
+    }
+
+    /// returns a mutable reference to the widget from the root widget tree matching the supplied id
+    pub fn find_widget_by_id_mut(&mut self, id: &str) -> Option<&mut Self> {
+        let matched_root = if let Some(node_id) = self.get_id() {
+            if node_id == id {
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        };
+        if matched_root {
+            return Some(self);
+        } else if let Some(children) = self.children_mut() {
+            children
+                .iter_mut()
+                .find_map(|child| child.as_mut().find_widget_by_id_mut(id))
+        } else {
+            None
+        }
+    }
+
+    /// Set the node at node_idx as focused, while the rest
+    /// should be set to false
+    fn set_focused_widget(
+        //node: &'a mut dyn Widget<MSG>,
+        &mut self,
+        node_idx: usize,
+        cur_index: &mut usize,
+    ) {
+        if node_idx == *cur_index {
+            self.set_focused(true);
+        } else if let Some(children) = self.children_mut() {
+            children.iter_mut().for_each(|child| {
+                *cur_index += 1;
+                child.as_mut().set_focused_widget(node_idx, cur_index)
+            })
+        } else {
+            self.set_focused(false);
+        }
+    }
+
+    /// set the node with idx to be in focused
+    pub fn set_focused_node(&mut self, node_idx: usize) {
+        self.set_focused_widget(node_idx, &mut 0)
+    }
+
+    pub fn increment_node_idx_to_descendant_count(
+        &self,
+        cur_node_idx: &mut usize,
+    ) {
+        if let Some(children) = self.children() {
+            for child in children {
+                *cur_node_idx += 1;
+                child
+                    .as_ref()
+                    .increment_node_idx_to_descendant_count(cur_node_idx);
+            }
+        }
+    }
+
+    fn remove_widget_recursive(
+        &mut self,
+        node_idx: usize,
+        cur_node_idx: &mut usize,
+    ) -> bool {
+        if let Some(children) = self.children_mut() {
+            let mut this_cur_node_idx = *cur_node_idx;
+            let mut to_be_remove = None;
+            // look ahead for remove
+            for (idx, child) in children.iter().enumerate() {
+                this_cur_node_idx += 1;
+                if node_idx == this_cur_node_idx {
+                    to_be_remove = Some(idx);
+                } else {
+                    child.as_ref().increment_node_idx_to_descendant_count(
+                        &mut this_cur_node_idx,
+                    );
+                }
+            }
+
+            if let Some(remove_idx) = to_be_remove {
+                self.take_child(remove_idx)
+                    .expect("must be able to remove child");
+                true
+            } else {
+                for child in children {
+                    *cur_node_idx += 1;
+                    if child
+                        .as_mut()
+                        .remove_widget_recursive(node_idx, cur_node_idx)
+                    {
+                        return true;
+                    }
+                }
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    pub fn draw_widget(&self, buf: &mut Buffer) -> crossterm::Result<Vec<Cmd>> {
+        let mut cmds = self.draw(buf);
+        if let Some(children) = self.children() {
+            for child in children {
+                let more_cmds = child.as_ref().draw_widget(buf)?;
+                cmds.extend(more_cmds);
+            }
+        }
+
+        Ok(cmds)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
