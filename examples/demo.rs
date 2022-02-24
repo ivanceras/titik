@@ -1,5 +1,6 @@
 //#![deny(warnings)]
-pub use crossterm::{
+use std::io::{self};
+pub use titik::crossterm::{
     cursor,
     event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
     execute, queue, style,
@@ -7,7 +8,6 @@ pub use crossterm::{
     terminal::{self, ClearType},
     Command, Result,
 };
-use std::io::{self};
 
 use titik::{
     Button, Callback, Checkbox, FlexBox, GroupBox, Image, Link, ListBox, Radio,
