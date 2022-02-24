@@ -72,24 +72,6 @@ impl<'a, MSG> Renderer<'a, MSG> {
         self.recompute_layout();
     }
 
-    fn draw_widget(
-        buf: &mut Buffer,
-        widget: &dyn Widget<MSG>,
-    ) -> Result<Vec<Cmd>>
-    where
-        MSG: 'a,
-    {
-        let mut cmds = widget.draw(buf);
-        if let Some(children) = widget.children() {
-            for child in children {
-                let more_cmds = child.as_ref().draw_widget(buf)?;
-                cmds.extend(more_cmds);
-            }
-        }
-
-        Ok(cmds)
-    }
-
     /// run the event loop of the renderer
     pub fn run(&mut self) -> Result<()> {
         command::init(&mut self.write)?;
@@ -100,14 +82,12 @@ impl<'a, MSG> Renderer<'a, MSG> {
             let mut buf = Buffer::new(width as usize, height as usize);
 
             buf.reset();
-            {
-                let cmds = self.root_node.draw_widget(&mut buf)?;
-                buf.render(&mut self.write)?;
+            let cmds = self.root_node.draw_widget(&mut buf)?;
+            buf.render(&mut self.write)?;
 
-                cmds.iter().for_each(|cmd| {
-                    cmd.execute(&mut self.write).expect("must execute")
-                });
-            }
+            cmds.iter().for_each(|cmd| {
+                cmd.execute(&mut self.write).expect("must execute")
+            });
             self.write.flush()?;
 
             if let Ok(c_event) = event::read() {

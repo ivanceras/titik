@@ -171,10 +171,10 @@ impl Buffer {
 
     /// writes to the stdout buffer
     pub fn render(&self, w: &mut Stdout) -> crossterm::Result<()> {
-        crossterm::queue!(w, cursor::Hide);
+        queue!(w, cursor::Hide)?;
         for (j, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
-                crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16))?;
+                queue!(w, cursor::MoveTo(i as u16, j as u16))?;
                 if let Some(bg) = cell.background_color {
                     queue!(w, SetBackgroundColor(bg))?;
                 }
@@ -186,7 +186,7 @@ impl Buffer {
                 }
                 // fillter is \0 null character, filler is not printable
                 if !cell.is_filler() {
-                    crossterm::queue!(w, Print(cell))?;
+                    queue!(w, Print(cell))?;
                 }
                 queue!(w, ResetColor)?;
             }

@@ -6,7 +6,7 @@ use titik::{
 };
 
 fn main() -> Result<()> {
-    let mut stdout = io::stdout();
+    let stdout = io::stdout();
     let mut root_node = FlexBox::<()>::new();
     root_node.set_border(false);
     root_node.set_thick_border(true);
