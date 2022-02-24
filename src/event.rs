@@ -2,6 +2,7 @@ use crate::Value;
 
 #[cfg(feature = "crossterm_new")]
 use crate::crossterm::event::MouseEventKind;
+
 pub use crate::crossterm::event::{
     KeyCode, KeyEvent, KeyModifiers, MouseEvent,
 };
