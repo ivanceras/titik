@@ -15,10 +15,7 @@ use std::{any::Any, fmt, fmt::Debug};
 
 /// A button widget
 #[derive(PartialEq, Clone)]
-pub struct Button<MSG>
-where
-    MSG: 'static,
-{
+pub struct Button<MSG> {
     layout: Option<Layout>,
     label: String,
     is_rounded: bool,
@@ -53,10 +50,7 @@ impl<MSG> Debug for Button<MSG> {
     }
 }
 
-impl<MSG> Button<MSG>
-where
-    MSG: 'static,
-{
+impl<MSG> Button<MSG> {
     /// create a new button with label
     pub fn new<S>(label: S) -> Self
     where
