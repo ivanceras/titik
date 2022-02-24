@@ -47,3 +47,7 @@
 
 ## Document
 - [ ] document each function in the widget interface
+
+## Issues
+- There seems to be a big issue with crossterm 0.23.0
+- Works fine in crosster [0.16.0, 0.17.0, 0.18.0]

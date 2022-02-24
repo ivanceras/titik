@@ -11,7 +11,7 @@ keywords = ["text", "tui", "terminal", "widget"]
 edition = "2018"
 
 [dependencies]
-crossterm = "0.16.0"
+crossterm = "0.18.0"
 expanse = "0.3.3"
 image = "0.23.0"
 unicode-width = "0.1.7"
