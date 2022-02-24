@@ -19,12 +19,12 @@ pub(crate) fn reset_top(w: &mut Stdout) -> crossterm::Result<()> {
 }
 
 pub(crate) fn init(w: &mut Stdout) -> crossterm::Result<()> {
-    crossterm::execute!(w, terminal::EnterAlternateScreen, EnableMouseCapture)?;
+    crossterm::queue!(w, terminal::EnterAlternateScreen, EnableMouseCapture)?;
     terminal::enable_raw_mode()
 }
 
 pub(crate) fn finalize(w: &mut Stdout) -> crossterm::Result<()> {
-    crossterm::execute!(
+    crossterm::queue!(
         w,
         style::ResetColor,
         cursor::Show,

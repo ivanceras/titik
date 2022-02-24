@@ -105,7 +105,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                 buf.render(&mut self.write)?;
 
                 cmds.iter().for_each(|cmd| {
-                    cmd.execute(&mut self.write).expect("must execute")
+                    cmd.queue(&mut self.write).expect("must execute")
                 });
             }
             self.write.flush()?;
