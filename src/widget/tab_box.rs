@@ -364,16 +364,16 @@ where
     }
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        match event {
-            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                if let Some(active_tab) =
-                    self.hit_tab_label(x as usize, y as usize)
-                {
-                    self.active_tab = active_tab;
-                }
-                vec![]
+        if event.is_mouse_click() {
+            let (x, y) =
+                event.extract_location().expect("must have a location");
+            if let Some(active_tab) = self.hit_tab_label(x as usize, y as usize)
+            {
+                self.active_tab = active_tab;
             }
-            _ => vec![],
+            vec![]
+        } else {
+            vec![]
         }
     }
 }

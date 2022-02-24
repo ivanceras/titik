@@ -330,57 +330,64 @@ where
                     .map(|cb| cb.emit(s_event.clone()))
                     .collect()
             }
-            Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                let mut x = x as f32 - layout.location.x.round();
-                let mut y = y as f32 - layout.location.y.round() - 1.0;
+            Event::Mouse(me) => {
+                let (x, y) = event
+                    .extract_location()
+                    .expect("must have a mouse location");
+                let modifiers = event.modifiers();
 
-                if y < 0.0 {
-                    y = 0.0;
-                }
-                let rows = self.content_height();
-                if y >= rows {
-                    y = rows - 1.0;
-                }
-                if x < 0.0 {
-                    x = 0.0;
-                }
-                let cursor_y = y + self.scroll_top;
-                if let Some(line) =
-                    self.area_buffer.content.get(cursor_y as usize)
-                {
-                    if x > line.len() as f32 {
-                        x = line.len() as f32;
-                    }
-                }
-                let cursor_x = x;
+                if event.is_mouse_click() {
+                    let mut x = x as f32 - layout.location.x.round();
+                    let mut y = y as f32 - layout.location.y.round() - 1.0;
 
-                self.area_buffer
-                    .set_cursor_loc(cursor_x as usize, cursor_y as usize);
-                vec![]
-            }
-            Event::Mouse(MouseEvent::ScrollUp(_x, _y, modifier)) => {
-                if modifier.contains(KeyModifiers::SHIFT) {
-                    if self.scroll_left > 0.0 {
-                        self.scroll_left -= 4.0;
+                    if y < 0.0 {
+                        y = 0.0;
                     }
-                } else {
-                    if self.scroll_top > 0.0 {
-                        self.scroll_top -= 4.0;
+                    let rows = self.content_height();
+                    if y >= rows {
+                        y = rows - 1.0;
                     }
-                }
-                vec![]
-            }
-            Event::Mouse(MouseEvent::ScrollDown(_x, _y, modifier)) => {
-                if modifier.contains(KeyModifiers::SHIFT) {
-                    self.scroll_left += 4.0;
-                } else {
-                    if self.content_height() - self.scroll_top
-                        > self.inner_height(&layout)
+                    if x < 0.0 {
+                        x = 0.0;
+                    }
+                    let cursor_y = y + self.scroll_top;
+                    if let Some(line) =
+                        self.area_buffer.content.get(cursor_y as usize)
                     {
-                        self.scroll_top += 4.0;
+                        if x > line.len() as f32 {
+                            x = line.len() as f32;
+                        }
                     }
+                    let cursor_x = x;
+
+                    self.area_buffer
+                        .set_cursor_loc(cursor_x as usize, cursor_y as usize);
+                    vec![]
+                } else if event.is_scrollup() {
+                    if modifiers.unwrap().contains(KeyModifiers::SHIFT) {
+                        if self.scroll_left > 0.0 {
+                            self.scroll_left -= 4.0;
+                        }
+                    } else {
+                        if self.scroll_top > 0.0 {
+                            self.scroll_top -= 4.0;
+                        }
+                    }
+                    vec![]
+                } else if event.is_scrolldown() {
+                    if modifiers.unwrap().contains(KeyModifiers::SHIFT) {
+                        self.scroll_left += 4.0;
+                    } else {
+                        if self.content_height() - self.scroll_top
+                            > self.inner_height(&layout)
+                        {
+                            self.scroll_top += 4.0;
+                        }
+                    }
+                    vec![]
+                } else {
+                    vec![]
                 }
-                vec![]
             }
             _ => vec![],
         }

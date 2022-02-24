@@ -46,10 +46,53 @@ impl Event {
     pub fn is_mouse_click(&self) -> bool {
         match self {
             Event::Mouse(me) => match me {
-                MouseEvent::Down(_, _, _, _) => true,
+                MouseEvent::Down(..) => true,
                 _ => false,
             },
             _ => false,
+        }
+    }
+
+    pub fn is_mouse_drag(&self) -> bool {
+        match self {
+            Event::Mouse(me) => match me {
+                MouseEvent::Drag(..) => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    pub fn is_scrollup(&self) -> bool {
+        match self {
+            Event::Mouse(me) => match me {
+                MouseEvent::ScrollUp(..) => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+    pub fn is_scrolldown(&self) -> bool {
+        match self {
+            Event::Mouse(me) => match me {
+                MouseEvent::ScrollDown(..) => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    pub fn modifiers(&self) -> Option<&KeyModifiers> {
+        match self {
+            Event::Mouse(me) => match me {
+                MouseEvent::Down(.., ref modifier) => Some(modifier),
+                MouseEvent::Up(.., ref modifier) => Some(modifier),
+                MouseEvent::Drag(.., ref modifier) => Some(modifier),
+                MouseEvent::ScrollDown(.., ref modifier) => Some(modifier),
+                MouseEvent::ScrollUp(.., ref modifier) => Some(modifier),
+            },
+            Event::Key(ke) => Some(&ke.modifiers),
+            _ => None,
         }
     }
 

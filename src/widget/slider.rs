@@ -104,22 +104,16 @@ where
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
         let layout = self.layout.expect("must have a layout");
-        match event {
-            Event::Mouse(MouseEvent::Down(_btn, x, _y, _modifier)) => {
-                let cursor_loc = x as i32 - layout.location.x.round() as i32;
-                let width = layout.size.width;
-                let value = cursor_loc as f32 / width;
-                self.value = value;
-                vec![]
-            }
-            Event::Mouse(MouseEvent::Drag(_btn, x, _y, _modifier)) => {
-                let cursor_loc = x as i32 - layout.location.x.round() as i32;
-                let width = layout.size.width;
-                let value = cursor_loc as f32 / width;
-                self.value = value;
-                vec![]
-            }
-            _ => vec![],
+        if event.is_mouse_click() || event.is_mouse_drag() {
+            let (x, _y) =
+                event.extract_location().expect("must have a location");
+            let cursor_loc = x as i32 - layout.location.x.round() as i32;
+            let width = layout.size.width;
+            let value = cursor_loc as f32 / width;
+            self.value = value;
+            vec![]
+        } else {
+            vec![]
         }
     }
 

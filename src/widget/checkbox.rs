@@ -110,15 +110,14 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
     fn set_size(&mut self, _width: Option<f32>, _height: Option<f32>) {}
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
-        match event {
-            Event::Mouse(MouseEvent::Down(_btn, _x, _y, _modifier)) => {
-                self.is_checked = !self.is_checked;
-                self.on_input
-                    .iter_mut()
-                    .map(|cb| cb.emit(event.clone()))
-                    .collect()
-            }
-            _ => vec![],
+        if event.is_mouse_click() {
+            self.is_checked = !self.is_checked;
+            self.on_input
+                .iter_mut()
+                .map(|cb| cb.emit(event.clone()))
+                .collect()
+        } else {
+            vec![]
         }
     }
 

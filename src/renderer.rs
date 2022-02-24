@@ -157,10 +157,11 @@ impl<'a, MSG> Renderer<'a, MSG> {
                                 .root_node
                                 .node_hit_at(x as f32, y as f32, &mut 0)
                                 .pop();
-                        }
 
-                        if let Some(idx) = self.focused_widget_idx.as_ref() {
-                            self.root_node.set_focused_node(*idx);
+                            if let Some(idx) = self.focused_widget_idx.as_ref()
+                            {
+                                self.root_node.set_focused_node(*idx);
+                            }
                         }
                     }
                     Event::Resize(width, height) => {

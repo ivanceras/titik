@@ -244,7 +244,9 @@ where
                 self.process_key(ke);
                 vec![]
             }
-            Event::Mouse(MouseEvent::Down(_btn, x, _y, _modifier)) => {
+            Event::Mouse(_me) => {
+                let (x, _y) =
+                    event.extract_location().expect("must have a location");
                 let cursor_loc = x as i32 - layout.location.x.round() as i32;
                 self.input_buffer.set_cursor_loc(cursor_loc as usize);
                 vec![]
