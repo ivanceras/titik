@@ -23,8 +23,7 @@ pub struct Button<MSG> {
     width: Option<f32>,
     height: Option<f32>,
     focused: bool,
-    //on_click: Vec<Callback<Event, MSG>>,
-    _phantom: PhantomData<MSG>,
+    on_click: Vec<Callback<Event, MSG>>,
     id: Option<String>,
 }
 
@@ -37,8 +36,7 @@ impl<MSG> Default for Button<MSG> {
             width: None,
             height: None,
             focused: false,
-            //on_click: vec![],
-            _phantom: PhantomData,
+            on_click: vec![],
             id: None,
         }
     }
@@ -76,18 +74,16 @@ impl<MSG> Button<MSG> {
         self.is_rounded = rounded;
     }
 
-    /*
     /// add to the click listener of this button
     pub fn add_click_listener(&mut self, cb: Callback<Event, MSG>) {
         self.on_click.push(cb);
     }
-    */
 
     pub fn on_click<F>(&mut self, f: F)
     where
         F: FnMut(Event) -> MSG + 'static,
     {
-        //self.on_click.push(f.into());
+        self.on_click.push(f.into());
     }
 
     fn border_top(&self) -> f32 {
@@ -107,12 +103,7 @@ impl<MSG> Button<MSG> {
     }
 }
 
-impl<MSG> Widget<MSG> for Button<MSG>
-/*
-where
-    MSG: 'static,
-*/
-{
+impl<MSG> Widget<MSG> for Button<MSG> {
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -198,13 +189,10 @@ where
 
     fn process_event(&mut self, event: Event) -> Vec<MSG> {
         if event.is_mouse_click() {
-            /*
             self.on_click
                 .iter_mut()
                 .map(|cb| cb.emit(event.clone()))
                 .collect()
-            */
-            vec![]
         } else {
             vec![]
         }
