@@ -1,10 +1,11 @@
+use crate::crossterm::event::KeyEvent;
+use crate::crossterm::event::KeyModifiers;
 use crate::Event;
 use crate::Value;
 use crate::{
     buffer::Buffer, event::InputEvent, symbol, symbol::bar,
     text_buffer::AreaBuffer, Callback, Cmd, Widget,
 };
-use crossterm::event::{KeyEvent, KeyModifiers, MouseEvent};
 use expanse::{
     geometry::Size,
     result::Layout,

@@ -1,11 +1,11 @@
-use crate::symbol;
-use crossterm::{
-    cursor, queue,
+use crate::crossterm::{
+    self, cursor, queue,
     style::{
         Attribute, Attributes, Color, Print, ResetColor, SetAttributes,
         SetBackgroundColor, SetForegroundColor,
     },
 };
+use crate::symbol;
 use ito_canvas::unicode_canvas::Canvas;
 use std::io::Stdout;
 use std::{fmt, io::Write};

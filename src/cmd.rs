@@ -1,4 +1,6 @@
-use crossterm::cursor;
+use crate::crossterm;
+use crate::crossterm::cursor;
+use crate::crossterm::queue;
 use std::io::Stdout;
 use std::io::Write;
 
@@ -16,9 +18,9 @@ impl Cmd {
     pub fn execute(&self, w: &mut Stdout) -> crossterm::Result<()> {
         match self {
             Cmd::MoveTo(x, y) => {
-                crossterm::queue!(w, cursor::MoveTo(*x as u16, *y as u16))
+                queue!(w, cursor::MoveTo(*x as u16, *y as u16))
             }
-            Cmd::ShowCursor => crossterm::queue!(w, cursor::Show),
+            Cmd::ShowCursor => queue!(w, cursor::Show),
         }
     }
 }

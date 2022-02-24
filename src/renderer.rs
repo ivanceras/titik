@@ -1,9 +1,11 @@
 //! Provides the core functionality of rendering to the terminal
 //! This has the event loop which calculates and process the events to the target widget
+
 use crate::cmd::Cmd;
 use crate::Event;
 use crate::{command, find_node, Buffer, Widget};
-pub use crossterm::{
+
+use crate::crossterm::{
     cursor,
     event::{self, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
     execute, queue, style,

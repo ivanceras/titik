@@ -4,7 +4,6 @@ use crate::{
     buffer::{Buffer, Cell},
     Cmd, Widget,
 };
-use crossterm::event::MouseEvent;
 use expanse::{
     geometry::{Rect, Size},
     result::Layout,

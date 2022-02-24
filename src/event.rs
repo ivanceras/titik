@@ -1,4 +1,9 @@
 use crate::Value;
+
+#[cfg(feature = "crossterm_new")]
+use crossterm_new as crossterm;
+
+use crossterm::event::MouseEventKind;
 pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -43,6 +48,7 @@ impl Event {
         }
     }
 
+    /*
     pub fn is_mouse_click(&self) -> bool {
         match self {
             Event::Mouse(me) => match me {
@@ -117,6 +123,61 @@ impl Event {
             Event::Key(_) => None,
             Event::Resize(_, _) => None,
             Event::InputEvent(_) => None,
+        }
+    }
+    */
+
+    pub fn is_mouse_click(&self) -> bool {
+        match self {
+            Event::Mouse(me) => match me.kind {
+                MouseEventKind::Down(..) => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    pub fn is_mouse_drag(&self) -> bool {
+        match self {
+            Event::Mouse(me) => match me.kind {
+                MouseEventKind::Drag(..) => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    pub fn is_scrollup(&self) -> bool {
+        match self {
+            Event::Mouse(me) => match me.kind {
+                MouseEventKind::ScrollUp => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+    pub fn is_scrolldown(&self) -> bool {
+        match self {
+            Event::Mouse(me) => match me.kind {
+                MouseEventKind::ScrollDown => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    pub fn extract_location(&self) -> Option<(u16, u16)> {
+        match self {
+            Event::Mouse(me) => Some((me.column, me.row)),
+            _ => None,
+        }
+    }
+
+    pub fn modifiers(&self) -> Option<&KeyModifiers> {
+        match self {
+            Event::Mouse(me) => Some(&me.modifiers),
+            Event::Key(ke) => Some(&ke.modifiers),
+            _ => None,
         }
     }
 }

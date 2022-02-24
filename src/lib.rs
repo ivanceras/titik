@@ -42,7 +42,13 @@
 pub use buffer::{Buffer, Cell};
 pub use callback::Callback;
 pub use cmd::Cmd;
+
+#[cfg(feature = "crossterm")]
 pub use crossterm;
+
+#[cfg(feature = "crossterm_new")]
+pub use crossterm_new as crossterm;
+
 pub use event::Event;
 pub use expanse;
 pub use mt_dom;

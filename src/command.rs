@@ -1,15 +1,17 @@
 //! command to the terminal, such as moving the cursor and clearing the screen
-use crossterm::{
-    cursor,
+//!
+
+use crate::crossterm::{
+    self, cursor,
     event::{DisableMouseCapture, EnableMouseCapture},
-    style, terminal,
+    execute, queue, style, terminal,
     terminal::ClearType,
 };
 use std::io::Stdout;
 use std::io::Write;
 
 pub(crate) fn reset_top(w: &mut Stdout) -> crossterm::Result<()> {
-    crossterm::queue!(
+    queue!(
         w,
         style::ResetColor,
         terminal::Clear(ClearType::All),
@@ -19,12 +21,12 @@ pub(crate) fn reset_top(w: &mut Stdout) -> crossterm::Result<()> {
 }
 
 pub(crate) fn init(w: &mut Stdout) -> crossterm::Result<()> {
-    crossterm::execute!(w, terminal::EnterAlternateScreen, EnableMouseCapture)?;
+    execute!(w, terminal::EnterAlternateScreen, EnableMouseCapture)?;
     terminal::enable_raw_mode()
 }
 
 pub(crate) fn finalize(w: &mut Stdout) -> crossterm::Result<()> {
-    crossterm::execute!(
+    execute!(
         w,
         style::ResetColor,
         cursor::Show,

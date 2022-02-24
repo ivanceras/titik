@@ -1,5 +1,4 @@
-use crate::{buffer::Buffer, Callback, Cmd, Widget};
-use crossterm::event::Event;
+use crate::{buffer::Buffer, Callback, Cmd, Event, Widget};
 use expanse::{
     geometry::Size,
     result::Layout,

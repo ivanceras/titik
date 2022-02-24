@@ -1,6 +1,6 @@
+use crate::crossterm::style::Color;
 use crate::symbol::bar;
 use crate::{buffer::Buffer, buffer::Cell, Cmd, Widget};
-use crossterm::style::Color;
 use expanse::result::Layout;
 use expanse::{
     geometry::Size,

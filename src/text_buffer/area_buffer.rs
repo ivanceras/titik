@@ -1,7 +1,4 @@
-use crossterm::event::{
-    KeyCode,
-    KeyEvent,
-};
+use crate::crossterm::event::{KeyCode, KeyEvent};
 use unicode_width::UnicodeWidthChar;
 
 /// Area buffer is a 2 dimensional text buffer

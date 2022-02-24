@@ -1,7 +1,6 @@
 use crate::Callback;
 use crate::Event;
 use crate::{buffer::Buffer, cmd::Cmd, symbol, Widget};
-use crossterm::event::MouseEvent;
 use expanse::result::Layout;
 use expanse::{
     geometry::Size,

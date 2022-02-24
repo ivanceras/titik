@@ -1,7 +1,7 @@
+use crate::crossterm::event::KeyEvent;
 use crate::Callback;
 use crate::Event;
 use crate::{buffer::Buffer, text_buffer::InputBuffer, Cmd, Widget};
-use crossterm::event::{KeyEvent, MouseEvent};
 use expanse::{
     geometry::Size,
     result::Layout,
