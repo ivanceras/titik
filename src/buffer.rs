@@ -7,6 +7,7 @@ use crossterm::{
     },
 };
 use ito_canvas::unicode_canvas::Canvas;
+use std::io::Stdout;
 use std::{fmt, io::Write};
 use unicode_width::UnicodeWidthStr;
 
@@ -169,7 +170,7 @@ impl Buffer {
     }
 
     /// writes to the stdout buffer
-    pub fn render(&self, w: &mut dyn Write) -> crossterm::Result<()> {
+    pub fn render(&self, w: &mut Stdout) -> crossterm::Result<()> {
         crossterm::queue!(w, cursor::Hide);
         for (j, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
