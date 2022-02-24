@@ -2,9 +2,7 @@ use crate::{buffer::Buffer, Cmd, Widget};
 use expanse::result::Layout;
 use expanse::{
     geometry::{Rect, Size},
-    style::{
-        Dimension, FlexDirection, PositionType, Style,
-    },
+    style::{Dimension, FlexDirection, PositionType, Style},
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::fmt;
