@@ -102,100 +102,6 @@ pub fn find_widget_by_id_mut<'a, MSG>(
     }
 }
 
-/// set the node with idx to be in focused
-pub fn set_focused_node<'a, MSG>(
-    node: &'a mut dyn Widget<MSG>,
-    node_idx: usize,
-) {
-    set_focused_widget(node, node_idx, &mut 0)
-}
-
-/// Set the node at node_idx as focused, while the rest
-/// should be set to false
-fn set_focused_widget<'a, MSG>(
-    node: &'a mut dyn Widget<MSG>,
-    node_idx: usize,
-    cur_index: &mut usize,
-) {
-    if node_idx == *cur_index {
-        node.set_focused(true);
-    } else if let Some(children) = node.children_mut() {
-        children.iter_mut().for_each(|child| {
-            *cur_index += 1;
-            set_focused_widget(child.as_mut(), node_idx, cur_index)
-        })
-    } else {
-        node.set_focused(false);
-    }
-}
-
-/// remove the widget at this node_idx
-pub fn remove_widget<MSG>(
-    root_widget: &mut dyn Widget<MSG>,
-    node_idx: usize,
-) -> bool {
-    remove_widget_recursive(root_widget, node_idx, &mut 0)
-}
-
-fn remove_widget_recursive<MSG>(
-    widget: &mut dyn Widget<MSG>,
-    node_idx: usize,
-    cur_node_idx: &mut usize,
-) -> bool {
-    if let Some(children) = widget.children_mut() {
-        let mut this_cur_node_idx = *cur_node_idx;
-        let mut to_be_remove = None;
-        // look ahead for remove
-        for (idx, child) in children.iter().enumerate() {
-            this_cur_node_idx += 1;
-            if node_idx == this_cur_node_idx {
-                to_be_remove = Some(idx);
-            } else {
-                increment_node_idx_to_descendant_count(
-                    child.as_ref(),
-                    &mut this_cur_node_idx,
-                );
-            }
-        }
-
-        if let Some(remove_idx) = to_be_remove {
-            widget
-                .take_child(remove_idx)
-                .expect("must be able to remove child");
-            true
-        } else {
-            for child in children {
-                *cur_node_idx += 1;
-                if remove_widget_recursive(
-                    child.as_mut(),
-                    node_idx,
-                    cur_node_idx,
-                ) {
-                    return true;
-                }
-            }
-            false
-        }
-    } else {
-        false
-    }
-}
-
-pub fn increment_node_idx_to_descendant_count<MSG>(
-    node: &dyn Widget<MSG>,
-    cur_node_idx: &mut usize,
-) {
-    if let Some(children) = node.children() {
-        for child in children {
-            *cur_node_idx += 1;
-            increment_node_idx_to_descendant_count(
-                child.as_ref(),
-                cur_node_idx,
-            );
-        }
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -217,22 +123,16 @@ mod test {
         let btn2_clone = btn2.clone();
         control.add_child(Box::new(btn2));
 
-        let got_btn1 = find_widget_by_id(&control, "btn1")
-            .expect("must return a widget")
-            .as_any()
-            .downcast_ref::<Button<()>>()
-            .expect("must be button");
+        let got_btn1 =
+            find_widget_by_id(&control, "btn1").expect("must return a widget");
+
         println!("btn1: {:?}", got_btn1);
         assert_eq!(*got_btn1.get_id(), Some("btn1".to_string()));
-        assert_eq!(got_btn1, &btn1_clone);
 
-        let got_btn2 = find_widget_by_id(&control, "btn2")
-            .expect("must return a widget")
-            .as_any()
-            .downcast_ref::<Button<()>>()
-            .expect("must be button");
+        let got_btn2 =
+            find_widget_by_id(&control, "btn2").expect("must return a widget");
+
         println!("btn2: {:?}", got_btn2);
         assert_eq!(*got_btn2.get_id(), Some("btn2".to_string()));
-        assert_eq!(got_btn2, &btn2_clone);
     }
 }

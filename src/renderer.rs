@@ -81,7 +81,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
         let mut cmds = widget.draw(buf);
         if let Some(children) = widget.children() {
             for child in children {
-                let more_cmds = Self::draw_widget(buf, child.as_ref())?;
+                let more_cmds = child.as_ref().draw_widget(buf)?;
                 cmds.extend(more_cmds);
             }
         }
@@ -100,7 +100,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
             buf.reset();
             {
-                let cmds = Self::draw_widget(&mut buf, self.root_node)?;
+                let cmds = self.root_node.draw_widget(&mut buf)?;
                 buf.render(&mut self.write)?;
 
                 cmds.iter().for_each(|cmd| {
@@ -155,7 +155,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                             .pop();
 
                         if let Some(idx) = self.focused_widget_idx.as_ref() {
-                            find_node::set_focused_node(self.root_node, *idx);
+                            self.root_node.set_focused_node(*idx);
                         }
                     }
                     Event::Resize(width, height) => {
