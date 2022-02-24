@@ -2,7 +2,7 @@
 //! This has the event loop which calculates and process the events to the target widget
 use crate::cmd::Cmd;
 use crate::Event;
-use crate::{command, find_node, layout, Buffer, Widget};
+use crate::{command, find_node, Buffer, Widget};
 pub use crossterm::{
     cursor,
     event::{self, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
@@ -41,13 +41,10 @@ impl<'a, MSG> Renderer<'a, MSG> {
         let (width, height) =
             terminal::size().expect("must get the terminal size");
 
-        layout::compute_node_layout(
-            root_node,
-            Size {
-                width: Number::Defined(width as f32),
-                height: Number::Defined(height as f32),
-            },
-        );
+        root_node.compute_node_layout(Size {
+            width: Number::Defined(width as f32),
+            height: Number::Defined(height as f32),
+        });
         Renderer {
             write,
             program,
@@ -59,13 +56,10 @@ impl<'a, MSG> Renderer<'a, MSG> {
 
     fn recompute_layout(&mut self) {
         let (width, height) = self.terminal_size;
-        layout::compute_node_layout(
-            self.root_node,
-            Size {
-                width: Number::Defined(width as f32),
-                height: Number::Defined(height as f32),
-            },
-        );
+        self.root_node.compute_node_layout(Size {
+            width: Number::Defined(width as f32),
+            height: Number::Defined(height as f32),
+        });
     }
 
     fn dispatch_msg(&mut self, msgs: Vec<MSG>) {
@@ -155,13 +149,10 @@ impl<'a, MSG> Renderer<'a, MSG> {
                     }
                     // mouse clicks sets the focused the widget underneath
                     Event::Mouse(MouseEvent::Down(_btn, x, y, _modifier)) => {
-                        self.focused_widget_idx = layout::node_hit_at(
-                            self.root_node,
-                            x as f32,
-                            y as f32,
-                            &mut 0,
-                        )
-                        .pop();
+                        self.focused_widget_idx = self
+                            .root_node
+                            .node_hit_at(x as f32, y as f32, &mut 0)
+                            .pop();
 
                         if let Some(idx) = self.focused_widget_idx.as_ref() {
                             find_node::set_focused_node(self.root_node, *idx);
@@ -178,12 +169,8 @@ impl<'a, MSG> Renderer<'a, MSG> {
                 // if it focused or not.
 
                 if let Some((x, y)) = extract_location(&event) {
-                    let hits = layout::node_hit_at(
-                        self.root_node,
-                        x as f32,
-                        y as f32,
-                        &mut 0,
-                    );
+                    let hits =
+                        self.root_node.node_hit_at(x as f32, y as f32, &mut 0);
                     for hit in hits.iter().rev() {
                         let mut hit_widget: Option<&mut dyn Widget<MSG>> =
                             find_node::find_widget_mut(self.root_node, *hit);

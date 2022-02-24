@@ -2,6 +2,8 @@ use crate::Event;
 use crate::{buffer::Buffer, Cmd};
 pub use button::Button;
 pub use checkbox::Checkbox;
+use expanse::geometry::Size;
+use expanse::number::Number;
 use expanse::result::Layout;
 use expanse::{
     node::{Node, Stretch},
@@ -131,6 +133,106 @@ where
 
     /// get the id of this widget
     fn get_id(&self) -> &Option<String>;
+
+    fn build_stretch_node_recursive(
+        &self,
+        stretch: &mut Stretch,
+    ) -> Option<expanse::node::Node> {
+        let children_styles = if let Some(children) = self.children() {
+            children
+                .iter()
+                .filter_map(|c| c.build_stretch_node_recursive(stretch))
+                .collect()
+        } else {
+            vec![]
+        };
+        let node_style = self.style();
+        stretch.new_node(node_style, &children_styles).ok()
+    }
+
+    fn set_node_layout_from_stretch_node(
+        &mut self,
+        stretch_node: expanse::node::Node,
+        stretch: &Stretch,
+        parent_loc: (f32, f32),
+        parent_offset: (f32, f32),
+    ) {
+        let mut layout =
+            *stretch.layout(stretch_node).expect("must have layout");
+
+        let (parent_loc_x, parent_loc_y) = parent_loc;
+        let (parent_offset_x, parent_offset_y) = parent_offset;
+        let (child_offset_x, child_offset_y) = self.get_offset();
+
+        layout.location.x += parent_loc_x + parent_offset_x;
+        layout.location.y += parent_loc_y + parent_offset_y;
+
+        layout.size.width -= parent_offset_x;
+        layout.size.height -= parent_offset_y;
+
+        let stretch_node_children: Vec<expanse::node::Node> =
+            stretch.children(stretch_node).expect("must get children");
+
+        let widget_children = self.children_mut().unwrap_or(&mut []);
+
+        stretch_node_children
+            .into_iter()
+            .zip(widget_children.iter_mut())
+            .for_each(|(stretch_node_child, widget_child)| {
+                widget_child.set_node_layout_from_stretch_node(
+                    stretch_node_child,
+                    stretch,
+                    (layout.location.x, layout.location.y),
+                    (child_offset_x, child_offset_y),
+                )
+            });
+
+        self.set_layout(layout);
+    }
+
+    fn node_hit_at(
+        &self,
+        x: f32,
+        y: f32,
+        cur_node_idx: &mut usize,
+    ) -> Vec<usize> {
+        let layout = self.layout().expect("must have a layout");
+        let loc = layout.location;
+        let width = layout.size.width;
+        let height = layout.size.height;
+
+        let mut hits = vec![];
+
+        if x >= loc.x && x < loc.x + width && y >= loc.y && y < loc.y + height {
+            hits.push(*cur_node_idx);
+        }
+        if let Some(children) = self.children() {
+            for child in children.iter() {
+                *cur_node_idx += 1;
+                hits.extend(child.node_hit_at(x, y, cur_node_idx));
+            }
+        }
+
+        hits
+    }
+
+    /// calculate the layout of the nodes utilizing the styles set on each of the widget
+    /// and its children widget styles
+    fn compute_node_layout(&mut self, parent_size: Size<Number>) {
+        let mut stretch = Stretch::new();
+        let stretch_node = self
+            .build_stretch_node_recursive(&mut stretch)
+            .expect("must have built a style node");
+        stretch
+            .compute_layout(stretch_node, parent_size)
+            .expect("must compute the layout");
+        self.set_node_layout_from_stretch_node(
+            stretch_node,
+            &stretch,
+            (0.0, 0.0),
+            (0.0, 0.0),
+        )
+    }
 }
 
 #[cfg(test)]
@@ -153,13 +255,10 @@ mod tests {
         btn.set_size(Some(20.0), Some(10.0));
         control.add_child(boxed::Box::new(btn));
 
-        crate::layout::compute_node_layout(
-            &mut control,
-            Size {
-                width: Number::Defined(100.0),
-                height: Number::Defined(100.0),
-            },
-        );
+        control.compute_node_layout(Size {
+            width: Number::Defined(100.0),
+            height: Number::Defined(100.0),
+        });
 
         let layout1 = control.children().expect("must have children")[1]
             .layout()
@@ -199,13 +298,10 @@ mod tests {
 
         control.add_child(boxed::Box::new(hrow));
 
-        crate::layout::compute_node_layout(
-            &mut control,
-            Size {
-                width: Number::Defined(100.0),
-                height: Number::Defined(100.0),
-            },
-        );
+        control.compute_node_layout(Size {
+            width: Number::Defined(100.0),
+            height: Number::Defined(100.0),
+        });
 
         let layout_btn2 = control.children().expect("must have children")[1]
             .children()
