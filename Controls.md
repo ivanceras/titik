@@ -16,6 +16,10 @@
  │ Button       │ border: 1px, rounded,
  ╰──────────────╯
 
+ ╭─┄┄┄┄┄┄┄┄┄┄┄┄┄╮
+ ┊ Button       ┊ border: 1px, rounded dashed,
+ ╰┄┄┄┄┄┄┄┄┄┄┄┄┄┄╯
+
  ╭──┬───────────╮
  │Ⴍ │SearchInput│ border: 1px, rounded,
  ╰──┴───────────╯
@@ -27,6 +31,10 @@
  ┏━━━━━━━━━━━━━━┓
  ┃ Button       ┃ border: 2px, rounded(will be cancelled)
  ┗━━━━━━━━━━━━━━┛
+
+ ┏╍╍╍╍╍╍╍╍╍╍╍╍╍╍┓
+ ┋ Button       ┋ border: 2px, dashed
+ ┗╍╍╍╍╍╍╍╍╍╍╍╍╍╍┛
  ┌────────────┬─┐
  │ Combobox   │⌵│
  └────────────┴─┘
