@@ -1,5 +1,5 @@
 use crate::Event;
-use crate::{buffer::Buffer, Cmd, InputBuffer, Widget};
+use crate::{buffer::Buffer, text_buffer::InputBuffer, Cmd, Widget};
 use crossterm::event::{KeyEvent, MouseEvent};
 use expanse::{
     geometry::Size,

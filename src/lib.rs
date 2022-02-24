@@ -45,22 +45,20 @@ pub use cmd::Cmd;
 pub use crossterm;
 pub use event::Event;
 pub use expanse;
-pub use input_buffer::InputBuffer;
 pub use mt_dom;
 pub use renderer::{Dispatch, Renderer};
 pub use value::Value;
 pub use widget::*;
 
-mod area_buffer;
 mod buffer;
 mod callback;
 mod cmd;
 pub mod command;
 pub mod event;
 mod find_node;
-mod input_buffer;
 pub mod renderer;
 #[allow(unused)]
 mod symbol;
+mod text_buffer;
 mod value;
 mod widget;

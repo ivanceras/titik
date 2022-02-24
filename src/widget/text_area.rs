@@ -1,8 +1,8 @@
 use crate::Event;
 use crate::Value;
 use crate::{
-    area_buffer::AreaBuffer, buffer::Buffer, event::InputEvent, symbol,
-    symbol::bar, Callback, Cmd, Widget,
+    buffer::Buffer, event::InputEvent, symbol, symbol::bar,
+    text_buffer::AreaBuffer, Callback, Cmd, Widget,
 };
 use crossterm::event::{KeyEvent, KeyModifiers, MouseEvent};
 use expanse::{
