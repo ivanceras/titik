@@ -36,7 +36,7 @@ impl<MSG> Image<MSG> {
         }
     }
 
-    fn create_cells(&self, width: f32, height: f32) -> Vec<Vec<Cell>> {
+    fn create_cells(&self, width: f32, _height: f32) -> Vec<Vec<Cell>> {
         let width_multiplier = 1.0 / 2.0;
         let height_multiplier = 1.0 / 2.0;
         let w = width * width_multiplier;
@@ -112,7 +112,7 @@ where
         let height = layout.size.height;
 
         let bottom = loc_y + height - 1.0;
-        let right = loc_x + width - 1.0;
+        let _right = loc_x + width - 1.0;
 
         let cells = self.create_cells(width, height);
         for (y, line) in cells.iter().enumerate() {

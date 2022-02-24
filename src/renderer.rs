@@ -1,17 +1,13 @@
 //! Provides the core functionality of rendering to the terminal
 //! This has the event loop which calculates and process the events to the target widget
 
-use crate::cmd::Cmd;
+
 use crate::Event;
 use crate::{command, find_node, Buffer, Widget};
 
 use crate::crossterm::{
-    cursor,
-    event::{self, KeyCode, KeyEvent, KeyModifiers, MouseEvent},
-    execute, queue, style,
-    style::{Attribute, Attributes, Color, ContentStyle},
-    terminal::{self, ClearType},
-    Command, Result,
+    event::{self, KeyCode, KeyModifiers},
+    terminal::{self}, Result,
 };
 use expanse::{geometry::Size, number::Number};
 use std::io::Stdout;

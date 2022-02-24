@@ -3,8 +3,7 @@ use expanse::{
     geometry::{Rect, Size},
     result::Layout,
     style::{
-        AlignContent, AlignItems, AlignSelf, Dimension, FlexDirection,
-        FlexWrap, JustifyContent, Overflow, PositionType, Style,
+        Dimension, FlexDirection, PositionType, Style,
     },
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};

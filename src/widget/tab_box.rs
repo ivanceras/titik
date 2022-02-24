@@ -4,8 +4,7 @@ use expanse::{
     geometry::{Rect, Size},
     result::Layout,
     style::{
-        AlignContent, AlignItems, AlignSelf, Dimension, FlexDirection,
-        FlexWrap, JustifyContent, Overflow, PositionType, Style,
+        Dimension, FlexDirection, PositionType, Style,
     },
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
@@ -69,7 +68,7 @@ impl<MSG> TabBox<MSG> {
     fn ensure_has_tab_index(&mut self, tab_index: usize) {
         let children_len = self.children.len();
         if tab_index >= children_len {
-            for i in children_len..tab_index {
+            for _i in children_len..tab_index {
                 self.children.push(vec![]);
             }
         }
@@ -136,13 +135,13 @@ impl<MSG> TabBox<MSG> {
     ///  └──────┴──────┴──────┴
     pub fn draw_labels(&self, buf: &mut Buffer, canvas: &mut Canvas) {
         let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round() as usize;
+        let _loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
-        let left_pad = 3;
+        let _left_pad = 3;
         let top = loc_y;
-        let width = layout.size.width.round() as usize;
+        let _width = layout.size.width.round() as usize;
         let height = 2;
-        let bottom = top + height;
+        let _bottom = top + height;
 
         let tab_rects = self.tab_label_rects();
 

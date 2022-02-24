@@ -1,5 +1,5 @@
 use crate::Event;
-use crate::{buffer::Buffer, event::InputEvent, symbol, Callback, Cmd, Widget};
+use crate::{buffer::Buffer, symbol, Callback, Cmd, Widget};
 use expanse::{
     geometry::Size,
     result::Layout,

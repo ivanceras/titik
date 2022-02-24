@@ -10,7 +10,7 @@ use expanse::{
     style::{Dimension, PositionType, Style},
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
-use std::marker::PhantomData;
+
 use std::{fmt, fmt::Debug};
 
 /// A button widget

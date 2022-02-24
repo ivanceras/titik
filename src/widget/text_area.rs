@@ -331,7 +331,7 @@ where
                     .map(|cb| cb.emit(s_event.clone()))
                     .collect()
             }
-            Event::Mouse(me) => {
+            Event::Mouse(_me) => {
                 let (x, y) = event
                     .extract_location()
                     .expect("must have a mouse location");

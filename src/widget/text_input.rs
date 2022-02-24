@@ -205,7 +205,7 @@ where
             buf.write_canvas(canvas);
         }
 
-        let inner_width = self.inner_width(&layout);
+        let _inner_width = self.inner_width(&layout);
         for (t, ch) in self.get_value().chars().enumerate() {
             buf.set_symbol(
                 (left + self.border_left() + t as f32) as usize,

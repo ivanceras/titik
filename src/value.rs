@@ -67,8 +67,8 @@ impl fmt::Display for Value {
             Value::Str(s) => write!(f, "{}", s),
             Value::Bool(b) => write!(f, "{}", b),
             Value::F64(v) => write!(f, "{}", v),
-            Value::Style(s) => todo!(),
-            Value::Bytes(v) => todo!(),
+            Value::Style(_s) => todo!(),
+            Value::Bytes(_v) => todo!(),
         }
     }
 }
