@@ -12,6 +12,7 @@ pub use crossterm::{
     Command, Result,
 };
 use expanse::{geometry::Size, number::Number};
+use std::io::Stdout;
 use std::io::Write;
 
 /// A Dispatch trait which the implementing APP will update
@@ -24,7 +25,7 @@ pub trait Dispatch<MSG> {
 
 /// This provides the render loop of the terminal UI
 pub struct Renderer<'a, MSG> {
-    write: &'a mut dyn Write,
+    write: Stdout,
     program: Option<&'a dyn Dispatch<MSG>>,
     root_node: &'a mut dyn Widget<MSG>,
     terminal_size: (u16, u16),
@@ -34,7 +35,7 @@ pub struct Renderer<'a, MSG> {
 impl<'a, MSG> Renderer<'a, MSG> {
     /// create a new renderer with the supplied root_node
     pub fn new(
-        write: &'a mut dyn Write,
+        write: Stdout,
         program: Option<&'a dyn Dispatch<MSG>>,
         root_node: &'a mut dyn Widget<MSG>,
     ) -> Self {
@@ -104,7 +105,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                 buf.render(&mut self.write)?;
 
                 cmds.iter().for_each(|cmd| {
-                    cmd.execute(self.write).expect("must execute")
+                    cmd.execute(&mut self.write).expect("must execute")
                 });
             }
             self.write.flush()?;
@@ -183,7 +184,7 @@ impl<'a, MSG> Renderer<'a, MSG> {
                 }
             }
         }
-        command::finalize(self.write)?;
+        command::finalize(&mut self.write)?;
         Ok(())
     }
 }

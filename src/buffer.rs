@@ -1,23 +1,13 @@
 use crate::symbol;
 use crossterm::{
-    cursor,
-    queue,
+    cursor, queue,
     style::{
-        Attribute,
-        Attributes,
-        Color,
-        Print,
-        ResetColor,
-        SetAttributes,
-        SetBackgroundColor,
-        SetForegroundColor,
+        Attribute, Attributes, Color, Print, ResetColor, SetAttributes,
+        SetBackgroundColor, SetForegroundColor,
     },
 };
 use ito_canvas::unicode_canvas::Canvas;
-use std::{
-    fmt,
-    io::Write,
-};
+use std::{fmt, io::Write};
 use unicode_width::UnicodeWidthStr;
 
 /// Cell contains the attributes of the char used in the buffer.
@@ -180,13 +170,13 @@ impl Buffer {
 
     /// writes to the stdout buffer
     pub fn render(&self, w: &mut dyn Write) -> crossterm::Result<()> {
-        crossterm::queue!(w, cursor::Hide)?;
+        QueueableCommand::queue(w, cursor::Hide);
         for (j, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
-                crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16))?;
+                QueueableCommand::queue(w, cursor::MoveTo(i as u16, j as u16))?;
                 // fillter is \0 null character, filler is not printable
                 if !cell.is_filler() {
-                    crossterm::queue!(w, Print(cell))?;
+                    QueueableCommand::queue(w, Print(cell))?;
                 }
             }
         }
@@ -197,17 +187,19 @@ impl Buffer {
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(bg) = self.background_color {
-            queue!(f, SetBackgroundColor(bg)).map_err(|_| fmt::Error)?;
+            QueueableCommand::queue(f, SetBackgroundColor(bg))
+                .map_err(|_| fmt::Error)?;
         }
         if let Some(fg) = self.foreground_color {
-            queue!(f, SetForegroundColor(fg)).map_err(|_| fmt::Error)?;
+            QueueableCommand::queue(f, SetForegroundColor(fg))
+                .map_err(|_| fmt::Error)?;
         }
         if !self.attributes.is_empty() {
-            queue!(f, SetAttributes(self.attributes))
+            QueueableCommand::queue(f, SetAttributes(self.attributes))
                 .map_err(|_| fmt::Error)?;
         }
         self.symbol.fmt(f)?;
-        queue!(f, ResetColor).map_err(|_| fmt::Error)?;
+        QueueableCommand::queue(f, ResetColor).map_err(|_| fmt::Error)?;
         Ok(())
     }
 }
