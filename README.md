@@ -30,6 +30,4 @@ You can then open a new terminal and tail the `/tmp/debug.log` file
 tail -f /tmp/debug.log
 ```
 
-
-
 License: MIT
