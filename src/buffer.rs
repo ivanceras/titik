@@ -170,13 +170,13 @@ impl Buffer {
 
     /// writes to the stdout buffer
     pub fn render(&self, w: &mut dyn Write) -> crossterm::Result<()> {
-        QueueableCommand::queue(w, cursor::Hide);
+        crossterm::queue!(w, cursor::Hide);
         for (j, line) in self.cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
-                QueueableCommand::queue(w, cursor::MoveTo(i as u16, j as u16))?;
+                crossterm::queue!(w, cursor::MoveTo(i as u16, j as u16))?;
                 // fillter is \0 null character, filler is not printable
                 if !cell.is_filler() {
-                    QueueableCommand::queue(w, Print(cell))?;
+                    crossterm::queue!(w, Print(cell))?;
                 }
             }
         }
@@ -186,20 +186,7 @@ impl Buffer {
 
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if let Some(bg) = self.background_color {
-            QueueableCommand::queue(f, SetBackgroundColor(bg))
-                .map_err(|_| fmt::Error)?;
-        }
-        if let Some(fg) = self.foreground_color {
-            QueueableCommand::queue(f, SetForegroundColor(fg))
-                .map_err(|_| fmt::Error)?;
-        }
-        if !self.attributes.is_empty() {
-            QueueableCommand::queue(f, SetAttributes(self.attributes))
-                .map_err(|_| fmt::Error)?;
-        }
         self.symbol.fmt(f)?;
-        QueueableCommand::queue(f, ResetColor).map_err(|_| fmt::Error)?;
         Ok(())
     }
 }
