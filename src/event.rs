@@ -48,6 +48,10 @@ impl Event {
             }
         }
     }
+
+    pub fn is_scroll(&self) -> bool {
+        self.is_scrollup() || self.is_scrolldown()
+    }
 }
 
 #[cfg(feature = "crossterm")]

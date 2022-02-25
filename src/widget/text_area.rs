@@ -178,6 +178,21 @@ impl<MSG> TextArea<MSG> {
         self.scroll_left / self.content_width() * inner_width
     }
 
+    fn can_scroll_up(&self) -> bool {
+        self.scroll_top > 0.0
+    }
+
+    fn can_scroll_left(&self) -> bool {
+        self.scroll_left > 0.0
+    }
+
+    fn can_scroll_down(&self, layout: &Layout) -> bool {
+        self.content_height() - self.scroll_top > self.inner_height(&layout)
+    }
+    fn can_scroll_right(&self, layout: &Layout) -> bool {
+        self.content_width() - self.scroll_left > self.inner_width(&layout)
+    }
+
     fn cursor_location(&self, layout: &Layout) -> (f32, f32) {
         let (cursor_loc_x, cursor_loc_y) =
             self.area_buffer.get_cursor_location();
@@ -398,29 +413,30 @@ where
                     self.area_buffer
                         .set_cursor_loc(cursor_x as usize, cursor_y as usize);
                     vec![]
-                } else if event.is_scrollup() {
-                    if modifiers.unwrap().contains(KeyModifiers::SHIFT) {
-                        if self.scroll_left > 0.0 {
-                            self.scroll_left -= scroll_speed_x;
-                        }
-                    } else {
-                        if self.scroll_top > 0.0 {
-                            self.scroll_top -= scroll_speed_y;
+                } else if event.is_scroll() {
+                    let is_shift_key_pressed =
+                        modifiers.unwrap().contains(KeyModifiers::SHIFT);
+
+                    if event.is_scrollup() {
+                        if is_shift_key_pressed {
+                            if self.can_scroll_left() {
+                                self.scroll_left -= scroll_speed_x;
+                            }
+                        } else {
+                            if self.can_scroll_up() {
+                                self.scroll_top -= scroll_speed_y;
+                            }
                         }
                     }
-                    vec![]
-                } else if event.is_scrolldown() {
-                    if modifiers.unwrap().contains(KeyModifiers::SHIFT) {
-                        if self.content_width() - self.scroll_left
-                            > self.inner_width(&layout)
-                        {
-                            self.scroll_left += scroll_speed_x;
-                        }
-                    } else {
-                        if self.content_height() - self.scroll_top
-                            > self.inner_height(&layout)
-                        {
-                            self.scroll_top += scroll_speed_y;
+                    if event.is_scrolldown() {
+                        if is_shift_key_pressed {
+                            if self.can_scroll_right(&layout) {
+                                self.scroll_left += scroll_speed_x;
+                            }
+                        } else {
+                            if self.can_scroll_down(&layout) {
+                                self.scroll_top += scroll_speed_y;
+                            }
                         }
                     }
                     vec![]
