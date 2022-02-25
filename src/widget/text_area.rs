@@ -116,6 +116,7 @@ impl<MSG> TextArea<MSG> {
         }
     }
 
+    /// layout height excluding the borders
     fn inner_height(&self, layout: &Layout) -> f32 {
         let ih = layout.size.height.round()
             - self.border_top()
@@ -127,6 +128,7 @@ impl<MSG> TextArea<MSG> {
         }
     }
 
+    /// layout width excluding the borders
     fn inner_width(&self, layout: &Layout) -> f32 {
         let iw = layout.size.width.round()
             - self.border_left()
@@ -146,12 +148,34 @@ impl<MSG> TextArea<MSG> {
         self.area_buffer.width() as f32
     }
 
-    fn scroller_height(&self, _layout: &Layout) -> f32 {
-        1.0
+    /// scroll height is the ratio of layout height to content height
+    /// if content height is the same as the layout height (perfect fit)
+    /// meaning scroll height is 1.0 * inner_height
+    fn scroller_height(&self, layout: &Layout) -> f32 {
+        let content_height = self.content_height();
+        let inner_height = self.inner_height(layout);
+        let ratio_layout_content = inner_height / content_height;
+        inner_height * ratio_layout_content
     }
 
-    fn scroller_width(&self, _layout: &Layout) -> f32 {
-        3.0
+    /// scroll_offset_y is the ratio of
+    /// scroll_top to the content_height
+    /// scroll_top / content_height * inner_height
+    fn scroller_offset_y(&self, layout: &Layout) -> f32 {
+        let inner_height = self.inner_height(layout);
+        self.scroll_top / self.content_height() * inner_height
+    }
+
+    fn scroller_width(&self, layout: &Layout) -> f32 {
+        let content_width = self.content_width();
+        let inner_width = self.inner_width(layout);
+        let ratio_layout_content = inner_width / content_width;
+        inner_width * ratio_layout_content
+    }
+
+    fn scroller_offset_x(&self, layout: &Layout) -> f32 {
+        let inner_width = self.inner_width(layout);
+        self.scroll_left / self.content_width() * inner_width
     }
 
     fn cursor_location(&self, layout: &Layout) -> (f32, f32) {
@@ -173,29 +197,37 @@ impl<MSG> TextArea<MSG> {
         let width = layout.size.width.round();
         let height = layout.size.height.round();
 
-        let bottom = loc_y + height - 1.0;
-        let right = loc_x + width - 1.0;
+        let bottom = loc_y + height - self.border_bottom();
+        let right = loc_x + width - self.border_right();
+        let top = loc_y + self.border_top();
+        let left = loc_x + self.border_left();
 
-        let scroller_width = self.scroller_width(&layout) as usize;
-        let scroller_height = self.scroller_height(&layout) as usize;
+        let scroller_width = self.scroller_width(&layout);
+        let scroller_height = self.scroller_height(&layout);
 
         let inner_width = self.inner_width(&layout);
         let inner_height = self.inner_height(&layout);
 
+        let content_width = self.content_width();
+        let content_height = self.content_height();
+
+        let scroller_offset_y = self.scroller_offset_y(&layout);
+        let scroller_offset_x = self.scroller_offset_x(&layout);
+
         if inner_height > 0.0 {
-            for j in 0..scroller_height {
+            for j in 0..scroller_height as usize {
                 buf.set_symbol(
                     right as usize,
-                    bottom as usize - j - 1,
+                    (top + j as f32 + scroller_offset_y) as usize,
                     bar::SEVEN_EIGHTHS,
                 );
             }
         }
 
         if inner_width > 0.0 {
-            for i in 0..scroller_width {
+            for i in 0..scroller_width as usize {
                 buf.set_symbol(
-                    right as usize - i - 1,
+                    (left + i as f32 + scroller_offset_x) as usize,
                     bottom as usize,
                     symbol::MIDDLE_BLOCK,
                 );
@@ -336,6 +368,8 @@ where
                     .extract_location()
                     .expect("must have a mouse location");
                 let modifiers = event.modifiers();
+                let scroll_speed_x = 2.0;
+                let scroll_speed_y = 2.0;
 
                 if event.is_mouse_click() {
                     let mut x = x as f32 - layout.location.x.round();
@@ -367,22 +401,26 @@ where
                 } else if event.is_scrollup() {
                     if modifiers.unwrap().contains(KeyModifiers::SHIFT) {
                         if self.scroll_left > 0.0 {
-                            self.scroll_left -= 4.0;
+                            self.scroll_left -= scroll_speed_x;
                         }
                     } else {
                         if self.scroll_top > 0.0 {
-                            self.scroll_top -= 4.0;
+                            self.scroll_top -= scroll_speed_y;
                         }
                     }
                     vec![]
                 } else if event.is_scrolldown() {
                     if modifiers.unwrap().contains(KeyModifiers::SHIFT) {
-                        self.scroll_left += 4.0;
+                        if self.content_width() - self.scroll_left
+                            > self.inner_width(&layout)
+                        {
+                            self.scroll_left += scroll_speed_x;
+                        }
                     } else {
                         if self.content_height() - self.scroll_top
                             > self.inner_height(&layout)
                         {
-                            self.scroll_top += 4.0;
+                            self.scroll_top += scroll_speed_y;
                         }
                     }
                     vec![]

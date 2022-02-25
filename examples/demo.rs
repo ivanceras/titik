@@ -70,7 +70,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
         "This is a text area\
             \n1. With a line that is a bit long.. but not very long....\
             \n2. and another line\
-            \n3. With a veryyyyyyy looooooooooooooooooooooooooooooooooooonnnnnnnnnnngggggggg line\
+            \n3. With a veryyyyyyy loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooonnnnnnnnnnngggggggg line\
             \n4. and another line...............\
             \n5. With a line\
             \n6. With a line and not too long\
@@ -78,16 +78,26 @@ fn build_ui() -> Box<dyn Widget<()>> {
             \n8. With a line\
             \n9. and another line\
             \n10. and another line with another pharse\
+            \nspacer\
+            \nspacer\
+            \nspacer\
+            \nspacer\
+            \nspacer\
+            \nspacer\
+            \nspacer\
+            \nspacer\
+            \nspacer\
+            \nspacer\
             \n11. With a line\
             \n12. and another line\
             \n13. With a line\
-            \n14. and another line not so loooooooooooooooooooooooooong\
+            \n14. and another line not so loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong\
             \n15. With a line\
             \n16. With a line\
             \n17. and another line\
             \n18. With a line\
             \n19. and another line\
-            \n20. This is the last line and also a looooooooooooooooooooong line",
+            \n20. This is the last line and also a loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong line",
     );
     //text_area1.set_size(Some(60.0), Some(10.0));
 
@@ -117,8 +127,8 @@ fn build_ui() -> Box<dyn Widget<()>> {
     root_node.add_child(Box::new(tab1));
     //root_node.add_child(Box::new(gb1));
     root_node.add_child(Box::new(input1));
-    root_node.add_child(Box::new(input2));
     root_node.add_child(Box::new(text_area1));
+    root_node.add_child(Box::new(input2));
     Box::new(root_node)
 }
 
