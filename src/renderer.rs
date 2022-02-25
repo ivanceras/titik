@@ -99,9 +99,9 @@ impl<'a, MSG> Renderer<'a, MSG> {
             let cmds = self.root_node.draw_widget(&mut buf)?;
             buf.render(&mut self.write)?;
 
-            cmds.iter().for_each(|cmd| {
-                cmd.execute(&mut self.write).expect("must execute")
-            });
+            for cmd in cmds.iter() {
+                cmd.execute(&mut self.write)?;
+            }
             self.write.flush()?;
 
             if let Ok(c_event) = event::read() {
