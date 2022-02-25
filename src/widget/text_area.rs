@@ -193,6 +193,7 @@ impl<MSG> TextArea<MSG> {
         self.content_width() - self.scroll_left > self.inner_width(&layout)
     }
 
+    /// return the cursor location relative to the screen
     fn cursor_location(&self, layout: &Layout) -> (f32, f32) {
         let (cursor_loc_x, cursor_loc_y) =
             self.area_buffer.get_cursor_location();
@@ -200,7 +201,7 @@ impl<MSG> TextArea<MSG> {
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
 
-        let abs_cursor_x = loc_x + cursor_loc_x as f32 + 1.0;
+        let abs_cursor_x = loc_x + cursor_loc_x as f32 + 1.0 - self.scroll_left;
         let abs_cursor_y = loc_y + cursor_loc_y as f32 + 1.0 - self.scroll_top;
         (abs_cursor_x, abs_cursor_y)
     }
@@ -314,8 +315,10 @@ where
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
         let height = layout.size.height.round();
+        let width = layout.size.width.round();
 
         let bottom = loc_y + height - 1.0;
+        let right = loc_x + width - 1.0;
 
         // draw the text content
         let text_loc_y = loc_y - self.scroll_top;
@@ -341,7 +344,8 @@ where
 
         let (abs_cursor_x, abs_cursor_y) = self.cursor_location(&layout);
 
-        let is_cursor_visible = abs_cursor_y > loc_y && abs_cursor_y < bottom;
+        let is_cursor_visible = (abs_cursor_y > loc_y && abs_cursor_y < bottom)
+            && (abs_cursor_x > loc_x && abs_cursor_x < right);
 
         self.draw_border(buf);
         self.draw_scrollers(buf);
@@ -408,7 +412,7 @@ where
                             x = line.len() as f32;
                         }
                     }
-                    let cursor_x = x;
+                    let cursor_x = x + self.scroll_left;
 
                     self.area_buffer
                         .set_cursor_loc(cursor_x as usize, cursor_y as usize);
