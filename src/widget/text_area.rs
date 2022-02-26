@@ -123,28 +123,12 @@ impl<MSG> TextArea<MSG> {
 
     /// layout height excluding the borders
     fn inner_height(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let ih = layout.size.height.round()
-            - self.border_top()
-            - self.border_bottom();
-        if ih > 0.0 {
-            ih
-        } else {
-            0.0
-        }
+        self.layout_height() - self.border_top() - self.border_bottom()
     }
 
     /// layout width excluding the borders
     fn inner_width(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let iw = layout.size.width.round()
-            - self.border_left()
-            - self.border_right();
-        if iw > 0.0 {
-            iw
-        } else {
-            0.0
-        }
+        self.layout_width() - self.border_left() - self.border_right()
     }
 
     fn content_height(&self) -> f32 {
