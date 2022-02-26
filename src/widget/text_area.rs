@@ -209,54 +209,52 @@ impl<MSG> TextArea<MSG> {
         vec2(abs_cursor_x, abs_cursor_y)
     }
 
-    fn left(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let loc_x = layout.location.x;
-        loc_x
-    }
     fn top(&self) -> f32 {
         let layout = self.unwrap_layout();
         let loc_y = layout.location.y;
         loc_y
     }
-    fn bottom(&self) -> f32 {
+
+    fn left(&self) -> f32 {
         let layout = self.unwrap_layout();
-        let height = layout.size.height;
-        self.top() + height - 1.0
+        let loc_x = layout.location.x;
+        loc_x
+    }
+
+    fn layout_width(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        layout.size.width
+    }
+
+    fn layout_height(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        layout.size.height
+    }
+
+    fn bottom(&self) -> f32 {
+        self.top() + self.layout_height() - 1.0
     }
 
     fn right(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let width = layout.size.width;
-        self.left() + width - 1.0
+        self.left() + self.layout_width() - 1.0
     }
 
     /// inner bottom location excluding the border
     fn inner_bottom(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let loc_y = layout.location.y;
-        let height = layout.size.height;
-        loc_y + height - self.border_bottom()
+        self.top() + self.layout_height() - self.border_bottom()
     }
     /// the inner right location of the textarea excluding the border
     fn inner_right(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let loc_x = layout.location.x;
-        let width = layout.size.width;
-        loc_x + width - self.border_right()
+        self.left() + self.layout_width() - self.border_right()
     }
     /// the inner top location of the textarea excluding the border
     fn inner_top(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let loc_y = layout.location.y;
-        loc_y + self.border_top()
+        self.top() + self.border_top()
     }
 
     /// the inner left location of the textare excluding the border
     fn inner_left(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let loc_x = layout.location.x;
-        loc_x + self.border_left()
+        self.left() + self.border_left()
     }
 
     fn is_cursor_visible(&self) -> bool {
