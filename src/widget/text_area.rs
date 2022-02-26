@@ -192,16 +192,17 @@ impl<MSG> TextArea<MSG> {
         top_left + cursor_loc - scroll_loc
     }
 
-    fn top(&self) -> f32 {
+    fn top_left(&self) -> Vec2 {
         let layout = self.unwrap_layout();
-        let loc_y = layout.location.y;
-        loc_y
+        vec2(layout.location.x, layout.location.y)
+    }
+
+    fn top(&self) -> f32 {
+        self.top_left().y
     }
 
     fn left(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let loc_x = layout.location.x;
-        loc_x
+        self.top_left().x
     }
 
     fn layout_width(&self) -> f32 {
