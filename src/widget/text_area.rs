@@ -204,13 +204,10 @@ impl<MSG> TextArea<MSG> {
         let (cursor_loc_x, cursor_loc_y) =
             self.area_buffer.get_cursor_location();
 
-        let layout = self.unwrap_layout();
-
-        let loc_x = layout.location.x.round();
-        let loc_y = layout.location.y.round();
-
-        let abs_cursor_x = loc_x + cursor_loc_x as f32 + 1.0 - self.scroll_left;
-        let abs_cursor_y = loc_y + cursor_loc_y as f32 + 1.0 - self.scroll_top;
+        let abs_cursor_x =
+            self.inner_left() + cursor_loc_x as f32 - self.scroll_left;
+        let abs_cursor_y =
+            self.inner_top() + cursor_loc_y as f32 - self.scroll_top;
         (abs_cursor_x, abs_cursor_y)
     }
 
@@ -370,8 +367,8 @@ where
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         // draw the text content
-        let text_loc_y = self.top() - self.scroll_top;
-        let text_loc_x = self.left() - self.scroll_left;
+        let text_loc_y = self.inner_top() - self.scroll_top;
+        let text_loc_x = self.inner_left() - self.scroll_left;
         let bottom_scroll = self.inner_height() + self.scroll_top;
         let right_scroll = self.inner_width() + self.scroll_left;
 
@@ -382,8 +379,8 @@ where
                         && (i as f32) < right_scroll
                     {
                         buf.set_symbol(
-                            (text_loc_x + i as f32 + 1.0) as usize,
-                            (text_loc_y + j as f32 + 1.0) as usize,
+                            (text_loc_x + i as f32) as usize,
+                            (text_loc_y + j as f32) as usize,
                             ch,
                         );
                     }
