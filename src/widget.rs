@@ -121,14 +121,14 @@ where
     /// get the id of this widget
     fn get_id(&self) -> &Option<String>;
 
-    fn build_stretch_node_recursive(
+    fn build_stretch_node(
         &self,
         stretch: &mut Stretch,
     ) -> Option<expanse::node::Node> {
         let children_styles = if let Some(children) = self.children() {
             children
                 .iter()
-                .filter_map(|c| c.build_stretch_node_recursive(stretch))
+                .filter_map(|c| c.build_stretch_node(stretch))
                 .collect()
         } else {
             vec![]
@@ -208,7 +208,7 @@ where
     fn compute_node_layout(&mut self, parent_size: Size<Number>) {
         let mut stretch = Stretch::new();
         let stretch_node = self
-            .build_stretch_node_recursive(&mut stretch)
+            .build_stretch_node(&mut stretch)
             .expect("must have built a style node");
         stretch
             .compute_layout(stretch_node, parent_size)

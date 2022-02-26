@@ -225,7 +225,7 @@ mod test {
         let cell = Cell::new("H".to_string());
         write!(w, "{}", cell).unwrap();
         println!("{}", w);
-        assert_eq!(w, "H\u{1b}[0m");
+        assert_eq!(w, "H");
         assert_eq!(cell.unicode_width(), 1);
     }
 
@@ -251,10 +251,7 @@ mod test {
         cell.background(Color::Yellow);
         write!(w, "{}", cell).unwrap();
         println!("{}", w);
-        assert_eq!(
-            w,
-            "\u{1b}[48;5;11m\u{1b}[38;5;9m\u{1b}[1m\u{1b}[3m\u{1b}[9mH\u{1b}[0m"
-        );
+        assert_eq!(w, "H");
     }
 
     #[test]
