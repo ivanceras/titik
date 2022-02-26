@@ -187,10 +187,9 @@ impl<MSG> TextArea<MSG> {
     /// return the cursor location relative to the screen
     fn cursor_location(&self) -> Vec2 {
         let cursor_loc = self.area_buffer.get_cursor_location();
-
-        let abs_cursor_x = self.inner_left() + cursor_loc.x - self.scroll_left;
-        let abs_cursor_y = self.inner_top() + cursor_loc.y - self.scroll_top;
-        vec2(abs_cursor_x, abs_cursor_y)
+        let top_left = vec2(self.inner_left(), self.inner_top());
+        let scroll_loc = vec2(self.scroll_left, self.scroll_top);
+        top_left + cursor_loc - scroll_loc
     }
 
     fn top(&self) -> f32 {
