@@ -84,6 +84,10 @@ impl<MSG> TextArea<MSG> {
         self.area_buffer.to_string()
     }
 
+    fn unwrap_layout(&self) -> &Layout {
+        self.layout.as_ref().expect("must have a layout")
+    }
+
     fn border_top(&self) -> f32 {
         if self.has_border {
             1.0
@@ -117,7 +121,8 @@ impl<MSG> TextArea<MSG> {
     }
 
     /// layout height excluding the borders
-    fn inner_height(&self, layout: &Layout) -> f32 {
+    fn inner_height(&self) -> f32 {
+        let layout = self.unwrap_layout();
         let ih = layout.size.height.round()
             - self.border_top()
             - self.border_bottom();
@@ -129,7 +134,8 @@ impl<MSG> TextArea<MSG> {
     }
 
     /// layout width excluding the borders
-    fn inner_width(&self, layout: &Layout) -> f32 {
+    fn inner_width(&self) -> f32 {
+        let layout = self.unwrap_layout();
         let iw = layout.size.width.round()
             - self.border_left()
             - self.border_right();
@@ -151,9 +157,9 @@ impl<MSG> TextArea<MSG> {
     /// scroll height is the ratio of layout height to content height
     /// if content height is the same as the layout height (perfect fit)
     /// meaning scroll height is 1.0 * inner_height
-    fn scroller_height(&self, layout: &Layout) -> f32 {
+    fn scroller_height(&self) -> f32 {
         let content_height = self.content_height();
-        let inner_height = self.inner_height(layout);
+        let inner_height = self.inner_height();
         let ratio_layout_content = inner_height / content_height;
         inner_height * ratio_layout_content
     }
@@ -161,20 +167,20 @@ impl<MSG> TextArea<MSG> {
     /// scroll_offset_y is the ratio of
     /// scroll_top to the content_height
     /// scroll_top / content_height * inner_height
-    fn scroller_offset_y(&self, layout: &Layout) -> f32 {
-        let inner_height = self.inner_height(layout);
+    fn scroller_offset_y(&self) -> f32 {
+        let inner_height = self.inner_height();
         self.scroll_top / self.content_height() * inner_height
     }
 
-    fn scroller_width(&self, layout: &Layout) -> f32 {
+    fn scroller_width(&self) -> f32 {
         let content_width = self.content_width();
-        let inner_width = self.inner_width(layout);
+        let inner_width = self.inner_width();
         let ratio_layout_content = inner_width / content_width;
         inner_width * ratio_layout_content
     }
 
-    fn scroller_offset_x(&self, layout: &Layout) -> f32 {
-        let inner_width = self.inner_width(layout);
+    fn scroller_offset_x(&self) -> f32 {
+        let inner_width = self.inner_width();
         self.scroll_left / self.content_width() * inner_width
     }
 
@@ -186,17 +192,19 @@ impl<MSG> TextArea<MSG> {
         self.scroll_left > 0.0
     }
 
-    fn can_scroll_down(&self, layout: &Layout) -> bool {
-        self.content_height() - self.scroll_top > self.inner_height(&layout)
+    fn can_scroll_down(&self) -> bool {
+        self.content_height() - self.scroll_top > self.inner_height()
     }
-    fn can_scroll_right(&self, layout: &Layout) -> bool {
-        self.content_width() - self.scroll_left > self.inner_width(&layout)
+    fn can_scroll_right(&self) -> bool {
+        self.content_width() - self.scroll_left > self.inner_width()
     }
 
     /// return the cursor location relative to the screen
-    fn cursor_location(&self, layout: &Layout) -> (f32, f32) {
+    fn cursor_location(&self) -> (f32, f32) {
         let (cursor_loc_x, cursor_loc_y) =
             self.area_buffer.get_cursor_location();
+
+        let layout = self.unwrap_layout();
 
         let loc_x = layout.location.x.round();
         let loc_y = layout.location.y.round();
@@ -206,29 +214,59 @@ impl<MSG> TextArea<MSG> {
         (abs_cursor_x, abs_cursor_y)
     }
 
+    /// inner bottom location excluding the border
+    fn inner_bottom(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        let loc_y = layout.location.y;
+        let height = layout.size.height;
+        loc_y + height - self.border_bottom()
+    }
+    /// the inner right location of the textarea excluding the border
+    fn inner_right(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        let loc_x = layout.location.x;
+        let width = layout.size.width;
+        loc_x + width - self.border_right()
+    }
+    /// the inner top location of the textarea excluding the border
+    fn inner_top(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        let loc_y = layout.location.y;
+        loc_y + self.border_top()
+    }
+
+    /// the inner left location of the textare excluding the border
+    fn inner_left(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        let loc_x = layout.location.x;
+        loc_x + self.border_left()
+    }
+
+    fn is_cursor_visible(&self) -> bool {
+        let (abs_cursor_x, abs_cursor_y) = self.cursor_location();
+        (abs_cursor_y >= self.inner_top()
+            && abs_cursor_y <= self.inner_bottom())
+            && (abs_cursor_x >= self.inner_left()
+                && abs_cursor_x <= self.inner_right())
+    }
+
     fn draw_scrollers(&self, buf: &mut Buffer) {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round();
-        let loc_y = layout.location.y.round();
-        let width = layout.size.width.round();
-        let height = layout.size.height.round();
+        let bottom = self.inner_bottom();
+        let right = self.inner_right();
+        let top = self.inner_top();
+        let left = self.inner_left();
 
-        let bottom = loc_y + height - self.border_bottom();
-        let right = loc_x + width - self.border_right();
-        let top = loc_y + self.border_top();
-        let left = loc_x + self.border_left();
+        let scroller_width = self.scroller_width();
+        let scroller_height = self.scroller_height();
 
-        let scroller_width = self.scroller_width(&layout);
-        let scroller_height = self.scroller_height(&layout);
-
-        let inner_width = self.inner_width(&layout);
-        let inner_height = self.inner_height(&layout);
+        let inner_width = self.inner_width();
+        let inner_height = self.inner_height();
 
         let content_width = self.content_width();
         let content_height = self.content_height();
 
-        let scroller_offset_y = self.scroller_offset_y(&layout);
-        let scroller_offset_x = self.scroller_offset_x(&layout);
+        let scroller_offset_y = self.scroller_offset_y();
+        let scroller_offset_x = self.scroller_offset_x();
 
         if inner_height > 0.0 {
             for j in 0..scroller_height as usize {
@@ -252,7 +290,7 @@ impl<MSG> TextArea<MSG> {
     }
 
     fn draw_border(&self, buf: &mut Buffer) {
-        let layout = self.layout.expect("must have a layout");
+        let layout = self.unwrap_layout();
         let loc_x = layout.location.x.round() as usize;
         let loc_y = layout.location.y.round() as usize;
         let width = layout.size.width.round() as usize;
@@ -275,7 +313,11 @@ impl<MSG> TextArea<MSG> {
             is_bottom_right_rounded: false,
         };
         let mut canvas = Canvas::new();
-        canvas.draw_rect((left, top), (right, bottom), border);
+        canvas.draw_rect(
+            (left as usize, top as usize),
+            (right as usize, bottom as usize),
+            border,
+        );
         buf.write_canvas(canvas);
     }
 }
@@ -323,8 +365,8 @@ where
         // draw the text content
         let text_loc_y = loc_y - self.scroll_top;
         let text_loc_x = loc_x - self.scroll_left;
-        let bottom_scroll = self.inner_height(&layout) + self.scroll_top;
-        let right_scroll = self.inner_width(&layout) + self.scroll_left;
+        let bottom_scroll = self.inner_height() + self.scroll_top;
+        let right_scroll = self.inner_width() + self.scroll_left;
 
         for (j, line) in self.area_buffer.content.iter().enumerate() {
             if (j as f32) >= self.scroll_top && (j as f32) < bottom_scroll {
@@ -342,15 +384,12 @@ where
             }
         }
 
-        let (abs_cursor_x, abs_cursor_y) = self.cursor_location(&layout);
-
-        let is_cursor_visible = (abs_cursor_y > loc_y && abs_cursor_y < bottom)
-            && (abs_cursor_x > loc_x && abs_cursor_x < right);
+        let (abs_cursor_x, abs_cursor_y) = self.cursor_location();
 
         self.draw_border(buf);
         self.draw_scrollers(buf);
 
-        if self.focused && is_cursor_visible {
+        if self.focused && self.is_cursor_visible() {
             vec![
                 Cmd::ShowCursor,
                 Cmd::MoveTo(abs_cursor_x as usize, abs_cursor_y as usize),
@@ -434,11 +473,11 @@ where
                     }
                     if event.is_scrolldown() {
                         if is_shift_key_pressed {
-                            if self.can_scroll_right(&layout) {
+                            if self.can_scroll_right() {
                                 self.scroll_left += scroll_speed_x;
                             }
                         } else {
-                            if self.can_scroll_down(&layout) {
+                            if self.can_scroll_down() {
                                 self.scroll_top += scroll_speed_y;
                             }
                         }
