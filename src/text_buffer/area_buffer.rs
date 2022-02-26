@@ -1,4 +1,5 @@
 use crate::crossterm::event::{KeyCode, KeyEvent};
+use glam::*;
 use unicode_width::UnicodeWidthChar;
 
 /// Area buffer is a 2 dimensional text buffer
@@ -112,8 +113,8 @@ impl AreaBuffer {
         self.cursor_loc_y = cursor_y;
     }
 
-    pub fn get_cursor_location(&self) -> (usize, usize) {
-        (self.cursor_loc_x, self.cursor_loc_y)
+    pub fn get_cursor_location(&self) -> Vec2 {
+        vec2(self.cursor_loc_x as f32, self.cursor_loc_y as f32)
     }
 
     pub fn height(&self) -> usize {

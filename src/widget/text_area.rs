@@ -11,6 +11,7 @@ use expanse::{
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
+use glam::*;
 use ito_canvas::unicode_canvas::{Border, Canvas};
 use std::fmt;
 
@@ -200,15 +201,12 @@ impl<MSG> TextArea<MSG> {
     }
 
     /// return the cursor location relative to the screen
-    fn cursor_location(&self) -> (f32, f32) {
-        let (cursor_loc_x, cursor_loc_y) =
-            self.area_buffer.get_cursor_location();
+    fn cursor_location(&self) -> Vec2 {
+        let cursor_loc = self.area_buffer.get_cursor_location();
 
-        let abs_cursor_x =
-            self.inner_left() + cursor_loc_x as f32 - self.scroll_left;
-        let abs_cursor_y =
-            self.inner_top() + cursor_loc_y as f32 - self.scroll_top;
-        (abs_cursor_x, abs_cursor_y)
+        let abs_cursor_x = self.inner_left() + cursor_loc.x - self.scroll_left;
+        let abs_cursor_y = self.inner_top() + cursor_loc.y - self.scroll_top;
+        vec2(abs_cursor_x, abs_cursor_y)
     }
 
     fn left(&self) -> f32 {
@@ -262,11 +260,11 @@ impl<MSG> TextArea<MSG> {
     }
 
     fn is_cursor_visible(&self) -> bool {
-        let (abs_cursor_x, abs_cursor_y) = self.cursor_location();
-        (abs_cursor_y >= self.inner_top()
-            && abs_cursor_y <= self.inner_bottom())
-            && (abs_cursor_x >= self.inner_left()
-                && abs_cursor_x <= self.inner_right())
+        let abs_cursor = self.cursor_location();
+        (abs_cursor.y >= self.inner_top()
+            && abs_cursor.y <= self.inner_bottom())
+            && (abs_cursor.x >= self.inner_left()
+                && abs_cursor.x <= self.inner_right())
     }
 
     fn draw_scrollers(&self, buf: &mut Buffer) {
@@ -392,10 +390,10 @@ where
         self.draw_scrollers(buf);
 
         if self.focused && self.is_cursor_visible() {
-            let (abs_cursor_x, abs_cursor_y) = self.cursor_location();
+            let abs_cursor = self.cursor_location();
             vec![
                 Cmd::ShowCursor,
-                Cmd::MoveTo(abs_cursor_x as usize, abs_cursor_y as usize),
+                Cmd::MoveTo(abs_cursor.x as usize, abs_cursor.y as usize),
             ]
         } else {
             vec![]
