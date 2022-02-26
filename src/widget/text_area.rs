@@ -214,6 +214,28 @@ impl<MSG> TextArea<MSG> {
         (abs_cursor_x, abs_cursor_y)
     }
 
+    fn left(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        let loc_x = layout.location.x;
+        loc_x
+    }
+    fn top(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        let loc_y = layout.location.y;
+        loc_y
+    }
+    fn bottom(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        let height = layout.size.height;
+        self.top() + height - 1.0
+    }
+
+    fn right(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        let width = layout.size.width;
+        self.left() + width - 1.0
+    }
+
     /// inner bottom location excluding the border
     fn inner_bottom(&self) -> f32 {
         let layout = self.unwrap_layout();
@@ -290,16 +312,10 @@ impl<MSG> TextArea<MSG> {
     }
 
     fn draw_border(&self, buf: &mut Buffer) {
-        let layout = self.unwrap_layout();
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
-        let width = layout.size.width.round() as usize;
-        let height = layout.size.height.round() as usize;
-
-        let left = loc_x;
-        let top = loc_y;
-        let bottom = top + height - 1;
-        let right = left + width - 1;
+        let left = self.left();
+        let top = self.top();
+        let bottom = self.bottom();
+        let right = self.right();
 
         let border = Border {
             use_thick_border: self.focused,
@@ -353,18 +369,9 @@ where
 
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round();
-        let loc_y = layout.location.y.round();
-        let height = layout.size.height.round();
-        let width = layout.size.width.round();
-
-        let bottom = loc_y + height - 1.0;
-        let right = loc_x + width - 1.0;
-
         // draw the text content
-        let text_loc_y = loc_y - self.scroll_top;
-        let text_loc_x = loc_x - self.scroll_left;
+        let text_loc_y = self.top() - self.scroll_top;
+        let text_loc_x = self.left() - self.scroll_left;
         let bottom_scroll = self.inner_height() + self.scroll_top;
         let right_scroll = self.inner_width() + self.scroll_left;
 
@@ -384,12 +391,11 @@ where
             }
         }
 
-        let (abs_cursor_x, abs_cursor_y) = self.cursor_location();
-
         self.draw_border(buf);
         self.draw_scrollers(buf);
 
         if self.focused && self.is_cursor_visible() {
+            let (abs_cursor_x, abs_cursor_y) = self.cursor_location();
             vec![
                 Cmd::ShowCursor,
                 Cmd::MoveTo(abs_cursor_x as usize, abs_cursor_y as usize),
