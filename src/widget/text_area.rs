@@ -3,7 +3,7 @@ use crate::crossterm::event::KeyModifiers;
 use crate::Event;
 use crate::Value;
 use crate::{
-    buffer::Buffer, event::InputEvent, symbol, symbol::bar,
+    buffer::Buffer, event::InputEvent, symbol, symbol::bar, symbol::block,
     text_buffer::AreaBuffer, Callback, Cmd, Widget,
 };
 use expanse::{
@@ -31,6 +31,7 @@ pub struct TextArea<MSG> {
     has_border: bool,
     is_rounded_border: bool,
     is_thick_border: bool,
+    is_scrolled: bool,
 }
 
 impl<MSG> TextArea<MSG> {
@@ -52,6 +53,7 @@ impl<MSG> TextArea<MSG> {
             has_border: true,
             is_rounded_border: false,
             is_thick_border: false,
+            is_scrolled: false,
         }
     }
 
@@ -288,18 +290,20 @@ impl<MSG> TextArea<MSG> {
                 buf.set_symbol(
                     right as usize,
                     (top + j as f32 + scroller_offset_y) as usize,
-                    bar::SEVEN_EIGHTHS,
+                    bar::THREE_QUARTERS,
                 );
             }
         }
 
         if inner_width > 0.0 {
             for i in 0..scroller_width as usize {
-                buf.set_symbol(
-                    (left + i as f32 + scroller_offset_x) as usize,
-                    bottom as usize,
-                    symbol::MIDDLE_BLOCK,
-                );
+                if i % 2 == 0 {
+                    buf.set_symbol(
+                        (left + i as f32 + scroller_offset_x) as usize,
+                        bottom as usize,
+                        symbol::MEDIUM_SQUARE,
+                    );
+                }
             }
         }
     }
@@ -385,7 +389,9 @@ where
         }
 
         self.draw_border(buf);
-        self.draw_scrollers(buf);
+        if self.focused && self.is_scrolled {
+            self.draw_scrollers(buf);
+        }
 
         if self.focused && self.is_cursor_visible() {
             let abs_cursor = self.cursor_location();
@@ -421,6 +427,7 @@ where
                     .collect()
             }
             Event::Mouse(_me) => {
+                self.is_scrolled = false;
                 let (x, y) = event
                     .extract_location()
                     .expect("must have a mouse location");
@@ -456,6 +463,7 @@ where
                         .set_cursor_loc(cursor_x as usize, cursor_y as usize);
                     vec![]
                 } else if event.is_scroll() {
+                    self.is_scrolled = true;
                     let is_shift_key_pressed =
                         modifiers.unwrap().contains(KeyModifiers::SHIFT);
 
