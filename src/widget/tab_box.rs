@@ -258,6 +258,20 @@ where
         self.has_border
     }
 
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: false,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: true,
+            is_top_right_rounded: true,
+            is_bottom_left_rounded: true,
+            is_bottom_right_rounded: true,
+        }
+    }
+
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         // offset the position of the top_border
         let layout = self.layout.expect("must have a layout");
@@ -270,19 +284,8 @@ where
         let right = left + width as usize - 1;
         let top = (loc_y + 2.0) as usize;
         let bottom = top + height as usize - 3;
-        let border = Border {
-            use_thick_border: false,
-            has_top: true,
-            has_bottom: true,
-            has_left: true,
-            has_right: true,
-            is_top_left_rounded: true,
-            is_top_right_rounded: true,
-            is_bottom_left_rounded: true,
-            is_bottom_right_rounded: true,
-        };
 
-        canvas.draw_rect((left, top), (right, bottom), border);
+        canvas.draw_rect((left, top), (right, bottom), self.border_style());
 
         self.draw_labels(buf, &mut canvas);
         buf.write_canvas(canvas);

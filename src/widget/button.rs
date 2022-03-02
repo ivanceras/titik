@@ -142,17 +142,6 @@ impl<MSG> Widget<MSG> for Button<MSG> {
 
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
-        let width = layout.size.width.round() as usize;
-        let height = layout.size.height.round() as usize;
-
-        let left = loc_x;
-        let top = loc_y;
-        let bottom = top + height - 1;
-        let right = left + width - 1;
-
         self.draw_border(buf);
 
         for (t, ch) in self.label.chars().enumerate() {
@@ -160,7 +149,11 @@ impl<MSG> Widget<MSG> for Button<MSG> {
             if self.focused {
                 cell.bold();
             }
-            buf.set_cell(loc_x + 1 + t, loc_y + 1, cell);
+            buf.set_cell(
+                self.inner_left() as usize + t,
+                self.inner_top() as usize,
+                cell,
+            );
         }
 
         vec![]

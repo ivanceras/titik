@@ -120,44 +120,28 @@ where
         self.has_border
     }
 
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: self.focused,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: self.is_rounded,
+            is_top_right_rounded: self.is_rounded,
+            is_bottom_left_rounded: self.is_rounded,
+            is_bottom_right_rounded: self.is_rounded,
+        }
+    }
+
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x;
-        let loc_y = layout.location.y;
-        let width = layout.size.width;
-        let height = layout.size.height;
-
-        let left = loc_x;
-        let top = loc_y;
-        let bottom = top + height - 1.0;
-        let right = left + width - 1.0;
-
-        if self.has_border {
-            let border = Border {
-                use_thick_border: self.focused,
-                has_top: true,
-                has_bottom: true,
-                has_left: true,
-                has_right: true,
-                is_top_left_rounded: self.is_rounded,
-                is_top_right_rounded: self.is_rounded,
-                is_bottom_left_rounded: self.is_rounded,
-                is_bottom_right_rounded: self.is_rounded,
-            };
-            let mut canvas = Canvas::new();
-            canvas.draw_rect(
-                (left as usize, top as usize),
-                (right as usize, bottom as usize),
-                border,
-            );
-            buf.write_canvas(canvas);
-        }
+        self.draw_border(buf);
 
         for (t, ch) in self.get_value().chars().enumerate() {
             buf.set_symbol(
-                (left + self.border_left() + t as f32) as usize,
-                (top + self.border_top()) as usize,
+                self.inner_left() as usize + t,
+                self.inner_top() as usize,
                 ch,
             );
         }
@@ -167,8 +151,8 @@ where
             vec![
                 Cmd::ShowCursor,
                 Cmd::MoveTo(
-                    (left + cursor_loc_x + self.border_left()) as usize,
-                    (top + self.border_top()) as usize,
+                    (self.inner_left() + cursor_loc_x) as usize,
+                    self.inner_top() as usize,
                 ),
             ]
         } else {

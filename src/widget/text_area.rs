@@ -151,24 +151,6 @@ where
         top_left + cursor_loc - scroll_loc
     }
 
-    /// inner bottom location excluding the border
-    fn inner_bottom(&self) -> f32 {
-        self.top() + self.layout_height() - self.border_bottom()
-    }
-    /// the inner right location of the textarea excluding the border
-    fn inner_right(&self) -> f32 {
-        self.left() + self.layout_width() - self.border_right()
-    }
-    /// the inner top location of the textarea excluding the border
-    fn inner_top(&self) -> f32 {
-        self.top() + self.border_top()
-    }
-
-    /// the inner left location of the textare excluding the border
-    fn inner_left(&self) -> f32 {
-        self.left() + self.border_left()
-    }
-
     fn is_cursor_visible(&self) -> bool {
         let abs_cursor = self.cursor_location();
         (abs_cursor.y >= self.inner_top()
@@ -218,34 +200,22 @@ where
         }
     }
 
-    fn border_style(&self) -> Border {
-        Border {
-            use_thick_border: self.focused,
-            has_top: self.has_border,
-            has_bottom: self.has_border,
-            has_left: self.has_border,
-            has_right: self.has_border,
-            is_top_left_rounded: self.is_rounded_border,
-            is_top_right_rounded: self.is_rounded_border,
-            is_bottom_left_rounded: self.is_rounded_border,
-            is_bottom_right_rounded: self.is_rounded_border,
-        }
-    }
-
     fn draw_border(&self, buf: &mut Buffer) {
-        let left = self.left();
-        let top = self.top();
-        let bottom = self.bottom();
-        let right = self.right();
+        if self.has_border() {
+            let left = self.left();
+            let top = self.top();
+            let bottom = self.bottom();
+            let right = self.right();
 
-        let border = self.border_style();
-        let mut canvas = Canvas::new();
-        canvas.draw_rect(
-            (left as usize, top as usize),
-            (right as usize, bottom as usize),
-            border,
-        );
-        buf.write_canvas(canvas);
+            let border = self.border_style();
+            let mut canvas = Canvas::new();
+            canvas.draw_rect(
+                (left as usize, top as usize),
+                (right as usize, bottom as usize),
+                border,
+            );
+            buf.write_canvas(canvas);
+        }
     }
 }
 
@@ -280,6 +250,20 @@ where
 
     fn has_border(&self) -> bool {
         self.has_border
+    }
+
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: self.focused,
+            has_top: self.has_border,
+            has_bottom: self.has_border,
+            has_left: self.has_border,
+            has_right: self.has_border,
+            is_top_left_rounded: self.is_rounded_border,
+            is_top_right_rounded: self.is_rounded_border,
+            is_bottom_left_rounded: self.is_rounded_border,
+            is_bottom_right_rounded: self.is_rounded_border,
+        }
     }
 
     /// draw this button to the buffer, with the given computed layout

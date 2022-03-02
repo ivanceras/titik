@@ -129,19 +129,21 @@ where
     }
 
     fn draw_border(&self, buf: &mut Buffer) {
-        let left = self.left();
-        let top = self.top();
-        let bottom = self.bottom();
-        let right = self.right();
+        if self.has_border() {
+            let left = self.left();
+            let top = self.top();
+            let bottom = self.bottom();
+            let right = self.right();
 
-        let border = self.border_style();
-        let mut canvas = Canvas::new();
-        canvas.draw_rect(
-            (left as usize, top as usize),
-            (right as usize, bottom as usize),
-            border,
-        );
-        buf.write_canvas(canvas);
+            let border = self.border_style();
+            let mut canvas = Canvas::new();
+            canvas.draw_rect(
+                (left as usize, top as usize),
+                (right as usize, bottom as usize),
+                border,
+            );
+            buf.write_canvas(canvas);
+        }
     }
 
     fn has_border(&self) -> bool;
@@ -202,6 +204,24 @@ where
         } else {
             0.0
         }
+    }
+
+    /// inner bottom location excluding the border
+    fn inner_bottom(&self) -> f32 {
+        self.top() + self.layout_height() - self.border_bottom()
+    }
+    /// the inner right location of the textarea excluding the border
+    fn inner_right(&self) -> f32 {
+        self.left() + self.layout_width() - self.border_right()
+    }
+    /// the inner top location of the textarea excluding the border
+    fn inner_top(&self) -> f32 {
+        self.top() + self.border_top()
+    }
+
+    /// the inner left location of the textare excluding the border
+    fn inner_left(&self) -> f32 {
+        self.left() + self.border_left()
     }
 
     /// build a node with styles from this widget and its children
