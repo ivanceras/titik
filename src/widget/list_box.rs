@@ -142,6 +142,10 @@ where
         }
     }
 
+    fn has_border(&self) -> bool {
+        true
+    }
+
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         self.draw_border(buf);
         self.draw_items(buf);

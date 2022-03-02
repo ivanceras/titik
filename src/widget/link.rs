@@ -157,6 +157,10 @@ impl<MSG> Widget<MSG> for Link {
         }
     }
 
+    fn has_border(&self) -> bool {
+        self.has_border
+    }
+
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         let layout = self.layout.expect("must have a layout");

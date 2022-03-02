@@ -78,6 +78,10 @@ where
         }
     }
 
+    fn has_border(&self) -> bool {
+        false
+    }
+
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         let layout = self.layout.expect("must have a layout");
         let loc_x = layout.location.x.round() as usize;

@@ -1,25 +1,27 @@
 use crate::Event;
-use crate::{buffer::Buffer, Cmd, Widget};
+use crate::{buffer::Buffer, Callback, Cmd, Widget};
 use expanse::{
     geometry::Size,
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::fmt;
 
 /// A one line text input
-#[derive(Default, Debug)]
-pub struct TextLabel {
+#[derive(Debug)]
+pub struct TextLabel<MSG> {
     layout: Option<Layout>,
     value: String,
     is_rounded: bool,
     has_border: bool,
     width: Option<f32>,
     height: Option<f32>,
+    on_click: Vec<Callback<Event, MSG>>,
     id: Option<String>,
 }
 
-impl TextLabel {
+impl<MSG> TextLabel<MSG> {
     /// creates a new text input with initial value
     pub fn new<S>(value: S) -> Self
     where
@@ -30,8 +32,10 @@ impl TextLabel {
             value: value.to_string(),
             is_rounded: false,
             has_border: false,
+            width: None,
+            height: None,
+            on_click: vec![],
             id: None,
-            ..Default::default()
         }
     }
 
@@ -49,64 +53,12 @@ impl TextLabel {
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }
-
-    fn border_top(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_bottom(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_left(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_right(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    #[allow(dead_code)]
-    fn inner_height(&self, layout: &Layout) -> usize {
-        let ih = layout.size.height.round()
-            - self.border_top()
-            - self.border_bottom();
-        if ih > 0.0 {
-            ih as usize
-        } else {
-            0
-        }
-    }
-
-    fn inner_width(&self, layout: &Layout) -> usize {
-        let iw = layout.size.width.round()
-            - self.border_left()
-            - self.border_right();
-        if iw > 0.0 {
-            iw as usize
-        } else {
-            0
-        }
-    }
 }
 
-impl<MSG> Widget<MSG> for TextLabel {
+impl<MSG> Widget<MSG> for TextLabel<MSG>
+where
+    MSG: fmt::Debug,
+{
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -144,6 +96,10 @@ impl<MSG> Widget<MSG> for TextLabel {
         }
     }
 
+    fn has_border(&self) -> bool {
+        self.has_border
+    }
+
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         let layout = self.layout.expect("must have a layout");
@@ -178,7 +134,6 @@ impl<MSG> Widget<MSG> for TextLabel {
             buf.write_canvas(canvas);
         }
 
-        let _inner_width = self.inner_width(&layout);
         for (t, ch) in self.get_value().chars().enumerate() {
             buf.set_symbol(
                 (left + self.border_left() + t as f32) as usize,

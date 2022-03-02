@@ -84,22 +84,6 @@ impl<MSG> Button<MSG> {
     {
         self.on_click.push(f.into());
     }
-
-    fn border_top(&self) -> f32 {
-        1.0
-    }
-
-    fn border_bottom(&self) -> f32 {
-        1.0
-    }
-
-    fn border_left(&self) -> f32 {
-        1.0
-    }
-
-    fn border_right(&self) -> f32 {
-        1.0
-    }
 }
 
 impl<MSG> Widget<MSG> for Button<MSG> {
@@ -136,6 +120,10 @@ impl<MSG> Widget<MSG> for Button<MSG> {
             },
             ..Default::default()
         }
+    }
+
+    fn has_border(&self) -> bool {
+        true
     }
 
     fn border_style(&self) -> Border {

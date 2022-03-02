@@ -76,22 +76,6 @@ impl<MSG> SearchBox<MSG> {
         self.is_rounded = rounded;
     }
 
-    fn border_top(&self) -> f32 {
-        1.0
-    }
-
-    fn border_bottom(&self) -> f32 {
-        1.0
-    }
-
-    fn border_left(&self) -> f32 {
-        1.0
-    }
-
-    fn border_right(&self) -> f32 {
-        1.0
-    }
-
     /// process the key event for this text input
     pub fn process_key(&mut self, key_event: KeyEvent) -> Vec<MSG> {
         self.input_buffer.process_key_event(key_event);
@@ -157,6 +141,10 @@ impl<MSG> Widget<MSG> for SearchBox<MSG> {
             is_bottom_left_rounded: self.is_rounded,
             is_bottom_right_rounded: self.is_rounded,
         }
+    }
+
+    fn has_border(&self) -> bool {
+        true
     }
 
     /// draw this button to the buffer, with the given computed layout

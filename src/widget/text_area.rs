@@ -90,68 +90,6 @@ where
         self.area_buffer.to_string()
     }
 
-    fn unwrap_layout(&self) -> &Layout {
-        self.layout.as_ref().expect("must have a layout")
-    }
-
-    fn border_top(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_bottom(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_left(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_right(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    /// layout height excluding the borders
-    fn inner_height(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let ih = layout.size.height.round()
-            - self.border_top()
-            - self.border_bottom();
-        if ih > 0.0 {
-            ih
-        } else {
-            0.0
-        }
-    }
-
-    /// layout width excluding the borders
-    fn inner_width(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        let iw = layout.size.width.round()
-            - self.border_left()
-            - self.border_right();
-        if iw > 0.0 {
-            iw
-        } else {
-            0.0
-        }
-    }
-
     fn content_height(&self) -> f32 {
         self.area_buffer.height() as f32
     }
@@ -338,6 +276,10 @@ where
             },
             ..Default::default()
         }
+    }
+
+    fn has_border(&self) -> bool {
+        self.has_border
     }
 
     /// draw this button to the buffer, with the given computed layout

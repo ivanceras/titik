@@ -86,38 +86,6 @@ impl<MSG> FlexBox<MSG> {
     pub fn set_rounded(&mut self, use_rounded_border: bool) {
         self.is_rounded_border = use_rounded_border;
     }
-
-    fn border_top(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_bottom(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_left(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_right(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
 }
 
 impl<MSG> Widget<MSG> for FlexBox<MSG>
@@ -154,6 +122,10 @@ where
             },
             ..Default::default()
         }
+    }
+
+    fn has_border(&self) -> bool {
+        self.has_border
     }
 
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {

@@ -67,61 +67,6 @@ impl<MSG> TextInput<MSG> {
         self.is_rounded = rounded;
     }
 
-    fn border_top(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_bottom(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_left(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_right(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    #[allow(dead_code)]
-    fn inner_height(&self, layout: &Layout) -> usize {
-        let ih = layout.size.height.round()
-            - self.border_top()
-            - self.border_bottom();
-        if ih > 0.0 {
-            ih as usize
-        } else {
-            0
-        }
-    }
-
-    fn inner_width(&self, layout: &Layout) -> usize {
-        let iw = layout.size.width.round()
-            - self.border_left()
-            - self.border_right();
-        if iw > 0.0 {
-            iw as usize
-        } else {
-            0
-        }
-    }
-
     pub fn on_input<F>(&mut self, f: F)
     where
         F: FnMut(Event) -> MSG + 'static,
@@ -171,6 +116,10 @@ where
         }
     }
 
+    fn has_border(&self) -> bool {
+        self.has_border
+    }
+
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         let layout = self.layout.expect("must have a layout");
@@ -205,7 +154,6 @@ where
             buf.write_canvas(canvas);
         }
 
-        let _inner_width = self.inner_width(&layout);
         for (t, ch) in self.get_value().chars().enumerate() {
             buf.set_symbol(
                 (left + self.border_left() + t as f32) as usize,
