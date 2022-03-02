@@ -308,23 +308,27 @@ impl<MSG> TextArea<MSG> {
         }
     }
 
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: self.focused,
+            has_top: self.has_border,
+            has_bottom: self.has_border,
+            has_left: self.has_border,
+            has_right: self.has_border,
+            is_top_left_rounded: self.is_rounded_border,
+            is_top_right_rounded: self.is_rounded_border,
+            is_bottom_left_rounded: self.is_rounded_border,
+            is_bottom_right_rounded: self.is_rounded_border,
+        }
+    }
+
     fn draw_border(&self, buf: &mut Buffer) {
         let left = self.left();
         let top = self.top();
         let bottom = self.bottom();
         let right = self.right();
 
-        let border = Border {
-            use_thick_border: self.focused,
-            has_top: true,
-            has_bottom: true,
-            has_left: true,
-            has_right: true,
-            is_top_left_rounded: false,
-            is_top_right_rounded: false,
-            is_bottom_left_rounded: false,
-            is_bottom_right_rounded: false,
-        };
+        let border = self.border_style();
         let mut canvas = Canvas::new();
         canvas.draw_rect(
             (left as usize, top as usize),
