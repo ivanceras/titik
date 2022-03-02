@@ -11,7 +11,7 @@ pub use titik::crossterm::{
 
 use titik::{
     Button, Callback, Checkbox, FlexBox, GroupBox, Image, Link, ListBox, Radio,
-    Renderer, Slider, TabBox, TextArea, TextInput, Widget,
+    Renderer, SearchBox, Slider, TabBox, TextArea, TextInput, Widget,
 };
 
 fn build_ui() -> Box<dyn Widget<()>> {
@@ -62,6 +62,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     gb1.add_child(Box::new(link1));
 
     let input1 = TextInput::new("Hello world!");
+    let search1 = SearchBox::new("Search...");
 
     let input2 =
         TextInput::new("The quick brown fox jumps over the lazy dog...");
@@ -115,6 +116,7 @@ fn build_ui() -> Box<dyn Widget<()>> {
     });
 
     root_node.add_child(Box::new(btn1));
+    root_node.add_child(Box::new(search1));
     root_node.add_child(Box::new(slider));
     root_node.add_child(Box::new(btn2));
     tab1.add_child(Box::new(gb1));

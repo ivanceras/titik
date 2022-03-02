@@ -34,3 +34,5 @@ pub const MIDDLE_BLOCK: char = '▮';
 /// 0x25fc
 pub const MEDIUM_SQUARE: char = '◼';
 pub const FULL_BLOCK: char = '█';
+
+pub const SEARCH_ICON: char = 'Ⴍ';

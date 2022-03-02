@@ -45,6 +45,10 @@ impl InputBuffer {
         self.cursor_loc
     }
 
+    pub fn set_content<S: ToString>(&mut self, content: S) {
+        self.content = content.to_string()
+    }
+
     /// append a character to the buffer and move the cursor location
     /// to the right
     fn add_char(&mut self, c: char) {
