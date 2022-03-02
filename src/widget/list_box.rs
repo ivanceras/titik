@@ -21,7 +21,10 @@ pub struct ListBox<MSG> {
     use_divider: bool,
 }
 
-impl<MSG> ListBox<MSG> {
+impl<MSG> ListBox<MSG>
+where
+    MSG: fmt::Debug + 'static,
+{
     ///create a new flexbox
     pub fn new() -> Self {
         ListBox {
@@ -41,59 +44,24 @@ impl<MSG> ListBox<MSG> {
         self.use_divider = use_divider;
     }
 
-    fn draw_border(&self, buf: &mut Buffer) {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
-        let width = layout.size.width.round() as usize;
-        let height = layout.size.height.round() as usize;
-
-        let left = loc_x;
-        let top = loc_y;
-        let bottom = top + height - 1;
-        let right = left + width - 1;
-
-        let border = Border {
-            use_thick_border: false,
-            has_top: true,
-            has_bottom: true,
-            has_left: true,
-            has_right: true,
-            is_top_left_rounded: false,
-            is_top_right_rounded: false,
-            is_bottom_left_rounded: false,
-            is_bottom_right_rounded: false,
-        };
-        let mut canvas = Canvas::new();
-        canvas.draw_rect((left, top), (right, bottom), border);
-        buf.write_canvas(canvas);
-    }
-
     /// set the list of this listbox;
     pub fn set_list(&mut self, list: Vec<String>) {
         self.list = list;
     }
 
     fn draw_items(&self, buf: &mut Buffer) {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x;
-        let loc_y = layout.location.y;
-        let width = layout.size.width;
-        let height = layout.size.height;
-        let bottom = layout.location.y + height - 1.0;
-
         for (j, li) in self.list.iter().enumerate() {
-            let item_left = loc_x + 1.0;
-            let item_right = loc_x + width - 2.0;
+            let item_left = self.inner_left();
+            let item_right = self.inner_right() - 1.0;
 
             let item_top = if self.use_divider {
-                loc_y + (j as f32 * 2.0)
+                self.inner_top() + (j as f32 * 2.0)
             } else {
-                loc_y + j as f32
+                self.inner_top() + j as f32
             };
 
             let item_bottom = item_top + 2.0;
-            if item_bottom < bottom {
+            if item_bottom < self.bottom() {
                 let mut canvas = Canvas::new();
                 buf.write_str(
                     (item_left + 1.0) as usize,
@@ -144,6 +112,20 @@ where
 
     fn has_border(&self) -> bool {
         true
+    }
+
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: false,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: false,
+            is_top_right_rounded: false,
+            is_bottom_left_rounded: false,
+            is_bottom_right_rounded: false,
+        }
     }
 
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {

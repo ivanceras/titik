@@ -94,18 +94,23 @@ impl<MSG: 'static> Widget<MSG> for Checkbox<MSG> {
 
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
         let box_symbol = if self.is_checked {
             symbol::BOX_CHECKED
         } else {
             symbol::BOX_UNCHECKED
         };
-        buf.set_symbol(loc_x, loc_y, box_symbol);
+        buf.set_symbol(
+            self.left() as usize,
+            self.inner_top() as usize,
+            box_symbol,
+        );
 
         for (t, ch) in self.label.chars().enumerate() {
-            buf.set_symbol(loc_x + 3 + t, loc_y, ch);
+            buf.set_symbol(
+                self.left() as usize + 3 + t,
+                self.inner_top() as usize,
+                ch,
+            );
         }
         vec![]
     }
