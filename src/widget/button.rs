@@ -138,6 +138,20 @@ impl<MSG> Widget<MSG> for Button<MSG> {
         }
     }
 
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: false,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: self.is_rounded,
+            is_top_right_rounded: self.is_rounded,
+            is_bottom_left_rounded: self.is_rounded,
+            is_bottom_right_rounded: self.is_rounded,
+        }
+    }
+
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
         let layout = self.layout.expect("must have a layout");
@@ -151,20 +165,7 @@ impl<MSG> Widget<MSG> for Button<MSG> {
         let bottom = top + height - 1;
         let right = left + width - 1;
 
-        let border = Border {
-            use_thick_border: false,
-            has_top: true,
-            has_bottom: true,
-            has_left: true,
-            has_right: true,
-            is_top_left_rounded: self.is_rounded,
-            is_top_right_rounded: self.is_rounded,
-            is_bottom_left_rounded: self.is_rounded,
-            is_bottom_right_rounded: self.is_rounded,
-        };
-        let mut canvas = Canvas::new();
-        canvas.draw_rect((left, top), (right, bottom), border);
-        buf.write_canvas(canvas);
+        self.draw_border(buf);
 
         for (t, ch) in self.label.chars().enumerate() {
             let mut cell = Cell::new(ch);

@@ -34,7 +34,10 @@ pub struct TextArea<MSG> {
     is_scrolled: bool,
 }
 
-impl<MSG> TextArea<MSG> {
+impl<MSG> TextArea<MSG>
+where
+    MSG: fmt::Debug + 'static,
+{
     /// create a new text area with initial value
     pub fn new<S>(value: S) -> Self
     where
@@ -208,37 +211,6 @@ impl<MSG> TextArea<MSG> {
         let top_left = vec2(self.inner_left(), self.inner_top());
         let scroll_loc = vec2(self.scroll_left, self.scroll_top);
         top_left + cursor_loc - scroll_loc
-    }
-
-    fn top_left(&self) -> Vec2 {
-        let layout = self.unwrap_layout();
-        vec2(layout.location.x, layout.location.y)
-    }
-
-    fn top(&self) -> f32 {
-        self.top_left().y
-    }
-
-    fn left(&self) -> f32 {
-        self.top_left().x
-    }
-
-    fn layout_width(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        layout.size.width
-    }
-
-    fn layout_height(&self) -> f32 {
-        let layout = self.unwrap_layout();
-        layout.size.height
-    }
-
-    fn bottom(&self) -> f32 {
-        self.top() + self.layout_height() - 1.0
-    }
-
-    fn right(&self) -> f32 {
-        self.left() + self.layout_width() - 1.0
     }
 
     /// inner bottom location excluding the border

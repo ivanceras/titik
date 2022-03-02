@@ -11,8 +11,10 @@ use expanse::{
     style::Style,
 };
 pub use flex_box::FlexBox;
+use glam::{vec2, Vec2};
 pub use group_box::GroupBox;
 pub use image_control::Image;
+use ito_canvas::unicode_canvas::{Border, Canvas};
 pub use link::Link;
 pub use list_box::ListBox;
 pub use radio::Radio;
@@ -47,6 +49,10 @@ where
 
     /// return the layout of thiswidget
     fn layout(&self) -> Option<&Layout>;
+
+    fn unwrap_layout(&self) -> &Layout {
+        self.layout().as_ref().expect("must have a layout")
+    }
 
     /// return the offset of the parent,
     /// this before any of it's children to be drawn
@@ -84,6 +90,57 @@ where
     /// writes into the buffer. The result will then be written into the
     /// stdout terminal.
     fn draw(&self, but: &mut Buffer) -> Vec<Cmd>;
+
+    fn top_left(&self) -> Vec2 {
+        let layout = self.unwrap_layout();
+        vec2(layout.location.x, layout.location.y)
+    }
+
+    fn top(&self) -> f32 {
+        self.top_left().y
+    }
+
+    fn left(&self) -> f32 {
+        self.top_left().x
+    }
+
+    fn layout_width(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        layout.size.width
+    }
+
+    fn layout_height(&self) -> f32 {
+        let layout = self.unwrap_layout();
+        layout.size.height
+    }
+
+    fn bottom(&self) -> f32 {
+        self.top() + self.layout_height() - 1.0
+    }
+
+    fn right(&self) -> f32 {
+        self.left() + self.layout_width() - 1.0
+    }
+
+    fn border_style(&self) -> Border {
+        Border::default()
+    }
+
+    fn draw_border(&self, buf: &mut Buffer) {
+        let left = self.left();
+        let top = self.top();
+        let bottom = self.bottom();
+        let right = self.right();
+
+        let border = self.border_style();
+        let mut canvas = Canvas::new();
+        canvas.draw_rect(
+            (left as usize, top as usize),
+            (right as usize, bottom as usize),
+            border,
+        );
+        buf.write_canvas(canvas);
+    }
 
     /// build a node with styles from this widget and its children
     /// The Layout tree is then calculated see `layout::compute_layout`
