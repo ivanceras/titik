@@ -1,15 +1,16 @@
 use crate::Event;
-use crate::{buffer::Buffer, Cmd, Widget};
+use crate::{buffer::Buffer, Callback, Cmd, Widget};
 use expanse::{
     geometry::Size,
     result::Layout,
     style::{Dimension, PositionType, Style},
 };
 use ito_canvas::unicode_canvas::{Border, Canvas};
+use std::fmt;
 
 /// A one line text input
-#[derive(Default, Debug)]
-pub struct Link {
+#[derive(Debug)]
+pub struct Link<MSG> {
     layout: Option<Layout>,
     label: String,
     //TODO: show the uri when hovered
@@ -18,10 +19,11 @@ pub struct Link {
     has_border: bool,
     width: Option<f32>,
     height: Option<f32>,
+    on_click: Vec<Callback<Event, MSG>>,
     id: Option<String>,
 }
 
-impl Link {
+impl<MSG> Link<MSG> {
     /// creates a new text input with initial label
     pub fn new<S>(uri: S, label: S) -> Self
     where
@@ -33,8 +35,10 @@ impl Link {
             uri: uri.to_string(),
             is_rounded: false,
             has_border: false,
+            width: None,
+            height: None,
+            on_click: vec![],
             id: None,
-            ..Default::default()
         }
     }
 
@@ -62,64 +66,12 @@ impl Link {
     pub fn set_rounded(&mut self, rounded: bool) {
         self.is_rounded = rounded;
     }
-
-    fn border_top(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_bottom(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_left(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    fn border_right(&self) -> f32 {
-        if self.has_border {
-            1.0
-        } else {
-            0.0
-        }
-    }
-
-    #[allow(dead_code)]
-    fn inner_height(&self, layout: &Layout) -> usize {
-        let ih = layout.size.height.round()
-            - self.border_top()
-            - self.border_bottom();
-        if ih > 0.0 {
-            ih as usize
-        } else {
-            0
-        }
-    }
-
-    fn inner_width(&self, layout: &Layout) -> usize {
-        let iw = layout.size.width.round()
-            - self.border_left()
-            - self.border_right();
-        if iw > 0.0 {
-            iw as usize
-        } else {
-            0
-        }
-    }
 }
 
-impl<MSG> Widget<MSG> for Link {
+impl<MSG> Widget<MSG> for Link<MSG>
+where
+    MSG: fmt::Debug,
+{
     fn layout(&self) -> Option<&Layout> {
         self.layout.as_ref()
     }
@@ -161,45 +113,28 @@ impl<MSG> Widget<MSG> for Link {
         self.has_border
     }
 
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: false,
+            has_top: self.has_border,
+            has_bottom: self.has_border,
+            has_left: self.has_border,
+            has_right: self.has_border,
+            is_top_left_rounded: self.is_rounded,
+            is_top_right_rounded: self.is_rounded,
+            is_bottom_left_rounded: self.is_rounded,
+            is_bottom_right_rounded: self.is_rounded,
+        }
+    }
+
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x;
-        let loc_y = layout.location.y;
-        let width = layout.size.width;
-        let height = layout.size.height;
+        self.draw_border(buf);
 
-        let left = loc_x;
-        let top = loc_y;
-        let bottom = top + height - 1.0;
-        let right = left + width - 1.0;
-
-        if self.has_border {
-            let border = Border {
-                use_thick_border: false,
-                has_top: true,
-                has_bottom: true,
-                has_left: true,
-                has_right: true,
-                is_top_left_rounded: self.is_rounded,
-                is_top_right_rounded: self.is_rounded,
-                is_bottom_left_rounded: self.is_rounded,
-                is_bottom_right_rounded: self.is_rounded,
-            };
-            let mut canvas = Canvas::new();
-            canvas.draw_rect(
-                (left as usize, top as usize),
-                (right as usize, bottom as usize),
-                border,
-            );
-            buf.write_canvas(canvas);
-        }
-
-        let _inner_width = self.inner_width(&layout);
         for (t, ch) in self.get_label().chars().enumerate() {
             buf.set_symbol(
-                (left + self.border_left() + t as f32) as usize,
-                (top + self.border_top()) as usize,
+                self.inner_left() as usize + t,
+                self.inner_top() as usize,
                 ch,
             );
         }

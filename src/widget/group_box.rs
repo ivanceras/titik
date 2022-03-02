@@ -24,7 +24,10 @@ pub struct GroupBox<MSG> {
     label: Option<String>,
 }
 
-impl<MSG> GroupBox<MSG> {
+impl<MSG> GroupBox<MSG>
+where
+    MSG: fmt::Debug + 'static,
+{
     /// create a new groupbox
     pub fn new() -> Self {
         GroupBox {
@@ -63,12 +66,13 @@ impl<MSG> GroupBox<MSG> {
     }
 
     fn draw_label(&self, buf: &mut Buffer) {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
         if let Some(label) = &self.label {
             for (t, ch) in label.chars().enumerate() {
-                buf.set_symbol(loc_x + 3 + t, loc_y, ch);
+                buf.set_symbol(
+                    self.left() as usize + 3 + t,
+                    self.top() as usize,
+                    ch,
+                );
             }
         }
     }
@@ -114,37 +118,22 @@ where
         self.has_border
     }
 
-    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout().expect("must have a layout");
-        let loc_x = layout.location.x.round();
-        let loc_y = layout.location.y.round();
-        let width = layout.size.width.round();
-        let height = layout.size.height.round();
-
-        if self.has_border {
-            let border = Border {
-                use_thick_border: self.is_thick_border,
-                has_top: true,
-                has_bottom: true,
-                has_left: true,
-                has_right: true,
-                is_top_left_rounded: self.is_rounded_border,
-                is_top_right_rounded: self.is_rounded_border,
-                is_bottom_left_rounded: self.is_rounded_border,
-                is_bottom_right_rounded: self.is_rounded_border,
-            };
-
-            let left = loc_x as usize;
-            let top = loc_y as usize;
-            let bottom = (loc_y + height - 1.0) as usize;
-            let right = (loc_x + width - 1.0) as usize;
-            let mut canvas = Canvas::new();
-            canvas.draw_rect((left, top), (right, bottom), border);
-            for (i, j, ch) in canvas.get_cells() {
-                buf.set_symbol(i, j, ch);
-            }
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: self.is_thick_border,
+            has_top: true,
+            has_bottom: true,
+            has_left: true,
+            has_right: true,
+            is_top_left_rounded: self.is_rounded_border,
+            is_top_right_rounded: self.is_rounded_border,
+            is_bottom_left_rounded: self.is_rounded_border,
+            is_bottom_right_rounded: self.is_rounded_border,
         }
+    }
 
+    fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
+        self.draw_border(buf);
         self.draw_label(buf);
         vec![]
     }

@@ -78,18 +78,23 @@ impl<MSG: 'static> Widget<MSG> for Radio<MSG> {
 
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
         let (box_symbol, x_offset) = if self.is_checked {
             (symbol::RADIO_CHECKED, 0)
         } else {
             (symbol::RADIO_UNCHECKED, 0)
         };
-        buf.set_symbol(loc_x, loc_y, box_symbol);
+        buf.set_symbol(
+            self.left() as usize,
+            self.inner_top() as usize,
+            box_symbol,
+        );
 
         for (t, ch) in self.label.chars().enumerate() {
-            buf.set_symbol(loc_x + 3 + x_offset + t, loc_y, ch);
+            buf.set_symbol(
+                self.left() as usize + 3 + x_offset + t,
+                self.inner_top() as usize,
+                ch,
+            );
         }
         vec![]
     }

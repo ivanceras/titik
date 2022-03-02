@@ -8,15 +8,12 @@ use titik::{
 fn main() -> Result<()> {
     let stdout = io::stdout();
     let mut root_node = FlexBox::<()>::new();
-    root_node.set_border(false);
     root_node.set_thick_border(true);
     let mut column = FlexBox::new();
     column.vertical();
-    column.set_border(false);
     column.set_thick_border(false);
     let mut row = FlexBox::<()>::new();
     row.horizontal();
-    row.set_border(false);
     row.set_thick_border(false);
     row.set_rounded(true);
     let btn1 = Button::<()>::new("btn 1");

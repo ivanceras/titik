@@ -83,21 +83,19 @@ where
     }
 
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round() as usize;
-        let loc_y = layout.location.y.round() as usize;
-        let width = layout.size.width.round() as usize;
-        let _height = layout.size.height.round() as usize;
         let mut canvas = Canvas::new();
-        let right = loc_x + width - 2;
         canvas.draw_horizontal_line(
-            (loc_x + 1, loc_y),
-            (right, loc_y),
+            (self.left() as usize + 1, self.top() as usize),
+            (self.right() as usize - 2, self.top() as usize),
             self.use_thick_track,
         );
         buf.write_canvas(canvas);
-        let slider_loc = (self.value * width as f32) as usize;
-        buf.set_symbol(loc_x + slider_loc, loc_y, symbol::MIDDLE_BLOCK);
+        let slider_loc = (self.value * self.layout_width()) as usize;
+        buf.set_symbol(
+            self.left() as usize + slider_loc,
+            self.top() as usize,
+            symbol::MIDDLE_BLOCK,
+        );
         vec![]
     }
 
@@ -110,10 +108,7 @@ where
         if event.is_mouse_click() || event.is_mouse_drag() {
             let (x, _y) =
                 event.extract_location().expect("must have a location");
-            let cursor_loc = x as i32 - layout.location.x.round() as i32;
-            let width = layout.size.width;
-            let value = cursor_loc as f32 / width;
-            self.value = value;
+            self.value = (x as f32 - self.left()) / self.layout_width();
             vec![]
         } else {
             vec![]

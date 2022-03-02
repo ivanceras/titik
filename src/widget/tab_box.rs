@@ -273,19 +273,13 @@ where
     }
 
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        // offset the position of the top_border
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x.round();
-        let loc_y = layout.location.y.round();
-        let width = layout.size.width.round();
-        let height = layout.size.height.round();
         let mut canvas = Canvas::new();
-        let left = loc_x as usize;
-        let right = left + width as usize - 1;
-        let top = (loc_y + 2.0) as usize;
-        let bottom = top + height as usize - 3;
 
-        canvas.draw_rect((left, top), (right, bottom), self.border_style());
+        canvas.draw_rect(
+            (self.left() as usize, (self.top() + 2.0) as usize),
+            (self.right() as usize, self.bottom() as usize),
+            self.border_style(),
+        );
 
         self.draw_labels(buf, &mut canvas);
         buf.write_canvas(canvas);

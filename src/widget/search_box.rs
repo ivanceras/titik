@@ -149,19 +149,7 @@ impl<MSG> Widget<MSG> for SearchBox<MSG> {
 
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout.expect("must have a layout");
-        let loc_x = layout.location.x;
-        let loc_y = layout.location.y;
-        let width = layout.size.width;
-        let height = layout.size.height;
-
-        let left = loc_x;
-        let top = loc_y;
-        let bottom = top + height - 1.0;
-        let right = left + width - 1.0;
-
-        let text_start = left + 4.0;
-
+        let text_start = self.left() + 4.0;
         self.draw_border(buf);
 
         for (t, ch) in self.get_search_term().chars().enumerate() {
@@ -169,7 +157,11 @@ impl<MSG> Widget<MSG> for SearchBox<MSG> {
             if self.focused {
                 cell.bold();
             }
-            buf.set_cell(text_start as usize + t, (loc_y + 1.0) as usize, cell);
+            buf.set_cell(
+                text_start as usize + t,
+                self.inner_top() as usize,
+                cell,
+            );
         }
 
         let cursor_loc_x = self.input_buffer.get_cursor_location() as f32;
@@ -178,7 +170,7 @@ impl<MSG> Widget<MSG> for SearchBox<MSG> {
                 Cmd::ShowCursor,
                 Cmd::MoveTo(
                     (text_start + cursor_loc_x) as usize,
-                    (top + self.border_top()) as usize,
+                    self.inner_top() as usize,
                 ),
             ]
         } else {
@@ -186,6 +178,7 @@ impl<MSG> Widget<MSG> for SearchBox<MSG> {
         }
     }
 
+    // draw border and search icon with separator
     fn draw_border(&self, buf: &mut Buffer) {
         let left = self.left();
         let top = self.top();

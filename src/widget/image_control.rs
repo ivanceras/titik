@@ -1,6 +1,6 @@
 use crate::crossterm::style::Color;
 use crate::symbol::bar;
-use crate::{buffer::Buffer, buffer::Cell, Cmd, Widget};
+use crate::{buffer::Buffer, buffer::Cell, widget::Border, Cmd, Widget};
 use expanse::result::Layout;
 use expanse::{
     geometry::Size,
@@ -18,6 +18,8 @@ pub struct Image<MSG> {
     /// the height of unit cells, will be divided by 2 when used for computing
     /// style layout
     height: Option<f32>,
+    has_border: bool,
+    is_rounded_border: bool,
     id: Option<String>,
     _phantom_msg: PhantomData<MSG>,
 }
@@ -32,6 +34,8 @@ impl<MSG> Image<MSG> {
             width: None,
             height: None,
             id: None,
+            has_border: false,
+            is_rounded_border: false,
             _phantom_msg: PhantomData,
         }
     }
@@ -104,26 +108,34 @@ where
     }
 
     fn has_border(&self) -> bool {
-        false
+        self.has_border
+    }
+
+    fn border_style(&self) -> Border {
+        Border {
+            use_thick_border: false,
+            has_top: self.has_border,
+            has_bottom: self.has_border,
+            has_left: self.has_border,
+            has_right: self.has_border,
+            is_top_left_rounded: self.is_rounded_border,
+            is_top_right_rounded: self.is_rounded_border,
+            is_bottom_left_rounded: self.is_rounded_border,
+            is_bottom_right_rounded: self.is_rounded_border,
+        }
     }
 
     /// draw this button to the buffer, with the given computed layout
     fn draw(&self, buf: &mut Buffer) -> Vec<Cmd> {
-        let layout = self.layout().expect("must have a layout");
-        let loc_x = layout.location.x;
-        let loc_y = layout.location.y;
-        let width = layout.size.width;
-        let height = layout.size.height;
+        self.draw_border(buf);
 
-        let bottom = loc_y + height - 1.0;
-        let _right = loc_x + width - 1.0;
-
-        let cells = self.create_cells(width, height);
+        let cells =
+            self.create_cells(self.layout_width(), self.layout_height());
         for (y, line) in cells.iter().enumerate() {
             for (i, cell) in line.iter().enumerate() {
-                let line_y = loc_y as usize + y;
-                let cell_x = loc_x as usize + i;
-                if line_y < bottom as usize {
+                let line_y = self.inner_top() as usize + y;
+                let cell_x = self.inner_left() as usize + i;
+                if line_y < self.bottom() as usize {
                     buf.set_cell(cell_x, line_y, cell.clone());
                 }
             }
